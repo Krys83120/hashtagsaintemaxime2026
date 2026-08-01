@@ -85,6 +85,29 @@ function extractProductImages(product: any): string[] {
   return urls;
 }
 
+async function printfulFetch(endpoint: string, apiKey: string, storeId?: string | number) {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+  };
+  if (storeId) headers["X-PF-Store-Id"] = String(storeId);
+
+  const res = await fetch(`https://api.printful.com${endpoint}`, { headers });
+  const rawBody = await res.text();
+  let body: any = {};
+  try {
+    body = rawBody ? JSON.parse(rawBody) : {};
+  } catch {
+    body = { raw: rawBody };
+  }
+
+  if (!res.ok) {
+    const apiMessage = body?.error?.message || body?.message || body?.result || body?.raw || res.statusText;
+    throw new Error(`Printful API ${res.status} sur ${endpoint} : ${apiMessage}`);
+  }
+  return body;
+}
+
 export async function POST() {
   const check = await requireActiveAdmin();
   if (!check.ok) {
@@ -100,26 +123,14 @@ export async function POST() {
   }
 
   try {
-    const storesRes = await fetch("https://api.printful.com/v2/stores", {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    if (!storesRes.ok) {
-      const body = await storesRes.text();
-      throw new Error(`Printful /stores a répondu ${storesRes.status} : ${body.slice(0, 300)}`);
-    }
-    const storesData = await storesRes.json();
-    const storeId = storesData.data?.[0]?.id;
+    // API v1 : les "sync products" d'une boutique ne sont pas encore exposés en v2
+    const storesRes = await printfulFetch("/stores", apiKey);
+    const stores = Array.isArray(storesRes.result) ? storesRes.result : [];
+    const storeId = stores[0]?.id;
     if (!storeId) throw new Error("Aucun store Printful trouvé sur ce compte.");
 
-    const listRes = await fetch(`https://api.printful.com/v2/stores/${storeId}/products?limit=100`, {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    if (!listRes.ok) {
-      const body = await listRes.text();
-      throw new Error(`Printful /products a répondu ${listRes.status} : ${body.slice(0, 300)}`);
-    }
-    const listData = await listRes.json();
-    const productList: any[] = listData.data || [];
+    const productsRes = await printfulFetch("/store/products?limit=100&offset=0", apiKey, storeId);
+    const productList: any[] = Array.isArray(productsRes.result) ? productsRes.result : [];
 
     const admin = createAdminClient();
     const { data: existingProducts } = await admin.from("products").select("slug, printful_id, image, images");
@@ -128,18 +139,11 @@ export async function POST() {
 
     for (const item of productList) {
       try {
-        // Le listing ne contient pas toutes les variantes : on va chercher la fiche complète
-        const detailRes = await fetch(`https://api.printful.com/v2/stores/${storeId}/products/${item.id}`, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
-        if (!detailRes.ok) {
-          const body = await detailRes.text();
-          throw new Error(`Détail produit ${item.id} : ${detailRes.status} ${body.slice(0, 200)}`);
-        }
-        const detail = (await detailRes.json()).data;
-
+        const detailRes = await printfulFetch(`/store/products/${item.id}`, apiKey, storeId);
+        const detail = detailRes.result || {};
+        const syncProduct = detail.sync_product || item;
         const variants = Array.isArray(detail.sync_variants) ? detail.sync_variants : [];
-        const product = { ...detail, variants };
+        const product = { ...syncProduct, variants };
 
         const sizes = Array.from(new Set(
           variants.map((v: any) => v.size || extractVariantAttribute(v.name, "size")).filter(Boolean)
