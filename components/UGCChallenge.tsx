@@ -17,14 +17,15 @@ export default function UGCChallenge() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="aspect-[4/3] bg-gradient-to-br from-sm-cyan/20 to-sm-coral/20 rounded-2xl flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-8xl mb-4">❤️</div>
-                  <p className="text-sm-cyan font-bold text-lg">COEUR AU SOL</p>
-                  <p className="text-sm-gray text-sm">Sainte-Maxime</p>
-                </div>
-              </div>
+            <div className="aspect-[4/5] sm:aspect-[4/3] bg-gradient-to-br from-sm-cyan/20 to-sm-coral/20 rounded-2xl relative overflow-hidden">
+              <Image
+                src="/images/coeur-au-sol.jpg"
+                alt="Cœur #SAINTEMAXIME peint au sol, rue piétonne de Sainte-Maxime"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover object-top"
+                priority
+              />
             </div>
           </motion.div>
 
