@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import { Save, Plus, Trash2, ChevronDown, ChevronUp, Palette, Tags } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface Category {
+  id?: string;
   name: string;
   slug: string;
   color: string;
@@ -15,12 +17,15 @@ interface Category {
   active: boolean;
 }
 
-const defaultCategories: Category[] = [
-  { name: "Accessoires", slug: "accessoires", color: "bg-sm-cyan", count: 0, description: "Coques, casquettes, bracelets et plus", image: "", active: true },
-  { name: "Vêtements Femme", slug: "vetements-femme", color: "bg-sm-coral", count: 0, description: "T-shirts, tops, robes estivales", image: "", active: true },
-  { name: "Vêtements Homme", slug: "vetements-homme", color: "bg-sm-deep", count: 0, description: "T-shirts, sweats, casquettes", image: "", active: true },
-  { name: "Vie Quotidienne", slug: "vie-quotidienne", color: "bg-sm-cyan", count: 0, description: "Mugs, serviettes, bougies, déco", image: "", active: true },
-];
+const emptyCategory = (): Category => ({
+  name: "Nouvelle Catégorie",
+  slug: `categorie-${Date.now()}`,
+  color: "bg-sm-cyan",
+  count: 0,
+  description: "",
+  image: "",
+  active: true,
+});
 
 const colorOptions = [
   { label: "Cyan", value: "bg-sm-cyan", hex: "#00D4E8" },
@@ -34,21 +39,52 @@ const colorOptions = [
 ];
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>(defaultCategories);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    const savedCats = localStorage.getItem("sm_site_categories");
-    if (savedCats) {
-      const parsed = JSON.parse(savedCats);
-      // Merge avec les defaults pour s'assurer que tous les champs existent
-      setCategories(defaultCategories.map(dc => {
-        const found = parsed.find((p: Category) => p.slug === dc.slug);
-        return found ? { ...dc, ...found } : dc;
-      }));
-    }
+    loadCategories();
   }, []);
+
+  const loadCategories = async () => {
+    setLoading(true);
+    const { data: cats, error: catsError } = await supabase
+      .from("categories")
+      .select("*")
+      .order("sort_order", { ascending: true });
+
+    if (catsError) {
+      setError("Erreur de chargement : " + catsError.message);
+      setLoading(false);
+      return;
+    }
+
+    // Compte les produits par catégorie (par slug)
+    const { data: prods } = await supabase.from("products").select("category");
+    const counts: Record<string, number> = {};
+    (prods || []).forEach((p) => {
+      counts[p.category] = (counts[p.category] || 0) + 1;
+    });
+
+    setCategories(
+      (cats || []).map((c) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        color: c.color,
+        description: c.description || "",
+        image: c.image || "",
+        active: c.active,
+        count: counts[c.slug] || 0,
+      }))
+    );
+    setLoading(false);
+  };
 
   const updateCategory = (slug: string, field: keyof Category, value: any) => {
     setCategories((prev) =>
@@ -57,30 +93,50 @@ export default function AdminCategoriesPage() {
   };
 
   const addCategory = () => {
-    const newSlug = `categorie-${Date.now()}`;
-    setCategories((prev) => [
-      ...prev,
-      {
-        name: "Nouvelle Catégorie",
-        slug: newSlug,
-        color: "bg-sm-cyan",
-        count: 0,
-        description: "",
-        image: "",
-        active: true,
-      },
-    ]);
-    setExpanded(newSlug);
+    const fresh = emptyCategory();
+    setCategories((prev) => [...prev, fresh]);
+    setExpanded(fresh.slug);
   };
 
-  const deleteCategory = (slug: string) => {
-    if (confirm("Supprimer cette catégorie ? Les produits associés perdront leur catégorie.")) {
-      setCategories((prev) => prev.filter((c) => c.slug !== slug));
+  const deleteCategory = async (cat: Category) => {
+    if (!confirm("Supprimer cette catégorie ? Les produits associés perdront leur catégorie.")) return;
+    if (cat.id) {
+      const { error: delError } = await supabase.from("categories").delete().eq("id", cat.id);
+      if (delError) {
+        setError("Erreur de suppression : " + delError.message);
+        return;
+      }
     }
+    setCategories((prev) => prev.filter((c) => c.slug !== cat.slug));
   };
 
-  const saveCategories = () => {
-    localStorage.setItem("sm_site_categories", JSON.stringify(categories));
+  const saveCategories = async () => {
+    setSaving(true);
+    setError("");
+
+    const rows = categories.map((c, index) => ({
+      id: c.id, // undefined pour les nouvelles catégories -> Supabase génère l'UUID
+      name: c.name,
+      slug: c.slug,
+      color: c.color,
+      description: c.description,
+      image: c.image,
+      active: c.active,
+      sort_order: index,
+    }));
+
+    const { error: upsertError } = await supabase
+      .from("categories")
+      .upsert(rows, { onConflict: "slug" });
+
+    setSaving(false);
+
+    if (upsertError) {
+      setError("Erreur de sauvegarde : " + upsertError.message);
+      return;
+    }
+
+    await loadCategories();
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -103,10 +159,11 @@ export default function AdminCategoriesPage() {
             </button>
             <button
               onClick={saveCategories}
-              className="flex items-center gap-2 bg-green-500 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-green-600 transition-colors"
+              disabled={saving}
+              className="flex items-center gap-2 bg-green-500 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-green-600 transition-colors disabled:opacity-60"
             >
               <Save className="w-4 h-4" />
-              Sauvegarder
+              {saving ? "Sauvegarde..." : "Sauvegarder"}
             </button>
           </div>
         </div>
@@ -117,8 +174,20 @@ export default function AdminCategoriesPage() {
             animate={{ opacity: 1, y: 0 }}
             className="p-4 bg-green-50 text-green-700 rounded-xl text-sm font-medium"
           >
-            ✅ Catégories sauvegardées !
+            ✅ Catégories sauvegardées ! Elles sont maintenant visibles sur le site.
           </motion.div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium">
+            ⚠️ {error}
+          </div>
+        )}
+
+        {loading && (
+          <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray text-sm-gray">
+            Chargement des catégories...
+          </div>
         )}
 
         <div className="space-y-3">
@@ -176,7 +245,7 @@ export default function AdminCategoriesPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteCategory(cat.slug);
+                        deleteCategory(cat);
                       }}
                       className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-colors"
                     >
@@ -258,7 +327,7 @@ export default function AdminCategoriesPage() {
           })}
         </div>
 
-        {categories.length === 0 && (
+        {!loading && categories.length === 0 && (
           <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray">
             <Tags className="w-12 h-12 text-sm-gray mx-auto mb-3" />
             <p className="text-sm-gray">Aucune catégorie. Ajoute-en une !</p>

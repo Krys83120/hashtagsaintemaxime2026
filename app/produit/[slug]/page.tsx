@@ -5,7 +5,7 @@ import { Star, Truck, RefreshCw, ShieldCheck } from "lucide-react";
 
 import Reviews from "@/components/Reviews";
 import ProductGallery from "@/components/ProductGallery";
-import { getProductBySlug, products } from "@/lib/products";
+import { getProductBySlug, getAllProducts, getAllProductSlugs } from "@/lib/products";
 import { averageRating, formatPrice } from "@/lib/utils";
 
 interface Props {
@@ -13,11 +13,12 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+  const slugs = await getAllProductSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = getProductBySlug(params.slug);
+  const product = await getProductBySlug(params.slug);
 
   if (!product) {
     return { title: "Produit non trouvé" };
@@ -35,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ProductPage({ params }: Props) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }: Props) {
+  const product = await getProductBySlug(params.slug);
 
   if (!product) {
     notFound();
@@ -44,7 +45,8 @@ export default function ProductPage({ params }: Props) {
 
   const avgRating = averageRating(product.reviews);
 
-  const crossSell = products
+  const allProducts = await getAllProducts();
+  const crossSell = allProducts
     .filter((item) => item.id !== product.id)
     .slice(0, 3);
 

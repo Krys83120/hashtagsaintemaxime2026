@@ -1,32 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, Printer, Package, Tags, Users, ShoppingCart,
   FileText, ImageIcon, Link2, Settings, LogOut, ChevronLeft, Menu, X
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    const auth = localStorage.getItem("sm_admin_auth");
-    const loginTime = localStorage.getItem("sm_admin_login_time");
-    if (auth !== "true" || !loginTime || Date.now() - parseInt(loginTime) > 24 * 60 * 60 * 1000) {
-      localStorage.removeItem("sm_admin_auth");
-      localStorage.removeItem("sm_admin_login_time");
-      router.push("/admin/");
-    }
-  }, [router]);
+  // L'accès à /admin/dashboard/* est déjà protégé côté serveur par middleware.ts
+  // (redirection automatique vers /admin/ si non connecté).
 
-  const handleLogout = () => {
-    localStorage.removeItem("sm_admin_auth");
-    localStorage.removeItem("sm_admin_login_time");
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
     router.push("/admin/");
+    router.refresh();
   };
 
   const navGroups = [

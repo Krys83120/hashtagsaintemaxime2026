@@ -5,8 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import UGCChallenge from "@/components/UGCChallenge";
 import Newsletter from "@/components/Newsletter";
 import SpinWheel from "@/components/SpinWheel";
-import { categories, products } from "@/lib/products";
-import { motion } from "framer-motion";
+import { getCategories, getAllProducts } from "@/lib/products";
 import { Star, Truck, Shield, RefreshCw } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -15,7 +14,8 @@ export const metadata: Metadata = {
     "Découvre la marque officielle #SAINTEMAXIME : vêtements, accessoires et souvenirs uniques de Sainte-Maxime. Édition limitée été 2026. Livraison offerte dès 60€.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [categories, products] = await Promise.all([getCategories(), getAllProducts()]);
   const featuredProducts = products.slice(0, 4);
 
   return (

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Boutique #SAINTEMAXIME® | Tous les Produits | Souvenirs & Lifestyle 2026",
@@ -8,7 +8,8 @@ export const metadata: Metadata = {
     "Tous les produits officiels #SAINTEMAXIME : vêtements, accessoires, souvenirs de Sainte-Maxime. Marque déposée. Livraison offerte dès 60€.",
 };
 
-export default function BoutiquePage() {
+export default async function BoutiquePage() {
+  const products = await getAllProducts();
   return (
     <div className="min-h-screen bg-sm-cream">
       <div className="bg-gradient-to-b from-sm-cyan to-sm-deep py-16 px-4 text-center">

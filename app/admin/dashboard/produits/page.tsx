@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Save, Plus, Trash2, Search, Filter, ChevronDown, ChevronUp, ImageIcon, Package } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface AdminProduct {
-  id: string;
+  id: string; // UUID Supabase, ou id temporaire "new-..." avant la 1ère sauvegarde
   slug: string;
   name: string;
   price: number;
@@ -24,42 +25,79 @@ interface AdminProduct {
   printfulId?: string;
 }
 
-const defaultProducts: AdminProduct[] = [
-  {
-    id: "1", slug: "t-shirt-saintemaxime-ete-2026", name: "T-Shirt #SAINTEMAXIME",
-    price: 25, category: "vetements-homme", image: "/images/product-tshirt.jpg",
-    badge: "BESTSELLER", description: "T-shirt premium 100% coton biologique.",
-    details: ["100% coton biologique", "Impression DTG", "Coupe unisexe"],
-    colors: [{ name: "Blanc", hex: "#FFFFFF" }, { name: "Bleu", hex: "#00D4E8" }],
-    sizes: ["XS", "S", "M", "L", "XL"], inStock: true, stockCount: 12,
-  },
-  {
-    id: "2", slug: "casquette-trucker-saintemaxime", name: "Casquette Trucker",
-    price: 20, category: "accessoires", image: "/images/product-casquette.jpg",
-    badge: "ÉDITION LIMITÉE", description: "Casquette trucker classique.",
-    details: ["Mesh aéré", "Brodé", "Réglable"],
-    colors: [{ name: "Noir", hex: "#1E293B" }],
-    sizes: ["One Size"], inStock: true, stockCount: 5,
-  },
-];
-
 const badgeOptions = ["", "BESTSELLER", "ÉDITION LIMITÉE", "NOUVEAU", "TENDANCE", "SOLDES", "EXCLUSIF"];
 
+function fromDbRow(row: any): AdminProduct {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    price: Number(row.price),
+    originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
+    category: row.category,
+    image: row.image || "",
+    badge: row.badge || "",
+    description: row.description || "",
+    details: row.details || [],
+    colors: row.colors || [],
+    sizes: row.sizes || [],
+    inStock: row.in_stock,
+    stockCount: row.stock_count || 0,
+    source: row.source,
+    printfulId: row.printful_id,
+  };
+}
+
+function toDbRow(p: AdminProduct) {
+  return {
+    id: p.id.startsWith("new-") ? undefined : p.id,
+    slug: p.slug,
+    name: p.name,
+    price: p.price,
+    original_price: p.originalPrice ?? null,
+    category: p.category,
+    image: p.image,
+    badge: p.badge || null,
+    description: p.description,
+    details: p.details,
+    colors: p.colors,
+    sizes: p.sizes,
+    in_stock: p.inStock,
+    stock_count: p.stockCount,
+    source: p.source || "manual",
+    printful_id: p.printfulId || null,
+  };
+}
+
 export default function AdminProduitsPage() {
-  const [products, setProducts] = useState<AdminProduct[]>(defaultProducts);
+  const [products, setProducts] = useState<AdminProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+  const supabase = createClient();
 
   useEffect(() => {
-    const savedProducts = localStorage.getItem("sm_admin_products");
-    if (savedProducts) {
-      try {
-        setProducts(JSON.parse(savedProducts));
-      } catch { /* ignore */ }
-    }
+    loadProducts();
   }, []);
+
+  const loadProducts = async () => {
+    setLoading(true);
+    const { data, error: loadError } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (loadError) {
+      setError("Erreur de chargement : " + loadError.message);
+    } else {
+      setProducts((data || []).map(fromDbRow));
+    }
+    setLoading(false);
+  };
 
   const filtered = products.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.slug.includes(search.toLowerCase());
@@ -73,15 +111,31 @@ export default function AdminProduitsPage() {
     setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
   };
 
-  const saveProducts = () => {
-    localStorage.setItem("sm_admin_products", JSON.stringify(products));
+  const saveProducts = async () => {
+    setSaving(true);
+    setError("");
+
+    const rows = products.map(toDbRow);
+    const { error: upsertError } = await supabase
+      .from("products")
+      .upsert(rows, { onConflict: "slug" });
+
+    setSaving(false);
+
+    if (upsertError) {
+      setError("Erreur de sauvegarde : " + upsertError.message);
+      return;
+    }
+
+    await loadProducts();
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
 
   const addProduct = () => {
+    const tempId = `new-${Date.now()}`;
     const newProduct: AdminProduct = {
-      id: Date.now().toString(),
+      id: tempId,
       slug: `nouveau-produit-${Date.now()}`,
       name: "Nouveau Produit",
       price: 0,
@@ -94,16 +148,23 @@ export default function AdminProduitsPage() {
       sizes: ["One Size"],
       inStock: true,
       stockCount: 0,
+      source: "manual",
     };
     setProducts((prev) => [...prev, newProduct]);
     setEditingId(newProduct.id);
   };
 
-  const deleteProduct = (id: string) => {
-    if (confirm("Supprimer ce produit ?")) {
-      setProducts((prev) => prev.filter((p) => p.id !== id));
-      if (editingId === id) setEditingId(null);
+  const deleteProduct = async (p: AdminProduct) => {
+    if (!confirm("Supprimer ce produit ?")) return;
+    if (!p.id.startsWith("new-")) {
+      const { error: delError } = await supabase.from("products").delete().eq("id", p.id);
+      if (delError) {
+        setError("Erreur de suppression : " + delError.message);
+        return;
+      }
     }
+    setProducts((prev) => prev.filter((prod) => prod.id !== p.id));
+    if (editingId === p.id) setEditingId(null);
   };
 
   return (
@@ -119,8 +180,8 @@ export default function AdminProduitsPage() {
             <button onClick={addProduct} className="flex items-center gap-2 bg-sm-cyan text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-sm-deep transition-colors">
               <Plus className="w-4 h-4" /> Ajouter
             </button>
-            <button onClick={saveProducts} className="flex items-center gap-2 bg-green-500 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-green-600 transition-colors">
-              <Save className="w-4 h-4" /> Sauvegarder
+            <button onClick={saveProducts} disabled={saving} className="flex items-center gap-2 bg-green-500 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-green-600 transition-colors disabled:opacity-60">
+              <Save className="w-4 h-4" /> {saving ? "Sauvegarde..." : "Sauvegarder"}
             </button>
           </div>
         </div>
@@ -128,8 +189,18 @@ export default function AdminProduitsPage() {
         {saved && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
             className="p-4 bg-green-50 text-green-700 rounded-xl text-sm font-medium">
-            ✅ Produits sauvegardés !
+            ✅ Produits sauvegardés ! Ils sont maintenant visibles sur le site.
           </motion.div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium">⚠️ {error}</div>
+        )}
+
+        {loading && (
+          <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray text-sm-gray">
+            Chargement des produits...
+          </div>
         )}
 
         {/* Filters */}
@@ -189,7 +260,7 @@ export default function AdminProduitsPage() {
                       className={`px-2 py-1 rounded-lg text-xs font-bold ${p.inStock ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                       {p.inStock ? "Stock" : "Rupture"}
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); deleteProduct(p.id); }}
+                    <button onClick={(e) => { e.stopPropagation(); deleteProduct(p); }}
                       className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -299,7 +370,7 @@ export default function AdminProduitsPage() {
           })}
         </div>
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray">
             <Package className="w-12 h-12 text-sm-gray mx-auto mb-3" />
             <p className="text-sm-gray">Aucun produit trouvé.</p>

@@ -1,38 +1,52 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Lock, Eye, EyeOff } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("sm_admin_auth") === "true") {
-      router.push("/admin/dashboard/");
-    }
-  }, [router]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
-      if (password === "Saintemaxime2026!") {
-        localStorage.setItem("sm_admin_auth", "true");
-        localStorage.setItem("sm_admin_login_time", Date.now().toString());
-        router.push("/admin/dashboard/");
-      } else {
-        setError("Mot de passe incorrect. Réessaie.");
-        setLoading(false);
-      }
-    }, 800);
+    const supabase = createClient();
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError || !data.user) {
+      setError("Identifiants incorrects.");
+      setLoading(false);
+      return;
+    }
+
+    // Vérifie que ce compte est bien un admin actif (table admin_users)
+    const { data: adminProfile } = await supabase
+      .from("admin_users")
+      .select("active")
+      .eq("id", data.user.id)
+      .single();
+
+    if (!adminProfile || !adminProfile.active) {
+      setError("Ce compte n'a pas accès à l'administration.");
+      await supabase.auth.signOut();
+      setLoading(false);
+      return;
+    }
+
+    router.push("/admin/dashboard/");
+    router.refresh();
   };
 
   return (
@@ -53,6 +67,19 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label className="block text-sm font-medium text-sm-dark mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none"
+              placeholder="toi@exemple.fr"
+              autoFocus
+              required
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-sm-dark mb-1">Mot de passe</label>
             <div className="relative">
               <input
@@ -61,7 +88,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none pr-12"
                 placeholder="••••••••"
-                autoFocus
+                required
               />
               <button
                 type="button"
@@ -91,12 +118,6 @@ export default function AdminLoginPage() {
             {loading ? "Vérification..." : "Se connecter"}
           </button>
         </form>
-
-        <p className="text-center text-xs text-sm-gray mt-6">
-          Mot de passe par défaut : <strong>Saintemaxime2026!</strong>
-          <br />
-          Change-le dans l'admin après la première connexion.
-        </p>
       </motion.div>
     </div>
   );
