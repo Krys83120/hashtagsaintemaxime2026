@@ -4,3 +4,6 @@
 dist/
 build/
 out/
+data/backups/
+logs/
+tsconfig.tsbuildinfo
