@@ -25,7 +25,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden py-24 sm:py-32">
+    <section className="relative overflow-hidden py-24 sm:py-32 min-h-[600px] sm:min-h-[720px] flex items-center">
       {/* Carrousel photo plein largeur */}
       <div className="absolute inset-0">
         <AnimatePresence initial={false}>
@@ -37,18 +37,28 @@ export default function Hero() {
             transition={{ duration: 1.2, ease: "easeInOut" }}
             className="absolute inset-0"
           >
+            {/* Arrière-plan flouté (même photo, agrandie) pour combler les bords sans recadrer la photo nette */}
+            <Image
+              src={slides[index].src}
+              alt=""
+              fill
+              aria-hidden
+              sizes="100vw"
+              className="object-cover scale-125 blur-2xl brightness-50"
+            />
+            {/* Photo nette, entière, jamais recadrée */}
             <Image
               src={slides[index].src}
               alt={slides[index].alt}
               fill
               priority={index === 0}
               sizes="100vw"
-              className="object-cover"
+              className="object-contain"
             />
           </motion.div>
         </AnimatePresence>
         {/* Overlay pour garder le texte blanc lisible sur toutes les photos */}
-        <div className="absolute inset-0 bg-gradient-to-b from-sm-deep/70 via-sm-deep/50 to-sm-deep/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sm-deep/70 via-sm-deep/40 to-sm-deep/80" />
       </div>
 
       {/* Indicateurs du carrousel */}
