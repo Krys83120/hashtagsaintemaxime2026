@@ -103,15 +103,21 @@ export async function POST() {
     const storesRes = await fetch("https://api.printful.com/v2/stores", {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
-    if (!storesRes.ok) throw new Error("Clé API Printful invalide ou accès refusé.");
+    if (!storesRes.ok) {
+      const body = await storesRes.text();
+      throw new Error(`Printful /stores a répondu ${storesRes.status} : ${body.slice(0, 300)}`);
+    }
     const storesData = await storesRes.json();
     const storeId = storesData.data?.[0]?.id;
-    if (!storeId) throw new Error("Aucun store Printful trouvé.");
+    if (!storeId) throw new Error("Aucun store Printful trouvé sur ce compte.");
 
     const listRes = await fetch(`https://api.printful.com/v2/stores/${storeId}/products?limit=100`, {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
-    if (!listRes.ok) throw new Error("Impossible de lister les produits Printful.");
+    if (!listRes.ok) {
+      const body = await listRes.text();
+      throw new Error(`Printful /products a répondu ${listRes.status} : ${body.slice(0, 300)}`);
+    }
     const listData = await listRes.json();
     const productList: any[] = listData.data || [];
 
@@ -126,7 +132,10 @@ export async function POST() {
         const detailRes = await fetch(`https://api.printful.com/v2/stores/${storeId}/products/${item.id}`, {
           headers: { Authorization: `Bearer ${apiKey}` },
         });
-        if (!detailRes.ok) throw new Error(`Détail produit ${item.id} inaccessible`);
+        if (!detailRes.ok) {
+          const body = await detailRes.text();
+          throw new Error(`Détail produit ${item.id} : ${detailRes.status} ${body.slice(0, 200)}`);
+        }
         const detail = (await detailRes.json()).data;
 
         const variants = Array.isArray(detail.sync_variants) ? detail.sync_variants : [];
