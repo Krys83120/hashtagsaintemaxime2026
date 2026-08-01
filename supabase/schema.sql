@@ -157,45 +157,71 @@ create policy "public read media" on media for select using (true);
 create policy "public read links" on links for select using (true);
 create policy "public read seo_settings" on seo_settings for select using (true);
 
+-- Fonctions "security definer" : contournent le RLS pour éviter toute
+-- récursion infinie quand une policy sur admin_users doit lire admin_users.
+create or replace function is_active_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from admin_users where id = auth.uid() and active = true
+  );
+$$;
+
+create or replace function is_superadmin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from admin_users where id = auth.uid() and role = 'superadmin' and active = true
+  );
+$$;
+
 -- Écriture : réservée aux admins authentifiés (vérifiés via admin_users)
 create policy "admin write categories" on categories for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 create policy "admin write products" on products for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 create policy "admin write reviews" on reviews for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 create policy "admin write pages_content" on pages_content for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 create policy "admin write media" on media for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 create policy "admin write links" on links for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 create policy "admin write seo_settings" on seo_settings for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 -- Commandes : lecture/écriture réservée aux admins (les clients n'ont pas de compte)
 create policy "admin read orders" on orders for select
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin());
 create policy "admin write orders" on orders for all
-  using (exists (select 1 from admin_users where id = auth.uid() and active = true))
-  with check (exists (select 1 from admin_users where id = auth.uid() and active = true));
+  using (is_active_admin())
+  with check (is_active_admin());
 
 -- admin_users : chaque admin peut lire son propre profil, seul un superadmin gère les autres
 create policy "self read admin_users" on admin_users for select
   using (id = auth.uid());
 create policy "superadmin manage admin_users" on admin_users for all
-  using (exists (select 1 from admin_users au where au.id = auth.uid() and au.role = 'superadmin' and au.active = true))
-  with check (exists (select 1 from admin_users au where au.id = auth.uid() and au.role = 'superadmin' and au.active = true));
+  using (is_superadmin())
+  with check (is_superadmin());
