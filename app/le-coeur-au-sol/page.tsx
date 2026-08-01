@@ -1,4 +1,6 @@
 import { Metadata } from "next";
+import Image from "next/image";
+import TagembedFeed from "@/components/TagembedFeed";
 
 export const metadata: Metadata = {
   title: "Le Cœur au Sol #SAINTEMAXIME® | Spot Instagrammable | Guide & Concours 2026",
@@ -7,6 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default function CoeurAuSolPage() {
+  const tagembedWidgetId = process.env.NEXT_PUBLIC_TAGEMBED_WIDGET_ID;
+
   return (
     <div className="min-h-screen bg-sm-cream">
       <div className="bg-gradient-to-b from-sm-coral to-sm-cyan py-20 px-4 text-center">
@@ -66,15 +70,28 @@ export default function CoeurAuSolPage() {
         <section className="text-center">
           <h2 className="text-2xl font-bold text-sm-deep mb-4">Galerie UGC</h2>
           <p className="text-sm-gray mb-8">
-            Déjà <strong className="text-sm-cyan">2 847 photos</strong> partagées avec #SAINTEMAXIME
+            Les plus belles photos partagées avec <strong className="text-sm-cyan">#SAINTEMAXIME</strong>
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="aspect-square bg-gradient-to-br from-sm-cyan/20 to-sm-coral/20 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">❤️</span>
-              </div>
-            ))}
+
+          {/* Photo officielle du cœur, toujours affichée */}
+          <div className="max-w-xs mx-auto aspect-square rounded-xl overflow-hidden relative mb-8">
+            <Image
+              src="/images/coeur-au-sol.jpg"
+              alt="Le cœur #SAINTEMAXIME peint au sol à Sainte-Maxime"
+              fill
+              sizes="320px"
+              className="object-cover"
+            />
           </div>
+
+          {/* Flux Instagram réel via Tagembed */}
+          {tagembedWidgetId ? (
+            <TagembedFeed widgetId={tagembedWidgetId} />
+          ) : (
+            <p className="text-sm text-sm-gray bg-white rounded-xl p-6 border border-dashed border-sm-lightgray">
+              Le flux Instagram sera bientôt connecté ici — en attendant, sois parmi les premiers à partager ta photo avec #SAINTEMAXIME !
+            </p>
+          )}
         </section>
       </div>
     </div>
