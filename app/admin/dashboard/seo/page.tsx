@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Save, Globe, Truck, Tag } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface SiteConfig {
   siteTitle: string;
@@ -19,6 +20,7 @@ interface SiteConfig {
   instagramUrl: string;
   facebookUrl: string;
   tiktokUrl: string;
+  tagembedWidgetId: string;
   maintenanceMode: boolean;
 }
 
@@ -36,27 +38,58 @@ const defaultConfig: SiteConfig = {
   instagramUrl: "https://www.instagram.com/hashtag_saintemaxime/",
   facebookUrl: "https://www.facebook.com/hashtagsaintemaxime/",
   tiktokUrl: "https://www.tiktok.com/@hashtagsaintemaxime",
+  tagembedWidgetId: "",
   maintenanceMode: false,
 };
 
 export default function AdminSEOPage() {
   const [config, setConfig] = useState<SiteConfig>(defaultConfig);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"seo" | "livraison" | "reseaux" |"general">("seo");
+  const supabase = createClient();
 
   useEffect(() => {
-    const savedConfig = localStorage.getItem("sm_site_config");
-    if (savedConfig) {
-      setConfig({ ...defaultConfig, ...JSON.parse(savedConfig) });
-    }
+    loadConfig();
   }, []);
+
+  const loadConfig = async () => {
+    setLoading(true);
+    const { data, error: loadError } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "site_config")
+      .maybeSingle();
+
+    if (loadError) {
+      setError("Erreur de chargement : " + loadError.message);
+    } else if (data) {
+      setConfig({ ...defaultConfig, ...(data.value as Partial<SiteConfig>) });
+    }
+    setLoading(false);
+  };
 
   const updateField = (field: keyof SiteConfig, value: any) => {
     setConfig((prev) => ({ ...prev, [field]: value }));
   };
 
-  const saveConfig = () => {
-    localStorage.setItem("sm_site_config", JSON.stringify(config));
+  const saveConfig = async () => {
+    setSaving(true);
+    setError("");
+
+    const { error: upsertError } = await supabase
+      .from("site_settings")
+      .upsert({ key: "site_config", value: config, updated_at: new Date().toISOString() });
+
+    setSaving(false);
+
+    if (upsertError) {
+      setError("Erreur de sauvegarde : " + upsertError.message);
+      return;
+    }
+
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -78,12 +111,23 @@ export default function AdminSEOPage() {
           </div>
           <button
             onClick={saveConfig}
-            className="flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-600 transition-colors"
+            disabled={saving}
+            className="flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-600 transition-colors disabled:opacity-60"
           >
             <Save className="w-4 h-4" />
-            Sauvegarder
+            {saving ? "Sauvegarde..." : "Sauvegarder"}
           </button>
         </div>
+
+        {error && (
+          <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium">⚠️ {error}</div>
+        )}
+
+        {loading && (
+          <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray text-sm-gray">
+            Chargement...
+          </div>
+        )}
 
         {saved && (
           <motion.div
@@ -256,6 +300,19 @@ export default function AdminSEOPage() {
                   onChange={(e) => updateField("tiktokUrl", e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-sm-dark mb-1">Tagembed Widget ID (flux Instagram "Cœur au Sol")</label>
+                <input
+                  type="text"
+                  value={config.tagembedWidgetId}
+                  onChange={(e) => updateField("tagembedWidgetId", e.target.value)}
+                  placeholder="ex: 123456"
+                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                />
+                <p className="text-xs text-sm-gray mt-1">
+                  Récupère cet ID depuis ton tableau de bord sur tagembed.com (widget de type "Instagram Hashtag" configuré sur #SAINTEMAXIME).
+                </p>
               </div>
             </div>
           )}
