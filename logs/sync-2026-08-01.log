@@ -1,0 +1,16 @@
+[2026-08-01T20:09:20.010Z] ✅ Clé API chargée
+[2026-08-01T20:09:20.013Z] ℹ️  ═══════════════════════════════════════════════
+[2026-08-01T20:09:20.013Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-08-01T20:09:20.013Z] ℹ️  ═══════════════════════════════════════════════
+[2026-08-01T20:09:20.013Z] ℹ️  Mode : ÉCRITURE
+[2026-08-01T20:09:20.014Z] ℹ️  23 produits existants chargés
+[2026-08-01T20:09:20.014Z] ℹ️  📡 Récupération des stores Printful...
+[2026-08-01T20:09:20.546Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-08-01T20:09:20.546Z] ℹ️  📡 Récupération des produits...
+[2026-08-01T20:09:20.929Z] ✅ 15 produits trouvés sur Printful
+[2026-08-01T20:09:26.227Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-08-01T20:09:26.230Z] ℹ️  8 produits manuels conservés
+[2026-08-01T20:09:26.233Z] ✅ Fichier sauvegardé : C:\NEWSTEMAXIME\data\products.json
+[2026-08-01T20:09:26.233Z] ℹ️  ───────────────────────────────────────────────
+[2026-08-01T20:09:26.233Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-08-01T20:09:26.233Z] ℹ️  ───────────────────────────────────────────────

@@ -1,0 +1,1112 @@
+{
+  "categories": [
+    {
+      "name": "Accessoires",
+      "count": 12,
+      "color": "bg-sm-cyan",
+      "slug": "accessoires"
+    },
+    {
+      "name": "Vêtements Femme",
+      "count": 0,
+      "color": "bg-sm-coral",
+      "slug": "vetements-femme"
+    },
+    {
+      "name": "Vêtements Homme",
+      "count": 4,
+      "color": "bg-sm-deep",
+      "slug": "vetements-homme"
+    },
+    {
+      "name": "Vie Quotidienne",
+      "count": 7,
+      "color": "bg-sm-cyan",
+      "slug": "vie-quotidienne"
+    }
+  ],
+  "products": [
+    {
+      "id": "1784646416235-zp8nd",
+      "slug": "bouteille-isotherme-saintemaxime-logo-2026",
+      "name": "Bouteille isotherme #SAINTEMAXIME Logo 2026",
+      "price": 45,
+      "category": "vie-quotidienne",
+      "image": "https://files.cdn.printful.com/files/e24/e2415aac12f3148343de44c24c393034_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/e24/e2415aac12f3148343de44c24c393034_preview.png",
+        "https://files.cdn.printful.com/products/935/23880_1764676493.jpg",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_preview.png",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_thumb.png",
+        "https://files.cdn.printful.com/files/e24/e2415aac12f3148343de44c24c393034_thumb.png"
+      ],
+      "description": "Bouteille isotherme #SAINTEMAXIME Logo 2026 – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#1E293B"
+        }
+      ],
+      "sizes": [
+        "22oz"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 15,
+      "source": "printful",
+      "printfulId": 434864957,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-vy6gy",
+      "slug": "mug-saintemaxime-logo-2026",
+      "name": "Mug #SAINTEMAXIME Logo 2026",
+      "price": 23,
+      "category": "vie-quotidienne",
+      "image": "https://files.cdn.printful.com/files/c7b/c7b86cd6117e62df62ee9aa5d1da65f7_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/c7b/c7b86cd6117e62df62ee9aa5d1da65f7_preview.png",
+        "https://files.cdn.printful.com/products/403/11051_1596788464.jpg",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_preview.png",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_thumb.png",
+        "https://files.cdn.printful.com/files/c7b/c7b86cd6117e62df62ee9aa5d1da65f7_thumb.png",
+        "https://files.cdn.printful.com/products/403/17196_1687769136.jpg",
+        "https://files.cdn.printful.com/files/ea9/ea9c31d3527ee94ae58e85685b98c5cb_preview.png",
+        "https://files.cdn.printful.com/files/ea9/ea9c31d3527ee94ae58e85685b98c5cb_thumb.png"
+      ],
+      "description": "Mug #SAINTEMAXIME Logo 2026 – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#1E293B"
+        }
+      ],
+      "sizes": [
+        "11 oz",
+        "15 oz"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 5,
+      "source": "printful",
+      "printfulId": 434864804,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-atlpm",
+      "slug": "bouteille-d-eau-acier-inoxydable-avec-paille-saintemaxime-logo-2026",
+      "name": "Bouteille d'eau Acier Inoxydable avec paille #SAINTEMAXIME Logo 2026",
+      "price": 38,
+      "category": "vie-quotidienne",
+      "image": "https://files.cdn.printful.com/files/1b2/1b20b2aefd6258ed3632553f8a3ef3ef_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/1b2/1b20b2aefd6258ed3632553f8a3ef3ef_preview.png",
+        "https://files.cdn.printful.com/products/788/20175_1721889457.jpg",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_preview.png",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_thumb.png",
+        "https://files.cdn.printful.com/files/1b2/1b20b2aefd6258ed3632553f8a3ef3ef_thumb.png"
+      ],
+      "description": "Bouteille d'eau Acier Inoxydable avec paille #SAINTEMAXIME Logo 2026 – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        }
+      ],
+      "sizes": [
+        "32 oz"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 23,
+      "source": "printful",
+      "printfulId": 434864660,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-0aw0n",
+      "slug": "t-shirt-unisexe-saintemaxime-logo-2026",
+      "name": " T-Shirt Unisexe #SAINTEMAXIME Logo 2026",
+      "price": 23,
+      "category": "vetements-homme",
+      "image": "https://files.cdn.printful.com/files/82b/82b70ea2db3a45b06dc7811967ad758b_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/82b/82b70ea2db3a45b06dc7811967ad758b_preview.png",
+        "https://files.cdn.printful.com/products/12/474_1772009316.jpg",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_preview.png",
+        "https://files.cdn.printful.com/files/8e2/8e27cc21805c646a3fbe71974e39aaea_thumb.png",
+        "https://files.cdn.printful.com/files/82b/82b70ea2db3a45b06dc7811967ad758b_thumb.png",
+        "https://files.cdn.printful.com/products/12/473_1653477371.jpg",
+        "https://files.cdn.printful.com/files/9a2/9a2ce3ad9ee44129bb4e001b333f7aa4_preview.png",
+        "https://files.cdn.printful.com/files/9a2/9a2ce3ad9ee44129bb4e001b333f7aa4_thumb.png",
+        "https://files.cdn.printful.com/products/12/504_1653477367.jpg",
+        "https://files.cdn.printful.com/products/12/535_1653477367.jpg",
+        "https://files.cdn.printful.com/products/12/566_1653477378.jpg",
+        "https://files.cdn.printful.com/products/12/597_1653477339.jpg",
+        "https://files.cdn.printful.com/products/12/628_1653477360.jpg"
+      ],
+      "description": " T-Shirt Unisexe #SAINTEMAXIME Logo 2026 – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#1E293B"
+        },
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        }
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL",
+        "3XL"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 18,
+      "source": "printful",
+      "printfulId": 434864498,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-qb5y4",
+      "slug": "coque-glossy-iphone-apple-saintemaxime-logo-2026",
+      "name": "Coque Glossy iPhone Apple #SAINTEMAXIME Logo 2026",
+      "price": 30,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/729/729fb3699eb2efb856d0a105652c81a7_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/729/729fb3699eb2efb856d0a105652c81a7_preview.png",
+        "https://files.cdn.printful.com/products/683/16888_1681967457.jpg",
+        "https://files.cdn.printful.com/files/22e/22ef5de268a1b0e4e30d7ce02f540fcd_preview.png",
+        "https://files.cdn.printful.com/files/22e/22ef5de268a1b0e4e30d7ce02f540fcd_thumb.png",
+        "https://files.cdn.printful.com/files/729/729fb3699eb2efb856d0a105652c81a7_thumb.png",
+        "https://files.cdn.printful.com/products/683/16890_1681967457.jpg",
+        "https://files.cdn.printful.com/files/345/34577093c8fcc8921ebac3210245c1ce_preview.png",
+        "https://files.cdn.printful.com/files/345/34577093c8fcc8921ebac3210245c1ce_thumb.png",
+        "https://files.cdn.printful.com/products/683/16892_1681967451.jpg",
+        "https://files.cdn.printful.com/files/4dc/4dcf5ffd40d121d0fb1fbe82c7906e7e_preview.png",
+        "https://files.cdn.printful.com/files/4dc/4dcf5ffd40d121d0fb1fbe82c7906e7e_thumb.png",
+        "https://files.cdn.printful.com/products/683/16894_1681967461.jpg",
+        "https://files.cdn.printful.com/files/126/126507fee2f22d04e1a481e1866894b4_preview.png",
+        "https://files.cdn.printful.com/files/126/126507fee2f22d04e1a481e1866894b4_thumb.png",
+        "https://files.cdn.printful.com/products/683/16898_1681967478.jpg",
+        "https://files.cdn.printful.com/files/920/9206843d9c93a6350f3a554eee9af104_preview.png",
+        "https://files.cdn.printful.com/files/920/9206843d9c93a6350f3a554eee9af104_thumb.png",
+        "https://files.cdn.printful.com/products/683/16896_1681967473.jpg",
+        "https://files.cdn.printful.com/files/bde/bde716c883eb6d411f5d2dc0592fce4b_preview.png",
+        "https://files.cdn.printful.com/files/bde/bde716c883eb6d411f5d2dc0592fce4b_thumb.png",
+        "https://files.cdn.printful.com/products/683/16900_1681967467.jpg",
+        "https://files.cdn.printful.com/files/f52/f527b4f232f789efd149ceefec26c214_preview.png",
+        "https://files.cdn.printful.com/files/f52/f527b4f232f789efd149ceefec26c214_thumb.png",
+        "https://files.cdn.printful.com/products/683/16902_1681967483.jpg",
+        "https://files.cdn.printful.com/files/a61/a614f7bf90c1fb8e51f48ef354d94c3b_preview.png",
+        "https://files.cdn.printful.com/files/a61/a614f7bf90c1fb8e51f48ef354d94c3b_thumb.png",
+        "https://files.cdn.printful.com/products/683/16906_1681967496.jpg",
+        "https://files.cdn.printful.com/files/f0c/f0c81b60ff5db9a6d1ce2d822487c89e_preview.png",
+        "https://files.cdn.printful.com/files/f0c/f0c81b60ff5db9a6d1ce2d822487c89e_thumb.png",
+        "https://files.cdn.printful.com/products/683/16904_1681967488.jpg",
+        "https://files.cdn.printful.com/files/996/996169ee15183b6499138dd5aa78c8b6_preview.png",
+        "https://files.cdn.printful.com/files/996/996169ee15183b6499138dd5aa78c8b6_thumb.png",
+        "https://files.cdn.printful.com/products/683/16908_1681967484.jpg",
+        "https://files.cdn.printful.com/files/27f/27fad07d51d7f13a106ae4a5625371cf_preview.png",
+        "https://files.cdn.printful.com/files/27f/27fad07d51d7f13a106ae4a5625371cf_thumb.png",
+        "https://files.cdn.printful.com/products/683/16910_1681967517.jpg",
+        "https://files.cdn.printful.com/files/954/954d493285075b30378a1c4667648594_preview.png",
+        "https://files.cdn.printful.com/files/954/954d493285075b30378a1c4667648594_thumb.png",
+        "https://files.cdn.printful.com/products/683/16914_1681967519.jpg",
+        "https://files.cdn.printful.com/files/de1/de178e82edc204dbd018ab50ead49fac_preview.png",
+        "https://files.cdn.printful.com/files/de1/de178e82edc204dbd018ab50ead49fac_thumb.png",
+        "https://files.cdn.printful.com/products/683/16912_1681967516.jpg",
+        "https://files.cdn.printful.com/files/b15/b15c8873a7f678b461c6e553bac77078_preview.png",
+        "https://files.cdn.printful.com/files/b15/b15c8873a7f678b461c6e553bac77078_thumb.png",
+        "https://files.cdn.printful.com/products/683/16916_1681967508.jpg",
+        "https://files.cdn.printful.com/files/517/5177af6cee195f55ef4cf20895ca9286_preview.png",
+        "https://files.cdn.printful.com/files/517/5177af6cee195f55ef4cf20895ca9286_thumb.png",
+        "https://files.cdn.printful.com/products/683/17722_1693906251.jpg",
+        "https://files.cdn.printful.com/files/a24/a24a2f28c42927525fdfde820fbe8baa_preview.png",
+        "https://files.cdn.printful.com/files/a24/a24a2f28c42927525fdfde820fbe8baa_thumb.png",
+        "https://files.cdn.printful.com/products/683/17724_1693906240.jpg",
+        "https://files.cdn.printful.com/files/7d7/7d7c186c144b68460bb3581303187758_preview.png",
+        "https://files.cdn.printful.com/files/7d7/7d7c186c144b68460bb3581303187758_thumb.png",
+        "https://files.cdn.printful.com/products/683/17726_1693906251.jpg",
+        "https://files.cdn.printful.com/files/14c/14c513bad74808cc7b0416c9f6ee75fd_preview.png",
+        "https://files.cdn.printful.com/files/14c/14c513bad74808cc7b0416c9f6ee75fd_thumb.png",
+        "https://files.cdn.printful.com/products/683/17728_1693906251.jpg",
+        "https://files.cdn.printful.com/files/fb8/fb8779c6e57d7986dc5e12fe80c3c7c2_preview.png",
+        "https://files.cdn.printful.com/files/fb8/fb8779c6e57d7986dc5e12fe80c3c7c2_thumb.png",
+        "https://files.cdn.printful.com/products/683/20294_1727078554.jpg",
+        "https://files.cdn.printful.com/files/7b4/7b45f040a2fad822e6f881d2e8ba08d0_preview.png",
+        "https://files.cdn.printful.com/files/7b4/7b45f040a2fad822e6f881d2e8ba08d0_thumb.png",
+        "https://files.cdn.printful.com/products/683/20295_1727078552.jpg",
+        "https://files.cdn.printful.com/files/c7e/c7e5a5e93273cfec3d9f461337e91ab2_preview.png",
+        "https://files.cdn.printful.com/files/c7e/c7e5a5e93273cfec3d9f461337e91ab2_thumb.png",
+        "https://files.cdn.printful.com/products/683/20296_1727078553.jpg",
+        "https://files.cdn.printful.com/files/b94/b941287c95c48e9e832f25332cac99c5_preview.png",
+        "https://files.cdn.printful.com/files/b94/b941287c95c48e9e832f25332cac99c5_thumb.png",
+        "https://files.cdn.printful.com/products/683/20297_1727078552.jpg",
+        "https://files.cdn.printful.com/files/2a6/2a6bf8b0f371e53283de8548caedae1d_preview.png",
+        "https://files.cdn.printful.com/files/2a6/2a6bf8b0f371e53283de8548caedae1d_thumb.png",
+        "https://files.cdn.printful.com/products/683/34009_1757671278.jpg",
+        "https://files.cdn.printful.com/files/3c1/3c123fd23b7cc51821772834660b6645_preview.png",
+        "https://files.cdn.printful.com/files/3c1/3c123fd23b7cc51821772834660b6645_thumb.png",
+        "https://files.cdn.printful.com/products/683/34011_1757671302.jpg",
+        "https://files.cdn.printful.com/files/48b/48ba55db825a493998fc1a45ff26eff8_preview.png",
+        "https://files.cdn.printful.com/files/48b/48ba55db825a493998fc1a45ff26eff8_thumb.png",
+        "https://files.cdn.printful.com/products/683/34013_1757671329.jpg",
+        "https://files.cdn.printful.com/files/03f/03fe937ac78b2e984d456faff73dfae6_preview.png",
+        "https://files.cdn.printful.com/files/03f/03fe937ac78b2e984d456faff73dfae6_thumb.png",
+        "https://files.cdn.printful.com/products/683/34015_1757671351.jpg",
+        "https://files.cdn.printful.com/files/ec1/ec1a00901964eee7ad466eaf5eda860a_preview.png",
+        "https://files.cdn.printful.com/files/ec1/ec1a00901964eee7ad466eaf5eda860a_thumb.png"
+      ],
+      "description": "Coque Glossy iPhone Apple #SAINTEMAXIME Logo 2026 – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Glossy",
+          "hex": "#E2E8F0"
+        }
+      ],
+      "sizes": [
+        "iPhone 11",
+        "iPhone 11 Pro",
+        "iPhone 11 Pro Max",
+        "iPhone 12 Mini",
+        "iPhone 12",
+        "iPhone 12 Pro",
+        "iPhone 12 Pro Max",
+        "iPhone 13 Mini",
+        "iPhone 13",
+        "iPhone 13 Pro",
+        "iPhone 13 Pro Max",
+        "iPhone 14",
+        "iPhone 14 Plus",
+        "iPhone 14 Pro",
+        "iPhone 14 Pro Max",
+        "iPhone 15",
+        "iPhone 15 Plus",
+        "iPhone 15 Pro",
+        "iPhone 15 Pro Max",
+        "iPhone 16",
+        "iPhone 16 Plus",
+        "iPhone 16 Pro",
+        "iPhone 16 Pro Max",
+        "iPhone 17",
+        "iPhone 17 Air",
+        "iPhone 17 Pro",
+        "iPhone 17 Pro Max"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 10,
+      "source": "printful",
+      "printfulId": 434864163,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-5a1cr",
+      "slug": "autocollants-holographiques-saintemaxime-lifestyle",
+      "name": "Autocollants Holographiques #SAINTEMAXIME - LIFESTYLE",
+      "price": 8,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/4c1/4c1fc7bc5aee6b8c7db2f612fd661bbf_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/4c1/4c1fc7bc5aee6b8c7db2f612fd661bbf_preview.png",
+        "https://files.cdn.printful.com/products/673/16705_1678965852.jpg",
+        "https://files.cdn.printful.com/files/49d/49da124d982493b9fd4f172df46f4f54_preview.png",
+        "https://files.cdn.printful.com/files/49d/49da124d982493b9fd4f172df46f4f54_thumb.png",
+        "https://files.cdn.printful.com/files/ce6/ce6ae9a0c3a16b6f57b6853726e89479_preview.png",
+        "https://files.cdn.printful.com/files/ce6/ce6ae9a0c3a16b6f57b6853726e89479_thumb.png",
+        "https://files.cdn.printful.com/products/673/16706_1678965856.jpg",
+        "https://files.cdn.printful.com/printfile-preview/609284314/27e805332ee4bfc232ab0b3e93d38e9c_preview.png",
+        "https://files.cdn.printful.com/printfile-preview/609284314/27e805332ee4bfc232ab0b3e93d38e9c_thumb.png",
+        "https://files.cdn.printful.com/files/220/220c71d410b53fd02897cfc8d8f39a90_preview.png",
+        "https://files.cdn.printful.com/files/220/220c71d410b53fd02897cfc8d8f39a90_thumb.png",
+        "https://files.cdn.printful.com/products/673/16707_1678965861.jpg",
+        "https://files.cdn.printful.com/printfile-preview/609284313/0a21a90e1185d00c80401e9c134539cf_preview.png",
+        "https://files.cdn.printful.com/printfile-preview/609284313/0a21a90e1185d00c80401e9c134539cf_thumb.png",
+        "https://files.cdn.printful.com/files/4c1/4c1fc7bc5aee6b8c7db2f612fd661bbf_thumb.png"
+      ],
+      "description": "Autocollants Holographiques #SAINTEMAXIME - LIFESTYLE – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Grey",
+          "hex": "#64748B"
+        }
+      ],
+      "sizes": [
+        "3″×3″",
+        "4″×4″",
+        "5.5″×5.5″"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 11,
+      "source": "printful",
+      "printfulId": 320144203,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-b5ey6",
+      "slug": "holographic-stickers-saintemaxime-lifestyle",
+      "name": "Holographic stickers #SAINTEMAXIME - LIFESTYLE",
+      "price": 8,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/4c1/4c1fc7bc5aee6b8c7db2f612fd661bbf_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/4c1/4c1fc7bc5aee6b8c7db2f612fd661bbf_preview.png",
+        "https://files.cdn.printful.com/products/673/16705_1678965852.jpg",
+        "https://files.cdn.printful.com/files/49d/49da124d982493b9fd4f172df46f4f54_preview.png",
+        "https://files.cdn.printful.com/files/49d/49da124d982493b9fd4f172df46f4f54_thumb.png",
+        "https://files.cdn.printful.com/files/ce6/ce6ae9a0c3a16b6f57b6853726e89479_preview.png",
+        "https://files.cdn.printful.com/files/ce6/ce6ae9a0c3a16b6f57b6853726e89479_thumb.png",
+        "https://files.cdn.printful.com/products/673/16706_1678965856.jpg",
+        "https://files.cdn.printful.com/printfile-preview/609284314/27e805332ee4bfc232ab0b3e93d38e9c_preview.png",
+        "https://files.cdn.printful.com/printfile-preview/609284314/27e805332ee4bfc232ab0b3e93d38e9c_thumb.png",
+        "https://files.cdn.printful.com/files/220/220c71d410b53fd02897cfc8d8f39a90_preview.png",
+        "https://files.cdn.printful.com/files/220/220c71d410b53fd02897cfc8d8f39a90_thumb.png",
+        "https://files.cdn.printful.com/products/673/16707_1678965861.jpg",
+        "https://files.cdn.printful.com/printfile-preview/609284313/0a21a90e1185d00c80401e9c134539cf_preview.png",
+        "https://files.cdn.printful.com/printfile-preview/609284313/0a21a90e1185d00c80401e9c134539cf_thumb.png",
+        "https://files.cdn.printful.com/files/4c1/4c1fc7bc5aee6b8c7db2f612fd661bbf_thumb.png"
+      ],
+      "description": "Holographic stickers #SAINTEMAXIME - LIFESTYLE – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Grey",
+          "hex": "#64748B"
+        }
+      ],
+      "sizes": [
+        "3″×3″",
+        "4″×4″",
+        "5.5″×5.5″"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 18,
+      "source": "printful",
+      "printfulId": 320143892,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-838gh",
+      "slug": "casquette-simple-femme-rose-saintemaxime",
+      "name": "Casquette Simple Femme Rose #SAINTEMAXIME",
+      "price": 29,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/9e1/9e18c1eada41763f887abab88debc4d1_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/9e1/9e18c1eada41763f887abab88debc4d1_preview.png",
+        "https://files.cdn.printful.com/products/627/16750_1748424908.jpg",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_preview.png",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_thumb.png",
+        "https://files.cdn.printful.com/files/9e1/9e18c1eada41763f887abab88debc4d1_thumb.png"
+      ],
+      "description": "Casquette Simple Femme Rose #SAINTEMAXIME – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Light Pink / White / Light Pink",
+          "hex": "#E2E8F0"
+        }
+      ],
+      "sizes": [
+        "One size"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 6,
+      "source": "printful",
+      "printfulId": 313202814,
+      "lastSyncedAt": "2026-07-21T18:53:23.084Z"
+    },
+    {
+      "id": "1784646416235-e59gv",
+      "slug": "casquette-rose-saintemaxime",
+      "name": "Casquette Rose #SAINTEMAXIME",
+      "price": 38,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/2cc/2ccd076cd3a71f8799a3260cefab3b91_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/2cc/2ccd076cd3a71f8799a3260cefab3b91_preview.png",
+        "https://files.cdn.printful.com/products/327/16749_1680525601.jpg",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_preview.png",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_thumb.png",
+        "https://files.cdn.printful.com/files/2cc/2ccd076cd3a71f8799a3260cefab3b91_thumb.png"
+      ],
+      "description": "Casquette Rose #SAINTEMAXIME – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Pink",
+          "hex": "#FF6B8A"
+        }
+      ],
+      "sizes": [
+        "One size"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 23,
+      "source": "printful",
+      "printfulId": 313202450,
+      "lastSyncedAt": "2026-07-21T18:53:23.085Z"
+    },
+    {
+      "id": "1784646416235-xlmkt",
+      "slug": "housse-blanche-pour-ordinateur-portable-saintemaxime",
+      "name": "Housse Blanche Pour Ordinateur Portable #SAINTEMAXIME",
+      "price": 38,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/0aa/0aa25532ea448b6181084ae95f2a2c0a_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/0aa/0aa25532ea448b6181084ae95f2a2c0a_preview.png",
+        "https://files.cdn.printful.com/products/394/10984_1737468114.jpg",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_preview.png",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_thumb.png",
+        "https://files.cdn.printful.com/files/358/358690b44efc7e431beb1fc4dea5b4c8_preview.png",
+        "https://files.cdn.printful.com/files/358/358690b44efc7e431beb1fc4dea5b4c8_thumb.png",
+        "https://files.cdn.printful.com/products/394/10985_1737468120.jpg",
+        "https://files.cdn.printful.com/files/0aa/0aa25532ea448b6181084ae95f2a2c0a_thumb.png"
+      ],
+      "description": "Housse Blanche Pour Ordinateur Portable #SAINTEMAXIME – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Housse Blanche Pour Ordinateur Portable #SAINTEMAXIME",
+          "hex": "#E2E8F0"
+        }
+      ],
+      "sizes": [
+        "13″",
+        "15″"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 7,
+      "source": "printful",
+      "printfulId": 312168208,
+      "lastSyncedAt": "2026-07-21T18:53:23.085Z"
+    },
+    {
+      "id": "1784646416235-69n1z",
+      "slug": "coque-iphone-saintemaxime",
+      "name": "Coque iPhone #SAINTEMAXIME",
+      "price": 30,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/95e/95e159be351d5d0326944d42f9351818_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/95e/95e159be351d5d0326944d42f9351818_preview.png",
+        "https://files.cdn.printful.com/products/181/10994_1582202453.jpg",
+        "https://files.cdn.printful.com/printfile-preview/312985897/29b17a24e55f22fb53460b572f996399_preview.png",
+        "https://files.cdn.printful.com/printfile-preview/312985897/29b17a24e55f22fb53460b572f996399_thumb.png",
+        "https://files.cdn.printful.com/files/95e/95e159be351d5d0326944d42f9351818_thumb.png",
+        "https://files.cdn.printful.com/products/181/10995_1582202476.jpg",
+        "https://files.cdn.printful.com/files/02e/02e0fe6e1556a4b0a29a63bba7253237_preview.png",
+        "https://files.cdn.printful.com/files/02e/02e0fe6e1556a4b0a29a63bba7253237_thumb.png",
+        "https://files.cdn.printful.com/products/181/10996_1582202496.jpg",
+        "https://files.cdn.printful.com/files/795/795c0753c058f9b2f292a9c639decb45_preview.png",
+        "https://files.cdn.printful.com/files/795/795c0753c058f9b2f292a9c639decb45_thumb.png",
+        "https://files.cdn.printful.com/products/181/11704_1603890447.jpg",
+        "https://files.cdn.printful.com/files/3a6/3a60ff70d0c1ffcbf2c29abbd3ce3cf5_preview.png",
+        "https://files.cdn.printful.com/files/3a6/3a60ff70d0c1ffcbf2c29abbd3ce3cf5_thumb.png",
+        "https://files.cdn.printful.com/products/181/11703_1603890456.jpg",
+        "https://files.cdn.printful.com/files/e02/e022abd32c9a6f0f49a6cbb8abf8299a_preview.png",
+        "https://files.cdn.printful.com/files/e02/e022abd32c9a6f0f49a6cbb8abf8299a_thumb.png",
+        "https://files.cdn.printful.com/products/181/11808_1603890467.jpg",
+        "https://files.cdn.printful.com/files/339/339a91c278f43110ea6c13763dcf3866_preview.png",
+        "https://files.cdn.printful.com/files/339/339a91c278f43110ea6c13763dcf3866_thumb.png",
+        "https://files.cdn.printful.com/products/181/11705_1603890473.jpg",
+        "https://files.cdn.printful.com/files/9f0/9f0ba4451997b92eb6ebb039d1526031_preview.png",
+        "https://files.cdn.printful.com/files/9f0/9f0ba4451997b92eb6ebb039d1526031_thumb.png",
+        "https://files.cdn.printful.com/products/181/7911_1582202430.jpg",
+        "https://files.cdn.printful.com/files/a3b/a3b2a342b1a7bd4ed4a267cfe79c5af4_preview.png",
+        "https://files.cdn.printful.com/files/a3b/a3b2a342b1a7bd4ed4a267cfe79c5af4_thumb.png",
+        "https://files.cdn.printful.com/products/181/7910_1582202405.jpg",
+        "https://files.cdn.printful.com/files/06c/06c30927ed0767fdd7d313022babf51b_preview.png",
+        "https://files.cdn.printful.com/files/06c/06c30927ed0767fdd7d313022babf51b_thumb.png",
+        "https://files.cdn.printful.com/products/181/11452_1663745124.jpg",
+        "https://files.cdn.printful.com/products/181/8933_1582202521.jpg",
+        "https://files.cdn.printful.com/files/c0e/c0e66be48dbcc4fdbc5b8e35222dc1b9_preview.png",
+        "https://files.cdn.printful.com/files/c0e/c0e66be48dbcc4fdbc5b8e35222dc1b9_thumb.png",
+        "https://files.cdn.printful.com/products/181/9621_1582202542.jpg",
+        "https://files.cdn.printful.com/files/8c0/8c0b53586a22e0c527ef597d1a07bf53_preview.png",
+        "https://files.cdn.printful.com/files/8c0/8c0b53586a22e0c527ef597d1a07bf53_thumb.png",
+        "https://files.cdn.printful.com/products/181/9620_1582202563.jpg",
+        "https://files.cdn.printful.com/files/11c/11ce15d40e4ece5c26876307ebfca908_preview.png",
+        "https://files.cdn.printful.com/files/11c/11ce15d40e4ece5c26876307ebfca908_thumb.png"
+      ],
+      "description": "Coque iPhone #SAINTEMAXIME – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Coque iPhone #SAINTEMAXIME",
+          "hex": "#E2E8F0"
+        }
+      ],
+      "sizes": [
+        "iPhone 11",
+        "iPhone 11 Pro",
+        "iPhone 11 Pro Max",
+        "iPhone 12",
+        "iPhone 12 mini",
+        "iPhone 12 Pro",
+        "iPhone 12 Pro Max",
+        "iPhone 7 Plus/8 Plus",
+        "iPhone 7/8",
+        "iPhone SE",
+        "iPhone X/XS",
+        "iPhone XR",
+        "iPhone XS Max"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 16,
+      "source": "printful",
+      "printfulId": 226123495,
+      "lastSyncedAt": "2026-07-21T18:53:23.085Z"
+    },
+    {
+      "id": "1784646416235-vwduh",
+      "slug": "housse-de-transport-noire-pc-portable-ou-macbook-13-et-15-saintemaxime",
+      "name": "Housse de Transport Noire Pc Portable ou Macbook 13\" et 15\" #SAINTEMAXIME",
+      "price": 45,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/b51/b51cf4cff0d82d487adfd6cf49900158_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/b51/b51cf4cff0d82d487adfd6cf49900158_preview.png",
+        "https://files.cdn.printful.com/products/394/10984_1737468114.jpg",
+        "https://files.cdn.printful.com/files/98a/98a49fa55cdb6ea3e737b1043fcd5844_preview.png",
+        "https://files.cdn.printful.com/files/98a/98a49fa55cdb6ea3e737b1043fcd5844_thumb.png",
+        "https://files.cdn.printful.com/files/b51/b51cf4cff0d82d487adfd6cf49900158_thumb.png",
+        "https://files.cdn.printful.com/products/394/10985_1737468120.jpg",
+        "https://files.cdn.printful.com/files/dc8/dc88e43a2636003ddc9c84241b41eca4_preview.png",
+        "https://files.cdn.printful.com/files/dc8/dc88e43a2636003ddc9c84241b41eca4_thumb.png",
+        "https://files.cdn.printful.com/files/424/42497cc9cbc1775d4daa9f2651e739fa_preview.png",
+        "https://files.cdn.printful.com/files/424/42497cc9cbc1775d4daa9f2651e739fa_thumb.png"
+      ],
+      "description": "Housse de Transport Noire Pc Portable ou Macbook 13\" et 15\" #SAINTEMAXIME – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Housse de Transport Noire Pc Portable ou Macbook 13\" et 15\" #SAINTEMAXIME",
+          "hex": "#E2E8F0"
+        }
+      ],
+      "sizes": [
+        "13″",
+        "15″"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 20,
+      "source": "printful",
+      "printfulId": 181051706,
+      "lastSyncedAt": "2026-07-21T18:53:23.085Z"
+    },
+    {
+      "id": "1784646416235-6fi07",
+      "slug": "housse-de-transport-pc-portable-ou-macbook-13-et-15-saintemaxime",
+      "name": "Housse de Transport Pc Portable ou Macbook 13\" et 15\" #SAINTEMAXIME",
+      "price": 45,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/575/575d07dbe5fef7c21653d64984674efe_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/575/575d07dbe5fef7c21653d64984674efe_preview.png",
+        "https://files.cdn.printful.com/products/394/10984_1737468114.jpg",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_preview.png",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_thumb.png",
+        "https://files.cdn.printful.com/files/575/575d07dbe5fef7c21653d64984674efe_thumb.png",
+        "https://files.cdn.printful.com/products/394/10985_1737468120.jpg",
+        "https://files.cdn.printful.com/files/11f/11f7fb108c9c0912818b3aa4f09bba0f_preview.png",
+        "https://files.cdn.printful.com/files/11f/11f7fb108c9c0912818b3aa4f09bba0f_thumb.png"
+      ],
+      "description": "Housse de Transport Pc Portable ou Macbook 13\" et 15\" #SAINTEMAXIME – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Housse de Transport Pc Portable ou Macbook 13\" et 15\" #SAINTEMAXIME",
+          "hex": "#E2E8F0"
+        }
+      ],
+      "sizes": [
+        "13″",
+        "15″"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 17,
+      "source": "printful",
+      "printfulId": 181051572,
+      "lastSyncedAt": "2026-07-21T18:53:23.085Z"
+    },
+    {
+      "id": "1784646416239-asmwh",
+      "slug": "sac-a-dos-saintemaxime",
+      "name": "Sac à Dos #SAINTEMAXIME",
+      "price": 60,
+      "category": "accessoires",
+      "image": "https://files.cdn.printful.com/files/6c6/6c6ffe6cebc3672ad56bf4d5558f62ac_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/6c6/6c6ffe6cebc3672ad56bf4d5558f62ac_preview.png",
+        "https://files.cdn.printful.com/products/279/9063_1534847488.jpg",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_preview.png",
+        "https://files.cdn.printful.com/files/eb0/eb0bd365106dacfbd7828de6fa546400_thumb.png",
+        "https://files.cdn.printful.com/files/6c6/6c6ffe6cebc3672ad56bf4d5558f62ac_thumb.png"
+      ],
+      "description": "Sac à Dos #SAINTEMAXIME – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        }
+      ],
+      "sizes": [
+        "One size"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 17,
+      "source": "printful",
+      "printfulId": 160279544,
+      "lastSyncedAt": "2026-07-21T18:53:23.088Z"
+    },
+    {
+      "id": "1784646416239-61dcq",
+      "slug": "unisex-zip-sweat-capuche-saintemaxime-noir-xl",
+      "name": "Unisex zip Sweat Capuche #SAINTEMAXIME Noir XL",
+      "price": 53,
+      "category": "vetements-homme",
+      "image": "https://files.cdn.printful.com/files/880/88077fea42d0225da2e56c53f091eecd_preview.png",
+      "images": [
+        "https://files.cdn.printful.com/files/880/88077fea42d0225da2e56c53f091eecd_preview.png",
+        "https://files.cdn.printful.com/products/293/9206_1581494805.jpg",
+        "https://files.cdn.printful.com/files/69c/69c3aceb730c7f0bfd5eb87399b3d8f1_preview.png",
+        "https://files.cdn.printful.com/files/69c/69c3aceb730c7f0bfd5eb87399b3d8f1_thumb.png",
+        "https://files.cdn.printful.com/files/880/88077fea42d0225da2e56c53f091eecd_thumb.png"
+      ],
+      "description": "Unisex zip Sweat Capuche #SAINTEMAXIME Noir XL – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.",
+      "details": [
+        "Impression haute définition DTG",
+        "Fabriqué à la demande via Printful",
+        "Livraison soignée 3-5 jours",
+        "Retours sous 30 jours"
+      ],
+      "colors": [
+        {
+          "name": "Solid Black Triblend",
+          "hex": "#E2E8F0"
+        }
+      ],
+      "sizes": [
+        "XL"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 9,
+      "source": "printful",
+      "printfulId": 138410985,
+      "lastSyncedAt": "2026-07-21T18:53:23.088Z"
+    },
+    {
+      "id": "1",
+      "slug": "t-shirt-saintemaxime-ete-2026",
+      "name": "T-Shirt #SAINTEMAXIME",
+      "price": 25,
+      "category": "vetements-homme",
+      "image": "/images/product-tshirt.jpg",
+      "badge": "BESTSELLER",
+      "description": "T-shirt premium 100% coton biologique. Design exclusif #SAINTEMAXIME estampillé sur la poitrine. Coupe moderne, confortable, idéal pour l'été dans le Golfe de Saint-Tropez.",
+      "details": [
+        "100% coton biologique (180g/m²)",
+        "Impression DTG haute définition",
+        "Coupe unisexe moderne",
+        "Lavable en machine 30°C",
+        "Fabriqué à la demande via Printful"
+      ],
+      "colors": [
+        {
+          "name": "Blanc",
+          "hex": "#FFFFFF"
+        },
+        {
+          "name": "Bleu",
+          "hex": "#00D4E8"
+        },
+        {
+          "name": "Noir",
+          "hex": "#1E293B"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "reviews": [
+        {
+          "id": "r1",
+          "author": "Marie L.",
+          "rating": 5,
+          "date": "2026-06-10",
+          "text": "T-shirt super qualité, le design est trop beau et la livraison rapide dans le Var."
+        },
+        {
+          "id": "r2",
+          "author": "Thomas B.",
+          "rating": 5,
+          "date": "2026-06-05",
+          "text": "Le t-shirt du golfe ! J'ai pris le bleu, il est incroyable."
+        },
+        {
+          "id": "r3",
+          "author": "Julie M.",
+          "rating": 4,
+          "date": "2026-05-28",
+          "text": "Très bien, taille un peu grand je recommande de prendre une taille en dessous."
+        }
+      ],
+      "inStock": true,
+      "stockCount": 12,
+      "source": "manual"
+    },
+    {
+      "id": "2",
+      "slug": "casquette-trucker-saintemaxime",
+      "name": "Casquette Trucker #SAINTEMAXIME",
+      "price": 20,
+      "category": "accessoires",
+      "image": "/images/product-casquette.jpg",
+      "badge": "ÉDITION LIMITÉE",
+      "description": "Casquette trucker classique avec mesh arrière. Logo #SAINTEMAXIME brodé en 3D. Le must-have de l'été pour les plages du Golfe.",
+      "details": [
+        "Mesh aéré et léger",
+        "Brodé #SAINTEMAXIME",
+        "Visière courbée",
+        "Réglable à l'arrière"
+      ],
+      "colors": [
+        {
+          "name": "Noir",
+          "hex": "#1E293B"
+        },
+        {
+          "name": "Blanc",
+          "hex": "#FFFFFF"
+        },
+        {
+          "name": "Rose",
+          "hex": "#FF6B8A"
+        }
+      ],
+      "sizes": [
+        "One Size"
+      ],
+      "reviews": [
+        {
+          "id": "r4",
+          "author": "Paul D.",
+          "rating": 5,
+          "date": "2026-06-12",
+          "text": "Casquette parfaite pour la plage !"
+        }
+      ],
+      "inStock": true,
+      "stockCount": 5,
+      "source": "manual"
+    },
+    {
+      "id": "3",
+      "slug": "bouteille-sport-saintemaxime",
+      "name": "Bouteille Sport #SAINTEMAXIME",
+      "price": 27,
+      "category": "vie-quotidienne",
+      "image": "/images/product-bouteille.jpg",
+      "badge": "NOUVEAU",
+      "description": "Bouteille en acier inoxydable avec paille rétractable. Garde vos boissons fraîches 24h. Design exclusif logo 2026.",
+      "details": [
+        "Acier inoxydable 304",
+        "Isolation double paroi",
+        "500ml",
+        "Paille rétractable intégrée"
+      ],
+      "colors": [
+        {
+          "name": "Bleu",
+          "hex": "#00D4E8"
+        },
+        {
+          "name": "Noir",
+          "hex": "#1E293B"
+        }
+      ],
+      "sizes": [
+        "500ml"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 20,
+      "source": "manual"
+    },
+    {
+      "id": "4",
+      "slug": "serviette-plage-saintemaxime",
+      "name": "Serviette de Plage #SAINTEMAXIME",
+      "price": 35,
+      "category": "vie-quotidienne",
+      "image": "/images/product-serviette.jpg",
+      "badge": "TENDANCE",
+      "description": "Serviette de plage en microfibre grand format. Séchage ultra-rapide, design exclusif #SAINTEMAXIME. Indispensable de l'été sur les plages du Golfe.",
+      "details": [
+        "Microfibre 100% polyester",
+        "160 x 80 cm",
+        "Séchage rapide",
+        "Impression sublimation"
+      ],
+      "colors": [
+        {
+          "name": "Bleu Cyan",
+          "hex": "#00D4E8"
+        },
+        {
+          "name": "Corail",
+          "hex": "#FF6B8A"
+        }
+      ],
+      "sizes": [
+        "160x80cm"
+      ],
+      "reviews": [
+        {
+          "id": "r5",
+          "author": "Sophie R.",
+          "rating": 5,
+          "date": "2026-06-15",
+          "text": "La serviette est immense et super belle. Je l'ai prise en corail, elle fait un carton sur la plage !"
+        }
+      ],
+      "inStock": true,
+      "stockCount": 8,
+      "source": "manual"
+    },
+    {
+      "id": "5",
+      "slug": "mug-blanc-saintemaxime",
+      "name": "Mug Blanc Brillant #SAINTEMAXIME",
+      "price": 15,
+      "category": "vie-quotidienne",
+      "image": "/images/product-mug.jpg",
+      "badge": "BESTSELLER",
+      "description": "Mug en céramique blanc brillant 325ml. Design #SAINTEMAXIME imprimé haute définition. Cadeau souvenir idéal.",
+      "details": [
+        "Céramique blanche brillante",
+        "325ml (11 oz)",
+        "Impression sublimation",
+        "Lavable au lave-vaisselle"
+      ],
+      "colors": [
+        {
+          "name": "Blanc",
+          "hex": "#FFFFFF"
+        }
+      ],
+      "sizes": [
+        "325ml"
+      ],
+      "reviews": [
+        {
+          "id": "r6",
+          "author": "Nicolas F.",
+          "rating": 5,
+          "date": "2026-06-01",
+          "text": "Mug parfait pour mon café du matin, le souvenir de l'été à Sainte-Maxime !"
+        }
+      ],
+      "inStock": true,
+      "stockCount": 25,
+      "source": "manual"
+    },
+    {
+      "id": "6",
+      "slug": "coque-telephone-saintemaxime",
+      "name": "Coque Téléphone #SAINTEMAXIME",
+      "price": 22,
+      "category": "accessoires",
+      "image": "/images/product-coque.jpg",
+      "badge": "NOUVEAU",
+      "description": "Coque de protection pour iPhone et Samsung. Design #SAINTEMAXIME lifestyle. Protection robuste et style Côte d'Azur.",
+      "details": [
+        "Polycarbonate robuste",
+        "Impression UV haute définition",
+        "Compatible iPhone & Samsung",
+        "Protection anti-choc"
+      ],
+      "colors": [
+        {
+          "name": "Bleu",
+          "hex": "#00D4E8"
+        },
+        {
+          "name": "Transparent",
+          "hex": "#F8FAFC"
+        }
+      ],
+      "sizes": [
+        "iPhone 14",
+        "iPhone 15",
+        "Samsung S24"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 15,
+      "source": "manual"
+    },
+    {
+      "id": "7",
+      "slug": "bougie-soja-saintemaxime",
+      "name": "Bougie de Cire de Soja #SAINTEMAXIME",
+      "price": 15,
+      "category": "vie-quotidienne",
+      "image": "/images/product-bougie.jpg",
+      "description": "Bougie en cire de soja dans un pot de verre. Parfum marin inspiré du Golfe de Saint-Tropez. 40h de combustion.",
+      "details": [
+        "Cire de soja 100% naturelle",
+        "Parfum marin",
+        "40h de combustion",
+        "Pot de verre réutilisable"
+      ],
+      "colors": [
+        {
+          "name": "Blanc",
+          "hex": "#FFFFFF"
+        }
+      ],
+      "sizes": [
+        "200g"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 10,
+      "source": "manual"
+    },
+    {
+      "id": "8",
+      "slug": "claquettes-homme-saintemaxime",
+      "name": "Claquettes Homme #SAINTEMAXIME",
+      "price": 35,
+      "category": "vetements-homme",
+      "image": "/images/product-claquettes.jpg",
+      "description": "Claquettes confortables avec semelle moulée. Logo #SAINTEMAXIME estampillé. Le style plage parfait.",
+      "details": [
+        "EVA léger et confortable",
+        "Semelle moulée",
+        "Impression sublimation"
+      ],
+      "colors": [
+        {
+          "name": "Noir",
+          "hex": "#1E293B"
+        },
+        {
+          "name": "Bleu",
+          "hex": "#00D4E8"
+        }
+      ],
+      "sizes": [
+        "38-39",
+        "40-41",
+        "42-43",
+        "44-45"
+      ],
+      "reviews": [],
+      "inStock": true,
+      "stockCount": 6,
+      "source": "manual"
+    }
+  ]
+}
