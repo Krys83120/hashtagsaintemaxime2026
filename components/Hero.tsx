@@ -1,78 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-const slides = [
-  { src: "/images/hero/hero-1.jpg", alt: "Panneau #SAINTEMAXIME sur la plage, ciel bleu" },
-  { src: "/images/hero/hero-2.jpg", alt: "Panneau #SAINTEMAXIME face à la mer" },
-  { src: "/images/hero/hero-3.jpg", alt: "Panneau #SAINTEMAXIME sur la promenade" },
-  { src: "/images/hero/hero-4.jpg", alt: "Panneau #SAINTEMAXIME vue large plage" },
-  { src: "/images/hero/hero-5.jpg", alt: "Panneau #SAINTEMAXIME au coucher de soleil" },
-];
-
 export default function Hero() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <section className="relative overflow-hidden py-24 sm:py-32 min-h-[600px] sm:min-h-[720px] flex items-center">
-      {/* Carrousel photo plein largeur */}
+      {/* Photo fixe #SAINTEMAXIME */}
       <div className="absolute inset-0">
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            {/* Arrière-plan flouté (même photo, agrandie) pour combler les bords sans recadrer la photo nette */}
-            <Image
-              src={slides[index].src}
-              alt=""
-              fill
-              aria-hidden
-              sizes="100vw"
-              className="object-cover scale-125 blur-2xl brightness-50"
-            />
-            {/* Photo nette, entière, jamais recadrée */}
-            <Image
-              src={slides[index].src}
-              alt={slides[index].alt}
-              fill
-              priority={index === 0}
-              sizes="100vw"
-              className="object-contain"
-            />
-          </motion.div>
-        </AnimatePresence>
-        {/* Overlay pour garder le texte blanc lisible sur toutes les photos */}
+        {/* Arrière-plan flouté (même photo, agrandie) pour combler les bords sans recadrer la photo nette */}
+        <Image
+          src="/images/hero/saintemaxime.jpg"
+          alt=""
+          fill
+          aria-hidden
+          sizes="100vw"
+          className="object-cover scale-125 blur-2xl brightness-50"
+        />
+        {/* Photo nette, entière, jamais recadrée */}
+        <Image
+          src="/images/hero/saintemaxime.jpg"
+          alt="#SAINTEMAXIME — panneau emblématique en bord de plage à Sainte-Maxime"
+          fill
+          priority
+          sizes="100vw"
+          className="object-contain"
+        />
+        {/* Overlay pour garder le texte blanc lisible sur la photo */}
         <div className="absolute inset-0 bg-gradient-to-b from-sm-deep/70 via-sm-deep/40 to-sm-deep/80" />
-      </div>
-
-      {/* Indicateurs du carrousel */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            aria-label={`Voir la photo ${i + 1}`}
-            className={`h-1.5 rounded-full transition-all ${
-              i === index ? "w-8 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
-            }`}
-          />
-        ))}
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
