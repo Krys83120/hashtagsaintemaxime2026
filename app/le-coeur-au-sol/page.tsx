@@ -1,7 +1,10 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import TagembedFeed from "@/components/TagembedFeed";
+<<<<<<< HEAD
 import { createClient } from "@/lib/supabase/server";
+=======
+>>>>>>> 2d1e0d4e46832c142f8e0d741f12c0cdc6bb090a
 
 export const metadata: Metadata = {
   title: "Le Cœur au Sol #SAINTEMAXIME® | Spot Instagrammable | Guide & Concours 2026",
@@ -9,6 +12,7 @@ export const metadata: Metadata = {
     "Trouve le cœur #SAINTEMAXIME au sol à Sainte-Maxime. Prends ta photo, partage avec #SAINTEMAXIME et gagne -15% + un kit été. Guide complet.",
 };
 
+<<<<<<< HEAD
 async function getTagembedWidgetId(): Promise<string> {
   try {
     const supabase = await createClient();
@@ -28,6 +32,10 @@ async function getTagembedWidgetId(): Promise<string> {
 
 export default async function CoeurAuSolPage() {
   const tagembedWidgetId = await getTagembedWidgetId();
+=======
+export default function CoeurAuSolPage() {
+  const tagembedWidgetId = process.env.NEXT_PUBLIC_TAGEMBED_WIDGET_ID;
+>>>>>>> 2d1e0d4e46832c142f8e0d741f12c0cdc6bb090a
 
   return (
     <div className="min-h-screen bg-sm-cream">
@@ -102,7 +110,11 @@ export default async function CoeurAuSolPage() {
             />
           </div>
 
+<<<<<<< HEAD
           {/* Flux Instagram réel via Tagembed (ID réglable depuis l'admin > SEO & Config > Réseaux Sociaux) */}
+=======
+          {/* Flux Instagram réel via Tagembed */}
+>>>>>>> 2d1e0d4e46832c142f8e0d741f12c0cdc6bb090a
           {tagembedWidgetId ? (
             <TagembedFeed widgetId={tagembedWidgetId} />
           ) : (
