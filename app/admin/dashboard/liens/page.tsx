@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Save, Globe, Instagram, Facebook, Mail, Phone, MapPin, ExternalLink, Plus, Trash2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface LinkItem {
-  id: string;
+  id?: string; // UUID Supabase, absent pour un lien pas encore sauvegardé
   label: string;
   url: string;
   icon: string;
@@ -14,50 +15,70 @@ interface LinkItem {
   section: "header" | "footer" | "social" | "contact" | "legal";
 }
 
-const defaultLinks: LinkItem[] = [
-  { id: "l1", label: "Boutique", url: "/boutique/", icon: "store", active: true, section: "header" },
-  { id: "l2", label: "La Marque", url: "/la-marque/", icon: "info", active: true, section: "header" },
-  { id: "l3", label: "Le Cœur au Sol", url: "/le-coeur-au-sol/", icon: "heart", active: true, section: "header" },
-  { id: "l4", label: "Instagram", url: "https://www.instagram.com/hashtag_saintemaxime/", icon: "instagram", active: true, section: "social" },
-  { id: "l5", label: "Facebook", url: "https://www.facebook.com/hashtagsaintemaxime/", icon: "facebook", active: true, section: "social" },
-  { id: "l6", label: "TikTok", url: "https://www.tiktok.com/@hashtagsaintemaxime", icon: "tiktok", active: true, section: "social" },
-  { id: "l7", label: "Email", url: "mailto:contact@hashtagsaintemaxime.fr", icon: "mail", active: true, section: "contact" },
-  { id: "l8", label: "Téléphone", url: "tel:+33494123456", icon: "phone", active: true, section: "contact" },
-  { id: "l9", label: "Adresse", url: "#", icon: "map", active: true, section: "contact" },
-  { id: "l10", label: "Mentions légales", url: "/mentions-legales/", icon: "file", active: true, section: "legal" },
-  { id: "l11", label: "CGV", url: "/cgv/", icon: "file", active: true, section: "legal" },
-  { id: "l12", label: "Politique de confidentialité", url: "/confidentialite/", icon: "file", active: true, section: "legal" },
-  { id: "l13", label: "Livraison & Retours", url: "/livraison/", icon: "truck", active: true, section: "footer" },
-  { id: "l14", label: "Guide des tailles", url: "/guide-tailles/", icon: "ruler", active: true, section: "footer" },
-];
+function fromDbRow(row: any): LinkItem {
+  return { id: row.id, label: row.label, url: row.url, icon: row.icon || "link", active: row.active, section: row.type };
+}
 
 export default function AdminLiensPage() {
-  const [links, setLinks] = useState<LinkItem[]>(defaultLinks);
+  const [links, setLinks] = useState<LinkItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
-  const [newLink, setNewLink] = useState({ label: "", url: "", section: "header" as const });
+  const [newLink, setNewLink] = useState({ label: "", url: "", section: "header" as LinkItem["section"] });
+  const supabase = createClient();
 
   useEffect(() => {
-    const savedLinks = localStorage.getItem("sm_admin_links");
-    if (savedLinks) {
-      try { setLinks(JSON.parse(savedLinks)); } catch { /* ignore */ }
-    }
+    loadLinks();
   }, []);
 
-  const saveLinks = () => {
-    localStorage.setItem("sm_admin_links", JSON.stringify(links));
+  const loadLinks = async () => {
+    setLoading(true);
+    const { data, error: loadError } = await supabase.from("links").select("*").order("sort_order", { ascending: true });
+    if (loadError) {
+      setError("Erreur de chargement : " + loadError.message);
+    } else {
+      setLinks((data || []).map(fromDbRow));
+    }
+    setLoading(false);
+  };
+
+  const saveLinks = async () => {
+    setSaving(true);
+    setError("");
+
+    const rows = links.map((l, index) => ({
+      id: l.id,
+      label: l.label,
+      url: l.url,
+      icon: l.icon,
+      active: l.active,
+      type: l.section,
+      sort_order: index,
+    }));
+
+    const { error: upsertError } = await supabase.from("links").upsert(rows);
+    setSaving(false);
+
+    if (upsertError) {
+      setError("Erreur de sauvegarde : " + upsertError.message);
+      return;
+    }
+
+    await loadLinks();
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const updateLink = (id: string, field: keyof LinkItem, value: any) => {
+  const updateLink = (id: string | undefined, field: keyof LinkItem, value: any) => {
     setLinks((prev) => prev.map((l) => (l.id === id ? { ...l, [field]: value } : l)));
   };
 
   const addLink = () => {
     if (!newLink.label || !newLink.url) return;
     const link: LinkItem = {
-      id: `l-${Date.now()}`,
+      id: crypto.randomUUID(),
       label: newLink.label,
       url: newLink.url,
       icon: "link",
@@ -69,10 +90,16 @@ export default function AdminLiensPage() {
     setShowAdd(false);
   };
 
-  const deleteLink = (id: string) => {
-    if (confirm("Supprimer ce lien ?")) {
-      setLinks((prev) => prev.filter((l) => l.id !== id));
+  const deleteLink = async (link: LinkItem) => {
+    if (!confirm("Supprimer ce lien ?")) return;
+    if (link.id) {
+      const { error: delError } = await supabase.from("links").delete().eq("id", link.id);
+      if (delError) {
+        setError("Erreur de suppression : " + delError.message);
+        return;
+      }
     }
+    setLinks((prev) => prev.filter((l) => l !== link));
   };
 
   const sections: { key: LinkItem["section"]; label: string }[] = [
@@ -105,9 +132,9 @@ export default function AdminLiensPage() {
               className="flex items-center gap-2 bg-sm-cyan text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-sm-deep transition-colors">
               <Plus className="w-4 h-4" /> Ajouter
             </button>
-            <button onClick={saveLinks}
-              className="flex items-center gap-2 bg-green-500 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-green-600 transition-colors">
-              <Save className="w-4 h-4" /> Sauvegarder
+            <button onClick={saveLinks} disabled={saving}
+              className="flex items-center gap-2 bg-green-500 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-green-600 transition-colors disabled:opacity-60">
+              <Save className="w-4 h-4" /> {saving ? "Sauvegarde..." : "Sauvegarder"}
             </button>
           </div>
         </div>
@@ -117,6 +144,16 @@ export default function AdminLiensPage() {
             className="p-4 bg-green-50 text-green-700 rounded-xl text-sm font-medium">
             ✅ Liens sauvegardés !
           </motion.div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium">⚠️ {error}</div>
+        )}
+
+        {loading && (
+          <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray text-sm-gray">
+            Chargement des liens...
+          </div>
         )}
 
         {/* Add form */}
@@ -161,8 +198,8 @@ export default function AdminLiensPage() {
                   <p className="text-xs text-sm-gray">{sectionLinks.filter((l) => l.active).length} actif(s) sur {sectionLinks.length}</p>
                 </div>
                 <div className="divide-y divide-sm-lightgray/50">
-                  {sectionLinks.map((link) => (
-                    <div key={link.id} className="flex items-center gap-4 px-6 py-3 hover:bg-sm-cream/30 transition-colors">
+                  {sectionLinks.map((link, i) => (
+                    <div key={link.id || `new-${i}`} className="flex items-center gap-4 px-6 py-3 hover:bg-sm-cream/30 transition-colors">
                       <input type="checkbox" checked={link.active}
                         onChange={(e) => updateLink(link.id, "active", e.target.checked)}
                         className="w-5 h-5 accent-sm-cyan flex-shrink-0" />
@@ -181,7 +218,7 @@ export default function AdminLiensPage() {
                         className="p-1.5 hover:bg-sm-cyan/10 rounded-lg text-sm-cyan transition-colors flex-shrink-0">
                         <ExternalLink className="w-4 h-4" />
                       </a>
-                      <button onClick={() => deleteLink(link.id)}
+                      <button onClick={() => deleteLink(link)}
                         className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-colors flex-shrink-0">
                         <Trash2 className="w-4 h-4" />
                       </button>
