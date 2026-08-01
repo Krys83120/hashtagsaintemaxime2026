@@ -32,10 +32,18 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
           <div className="w-full h-full flex items-center justify-center">
-            <div className="w-32 h-32 rounded-full bg-sm-cyan/20 flex items-center justify-center text-sm-cyan text-4xl font-bold">
-              #
-            </div>
-          </div>
+  {product.image ? (
+    <img
+      src={product.image}
+      alt={product.name}
+      className="w-full h-full object-contain"
+    />
+  ) : (
+    <div className="w-32 h-32 rounded-full bg-sm-cyan/20 flex items-center justify-center text-sm-cyan text-4xl font-bold">
+      #
+    </div>
+  )}
+</div>
           {/* Quick hover overlay */}
           <div className="absolute inset-0 bg-sm-cyan/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <span className="bg-white text-sm-cyan font-semibold px-4 py-2 rounded-full text-sm shadow-sm">

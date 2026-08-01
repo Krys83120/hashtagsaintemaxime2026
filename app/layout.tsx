@@ -96,7 +96,7 @@ export default function RootLayout({
               description:
                 "La marque officielle #SAINTEMAXIME propose des vêtements, accessoires et souvenirs uniques estampillés de la ville de Sainte-Maxime.",
               sameAs: [
-                "https://www.instagram.com/hashtagsaintemaxime/",
+                "https://www.instagram.com/hashtag_saintemaxime/",
                 "https://www.facebook.com/hashtagsaintemaxime/",
               ],
               contactPoint: {

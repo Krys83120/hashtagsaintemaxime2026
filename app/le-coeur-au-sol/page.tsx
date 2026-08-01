@@ -54,7 +54,7 @@ export default function CoeurAuSolPage() {
             <li className="flex items-center gap-2 text-sm-dark"><span className="text-sm-cyan">✓</span> Bracelet Silicone</li>
           </ul>
           <a
-            href="https://instagram.com/hashtagsaintemaxime"
+            href="https://www.instagram.com/hashtag_saintemaxime/"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-gradient-to-r from-sm-coral to-sm-cyan text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition-opacity"

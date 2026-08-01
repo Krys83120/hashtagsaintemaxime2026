@@ -1,0 +1,620 @@
+#!/usr/bin/env node
+
+// ================================================================
+// AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+// ================================================================
+// Script Node.js de synchronisation automatique avec l’API Printful.
+//
+// Fonctionnalités :
+// - Synchronisation incrémentale
+// - Backup automatique
+// - Logging détaillé
+// - Mode dry-run
+// - Build Next.js optionnel
+// - Planification interne avec node-cron
+// - Support webhook Printful
+//
+// Utilisation :
+// node scripts/auto-sync-printful.js
+// node scripts/auto-sync-printful.js --dry-run
+// node scripts/auto-sync-printful.js --build
+// node scripts/auto-sync-printful.js --schedule "0 */6 * * *"
+// node scripts/auto-sync-printful.js --webhook --port 3001
+//
+// Variable d’environnement :
+// PRINTFUL_API_KEY=<CLE_API_PRINTFUL>
+// ================================================================
+
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
+
+// ─── CONFIG ─────────────────────────────────────────────────────
+const PRINTFUL_API_URL = "https://api.printful.com";
+const PRODUCTS_JSON_PATH = path.join(__dirname, "..", "data", "products.json");
+const LOGS_DIR = path.join(__dirname, "..", "logs");
+const BACKUP_DIR = path.join(__dirname, "..", "data", "backups");
+const CONFIG_PATH = path.join(__dirname, "..", "data", "sync-config.json");
+
+// ─── CLI ARGS ───────────────────────────────────────────────────
+const args = process.argv.slice(2);
+const IS_DRY_RUN = args.includes("--dry-run");
+const IS_VERBOSE = args.includes("--verbose") || args.includes("-v");
+const SHOULD_BUILD = args.includes("--build");
+const SCHEDULE_CRON = getArgValue("--schedule");
+const WEBHOOK_MODE = args.includes("--webhook");
+const WEBHOOK_PORT = parseInt(getArgValue("--port") || "3001", 10);
+
+function getArgValue(flag) {
+  const idx = args.indexOf(flag);
+  return idx !== -1 && args[idx + 1] ? args[idx + 1] : undefined;
+}
+
+// ─── LOGGER ─────────────────────────────────────────────────────
+class Logger {
+  constructor() {
+    this.logs = [];
+    this.dateStr = new Date().toISOString().split("T")[0];
+    this.logPath = path.join(LOGS_DIR, `sync-${this.dateStr}.log`);
+  }
+
+  info(msg) {
+    const line = `[${timestamp()}] ℹ️  ${msg}`;
+    this.logs.push(line);
+    console.log(line);
+  }
+  success(msg) {
+    const line = `[${timestamp()}] ✅ ${msg}`;
+    this.logs.push(line);
+    console.log(line);
+  }
+  warn(msg) {
+    const line = `[${timestamp()}] ⚠️  ${msg}`;
+    this.logs.push(line);
+    console.log(line);
+  }
+  error(msg) {
+    const line = `[${timestamp()}] ❌ ${msg}`;
+    this.logs.push(line);
+    console.error(line);
+  }
+  debug(msg) {
+    if (IS_VERBOSE) {
+      const line = `[${timestamp()}] 🐛 ${msg}`;
+      this.logs.push(line);
+      console.log(line);
+    }
+  }
+
+  save() {
+    if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR, { recursive: true });
+    const content = this.logs.join("\n") + "\n";
+    fs.appendFileSync(this.logPath, content, "utf-8");
+  }
+}
+
+const logger = new Logger();
+
+function timestamp() {
+  return new Date().toISOString();
+}
+
+// ─── ENV LOADER ─────────────────────────────────────────────────
+function loadEnv() {
+  const envPath = path.join(__dirname, "..", ".env");
+  if (!fs.existsSync(envPath)) {
+    logger.error("Fichier .env introuvable. Crée-le avec PRINTFUL_API_KEY=...");
+    process.exit(1);
+  }
+  const content = fs.readFileSync(envPath, "utf-8");
+  const match = content.match(/PRINTFUL_API_KEY=(.+)/);
+  if (!match) {
+    logger.error("PRINTFUL_API_KEY non trouvé dans .env");
+    process.exit(1);
+  }
+  return match[1].trim();
+}
+
+// ─── API PRINTFUL ───────────────────────────────────────────────
+async function printfulFetch(endpoint, apiKey, storeId) {
+  const url = `${PRINTFUL_API_URL}${endpoint}`;
+  logger.debug(`GET ${url}`);
+
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+  };
+
+  // Requis lorsque le jeton donne accès à plusieurs boutiques.
+  if (storeId) {
+    headers["X-PF-Store-Id"] = String(storeId);
+  }
+
+  const res = await fetch(url, { headers });
+  const rawBody = await res.text();
+
+  let body = {};
+  try {
+    body = rawBody ? JSON.parse(rawBody) : {};
+  } catch {
+    body = { raw: rawBody };
+  }
+
+  if (!res.ok) {
+    const apiMessage =
+      body?.error?.message ||
+      body?.message ||
+      body?.result ||
+      body?.raw ||
+      res.statusText;
+
+    throw new Error(`Printful API ${res.status} sur ${endpoint}: ${apiMessage}`);
+  }
+
+  return body;
+}
+
+// ─── LOAD / SAVE PRODUCTS JSON ──────────────────────────────────
+function loadExistingProducts() {
+  if (!fs.existsSync(PRODUCTS_JSON_PATH)) {
+    return { categories: getDefaultCategories(), products: [] };
+  }
+  try {
+    const raw = fs.readFileSync(PRODUCTS_JSON_PATH, "utf-8");
+    return JSON.parse(raw);
+  } catch (e) {
+    logger.warn(`Impossible de parser ${PRODUCTS_JSON_PATH}, démarrage frais`);
+    return { categories: getDefaultCategories(), products: [] };
+  }
+}
+
+function getDefaultCategories() {
+  return [
+    { name: "Accessoires", count: 0, color: "bg-sm-cyan", slug: "accessoires" },
+    { name: "Vêtements Femme", count: 0, color: "bg-sm-coral", slug: "vetements-femme" },
+    { name: "Vêtements Homme", count: 0, color: "bg-sm-deep", slug: "vetements-homme" },
+    { name: "Vie Quotidienne", count: 0, color: "bg-sm-cyan", slug: "vie-quotidienne" },
+  ];
+}
+
+function saveProducts(data, isDryRun = false) {
+  if (isDryRun) {
+    logger.info("[DRY-RUN] Aucune écriture sur disque");
+    return;
+  }
+  // Backup
+  if (fs.existsSync(PRODUCTS_JSON_PATH)) {
+    if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
+    const backupName = `products-${Date.now()}.json`;
+    fs.copyFileSync(PRODUCTS_JSON_PATH, path.join(BACKUP_DIR, backupName));
+    logger.debug(`Backup créé : ${backupName}`);
+  }
+  fs.writeFileSync(PRODUCTS_JSON_PATH, JSON.stringify(data, null, 2), "utf-8");
+  logger.success(`Fichier sauvegardé : ${PRODUCTS_JSON_PATH}`);
+}
+
+// ─── EXTRACTION DES IMAGES PRINTFUL ─────────────────────────────
+function extractProductImages(product) {
+  const urls = [];
+
+  const add = (value) => {
+    if (typeof value !== "string") return;
+    const url = value.trim();
+    if (!url || url.includes("product-placeholder")) return;
+    if (!urls.includes(url)) urls.push(url);
+  };
+
+  add(product.thumbnail_url);
+  add(product.thumbnail);
+  add(product.image);
+
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+
+  for (const variant of variants) {
+    add(variant.image);
+    add(variant.thumbnail_url);
+    add(variant.preview_url);
+    add(variant.product?.image);
+
+    const files = Array.isArray(variant.files) ? variant.files : [];
+    for (const file of files) {
+      add(file.preview_url);
+      add(file.thumbnail_url);
+      add(file.url);
+    }
+  }
+
+  return urls;
+}
+
+// ─── MAPPING PRINTFUL → INTERNAL ────────────────────────────────
+function mapPrintfulProduct(pfProduct, existingProducts) {
+  const product = pfProduct.data || pfProduct;
+  const variants = product.variants || [];
+  const sizes = [
+    ...new Set(
+      variants
+        .map((v) => v.size || extractVariantAttribute(v.name, "size"))
+        .filter(Boolean)
+    ),
+  ];
+
+  const colors = [
+    ...new Set(
+      variants
+        .map((v) => v.color || extractVariantAttribute(v.name, "color"))
+        .filter(Boolean)
+    ),
+  ].map((c) => ({
+    name: c,
+    hex: colorToHex(c),
+  }));
+
+  const category = detectCategory(product.name, product.type);
+  const retailPrice = variants[0]?.retail_price || variants[0]?.price || 0;
+  const price = Math.round(parseFloat(retailPrice) * 1.5); // marge 50%
+  const slug = slugify(product.name);
+  const images = extractProductImages(product);
+  const mainImage = images[0] || "/images/product-placeholder.jpg";
+
+  // Recherche produit existant pour merge
+  const existing = existingProducts.find((p) => p.printfulId === product.id || p.slug === slug);
+
+  const base = {
+    id: existing?.id || `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+    slug,
+    name: product.name,
+    price,
+    category,
+    image: mainImage,
+    images,
+    description: product.description || `${product.name} – Produit officiel #SAINTEMAXIME. Design exclusif, qualité premium.`,
+    details: [
+      "Impression haute définition DTG",
+      "Fabriqué à la demande via Printful",
+      "Livraison soignée 3-5 jours",
+      "Retours sous 30 jours",
+    ],
+    colors: colors.length > 0 ? colors : [{ name: "Blanc", hex: "#FFFFFF" }],
+    sizes: sizes.length > 0 ? sizes : ["One Size"],
+    reviews: [],
+    inStock: true,
+    stockCount: Math.floor(Math.random() * 20) + 5,
+    source: "printful",
+    printfulId: product.id,
+    lastSyncedAt: new Date().toISOString(),
+  };
+
+  if (existing) {
+    // Merge : préserver les champs manuels
+    logger.debug(`Merge avec existant : ${existing.slug}`);
+    return {
+      ...base,
+      id: existing.id,
+      badge: existing.badge || base.badge,
+      description: existing.source === "manual" && existing.description ? existing.description : base.description,
+      details: existing.source === "manual" && existing.details?.length > 4 ? existing.details : base.details,
+      reviews: existing.reviews || [],
+      stockCount: existing.stockCount ?? base.stockCount,
+      image: base.image,
+      images: base.images.length > 0 ? base.images : existing.images || [existing.image].filter(Boolean),
+      source: existing.source || "printful",
+    };
+  }
+
+  return base;
+}
+
+
+function extractVariantAttribute(variantName, attribute) {
+  const value = String(variantName || "").trim();
+  if (!value) return undefined;
+
+  // Les noms Printful ressemblent souvent à :
+  // "T-shirt - Black / L" ou "Mug - White"
+  const afterDash = value.includes(" - ")
+    ? value.split(" - ").slice(1).join(" - ")
+    : value;
+
+  const parts = afterDash
+    .split("/")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (attribute === "color") {
+    return parts.length >= 2 ? parts[0] : undefined;
+  }
+
+  if (attribute === "size") {
+    return parts.length >= 2 ? parts[parts.length - 1] : parts[0];
+  }
+
+  return undefined;
+}
+
+function detectCategory(name, type) {
+  const lower = (name || "").toLowerCase();
+  const typeLower = (type || "").toLowerCase();
+  if (lower.includes("t-shirt") || lower.includes("shirt") || lower.includes("tee") || lower.includes("sweat") || lower.includes("hoodie")) {
+    return "vetements-homme";
+  }
+  if (lower.includes("casquette") || lower.includes("cap") || lower.includes("hat") || lower.includes("bonnet")) {
+    return "accessoires";
+  }
+  if (lower.includes("mug") || lower.includes("tasse") || lower.includes("bouteille") || lower.includes("bottle") || lower.includes("serviette") || lower.includes("towel") || lower.includes("bougie") || lower.includes("candle") || lower.includes("coussin") || lower.includes("pillow")) {
+    return "vie-quotidienne";
+  }
+  if (lower.includes("coque") || lower.includes("case") || lower.includes("bracelet") || lower.includes("autocollant") || lower.includes("sticker") || lower.includes("tote") || lower.includes("sac") || lower.includes("bag")) {
+    return "accessoires";
+  }
+  if (typeLower.includes("t-shirt") || typeLower.includes("apparel")) return "vetements-homme";
+  if (typeLower.includes("mug") || typeLower.includes("home")) return "vie-quotidienne";
+  if (typeLower.includes("hat") || typeLower.includes("accessories")) return "accessoires";
+  return "accessoires";
+}
+
+function slugify(text) {
+  return text
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function colorToHex(colorName) {
+  const map = {
+    white: "#FFFFFF",
+    black: "#1E293B",
+    blue: "#00D4E8",
+    navy: "#0085A1",
+    red: "#FF6B8A",
+    pink: "#FF6B8A",
+    coral: "#FF6B8A",
+    green: "#10B981",
+    yellow: "#FFD700",
+    gold: "#FFD700",
+    orange: "#F97316",
+    purple: "#8B5CF6",
+    gray: "#64748B",
+    grey: "#64748B",
+  };
+  return map[(colorName || "").toLowerCase()] || "#E2E8F0";
+}
+
+// ─── UPDATE CATEGORY COUNTS ─────────────────────────────────────
+function updateCategoryCounts(data) {
+  const counts = {};
+  data.products.forEach((p) => {
+    counts[p.category] = (counts[p.category] || 0) + 1;
+  });
+  data.categories = data.categories.map((c) => ({
+    ...c,
+    count: counts[c.slug] || 0,
+  }));
+}
+
+// ─── SYNC CORE ──────────────────────────────────────────────────
+async function runSync(apiKey) {
+  logger.info("═══════════════════════════════════════════════");
+  logger.info("  🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME");
+  logger.info("═══════════════════════════════════════════════");
+  logger.info(`Mode : ${IS_DRY_RUN ? "DRY-RUN (simulation)" : "ÉCRITURE"}`);
+
+  const existing = loadExistingProducts();
+  logger.info(`${existing.products.length} produits existants chargés`);
+
+  // 1. Récupérer le store
+  logger.info("📡 Récupération des stores Printful...");
+  const storesRes = await printfulFetch("/stores", apiKey);
+  const stores = Array.isArray(storesRes.result) ? storesRes.result : [];
+
+  const store = stores[0];
+  const storeId = store?.id;
+  const storeName = store?.name || "Inconnu";
+
+  if (!storeId) {
+    throw new Error("Aucun store Printful trouvé pour cette clé API");
+  }
+
+  logger.success(`Store : ${storeName} (ID: ${storeId})`);
+
+  // 2. Récupérer la liste des produits synchronisés
+  logger.info("📡 Récupération des produits...");
+  const productsRes = await printfulFetch(
+    "/store/products?limit=100&offset=0",
+    apiKey,
+    storeId
+  );
+
+  const productSummaries = Array.isArray(productsRes.result)
+    ? productsRes.result
+    : [];
+
+  logger.success(`${productSummaries.length} produits trouvés sur Printful`);
+
+  // La liste ne contient pas toutes les variantes : on charge chaque fiche.
+  const rawProducts = [];
+
+  for (const summary of productSummaries) {
+    logger.debug(`Chargement du produit Printful ${summary.id}...`);
+
+    const detailRes = await printfulFetch(
+      `/store/products/${summary.id}`,
+      apiKey,
+      storeId
+    );
+
+    const detail = detailRes.result || {};
+    const syncProduct = detail.sync_product || summary;
+    const syncVariants = Array.isArray(detail.sync_variants)
+      ? detail.sync_variants
+      : [];
+
+    rawProducts.push({
+      ...syncProduct,
+      variants: syncVariants,
+      thumbnail_url:
+        syncProduct.thumbnail_url ||
+        syncProduct.thumbnail ||
+        summary.thumbnail_url,
+    });
+  }
+
+  if (rawProducts.length === 0) {
+    logger.warn("Aucun produit sur Printful. Arrêt.");
+    return { created: 0, updated: 0, unchanged: 0 };
+  }
+
+  // 3. Mapper & merger
+  logger.info("🔄 Mapping et fusion incrémentale...");
+  const mergedProducts = [];
+  let created = 0;
+  let updated = 0;
+  let unchanged = 0;
+
+  for (const pfProduct of rawProducts) {
+    const mapped = mapPrintfulProduct(pfProduct, existing.products);
+    const existingProd = existing.products.find(
+      (p) => p.printfulId === mapped.printfulId || p.slug === mapped.slug
+    );
+    if (!existingProd) created++;
+    else if (JSON.stringify(existingProd) !== JSON.stringify(mapped)) updated++;
+    else unchanged++;
+    mergedProducts.push(mapped);
+  }
+
+  // 4. Conserver les produits manuels qui n'existent pas sur Printful
+  const manualProducts = existing.products.filter((p) => p.source === "manual" && !mergedProducts.find((m) => m.id === p.id));
+  if (manualProducts.length > 0) {
+    logger.info(`${manualProducts.length} produits manuels conservés`);
+    mergedProducts.push(...manualProducts);
+  }
+
+  const data = {
+    categories: existing.categories,
+    products: mergedProducts,
+  };
+  updateCategoryCounts(data);
+
+  // 5. Sauvegarder
+  saveProducts(data, IS_DRY_RUN);
+
+  logger.info("───────────────────────────────────────────────");
+  logger.success(`RÉSUMÉ — Créés: ${created} | Mis à jour: ${updated} | Inchangés: ${unchanged} | Manuels conservés: ${manualProducts.length}`);
+  logger.info("───────────────────────────────────────────────");
+
+  return { created, updated, unchanged, manualKept: manualProducts.length, total: mergedProducts.length };
+}
+
+// ─── BUILD TRIGGER ──────────────────────────────────────────────
+function triggerBuild() {
+  if (IS_DRY_RUN) {
+    logger.info("[DRY-RUN] Build ignoré");
+    return;
+  }
+  logger.info("🔨 Déclenchement du build Next.js...");
+  try {
+    execSync("npm run build", { stdio: "inherit", cwd: path.join(__dirname, "..") });
+    logger.success("Build terminé avec succès !");
+  } catch (e) {
+    logger.error(`Build échoué : ${e.message}`);
+  }
+}
+
+// ─── WEBHOOK SERVER ─────────────────────────────────────────────
+async function startWebhookServer(apiKey) {
+  const http = require("http");
+  const server = http.createServer(async (req, res) => {
+    if (req.method === "POST" && req.url === "/webhook/printful") {
+      logger.info("🌐 Webhook Printful reçu !");
+      let body = "";
+      req.on("data", (chunk) => (body += chunk));
+      req.on("end", async () => {
+        try {
+          const payload = JSON.parse(body);
+          logger.debug(`Payload type: ${payload.type}`);
+          if (["product_created", "product_updated", "product_deleted", "stock_updated"].includes(payload.type)) {
+            await runSync(apiKey);
+            if (SHOULD_BUILD) triggerBuild();
+          }
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ status: "ok" }));
+        } catch (e) {
+          logger.error(`Webhook error: ${e.message}`);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: e.message }));
+        }
+      });
+    } else {
+      res.writeHead(404);
+      res.end("Not found");
+    }
+  });
+
+  server.listen(WEBHOOK_PORT, () => {
+    logger.success(`🌐 Serveur webhook écoutant sur le port ${WEBHOOK_PORT}`);
+    logger.info(`Endpoint : http://localhost:${WEBHOOK_PORT}/webhook/printful`);
+    logger.info("Configure ce webhook dans Printful Dashboard → Settings → API → Webhooks");
+  });
+}
+
+// ─── SCHEDULER (node-cron) ──────────────────────────────────────
+function startScheduler(apiKey, cronExpr) {
+  let cron;
+  try {
+    cron = require("node-cron");
+  } catch (e) {
+    logger.error("node-cron n'est pas installé. Installe-le avec : npm install node-cron");
+    process.exit(1);
+  }
+
+  logger.success(`⏰ Planificateur activé : ${cronExpr}`);
+  cron.schedule(cronExpr, async () => {
+    logger.info("⏰ Sync programmée déclenchée");
+    try {
+      await runSync(apiKey);
+      if (SHOULD_BUILD) triggerBuild();
+      logger.save();
+    } catch (e) {
+      logger.error(`Sync programmée échouée : ${e.message}`);
+      logger.save();
+    }
+  });
+}
+
+// ─── MAIN ───────────────────────────────────────────────────────
+async function main() {
+  const apiKey = loadEnv();
+  logger.success("Clé API chargée");
+
+  // Mode webhook
+  if (WEBHOOK_MODE) {
+    await startWebhookServer(apiKey);
+    return;
+  }
+
+  // Exécution unique
+  try {
+    const stats = await runSync(apiKey);
+    if (SHOULD_BUILD && (stats.created > 0 || stats.updated > 0)) {
+      triggerBuild();
+    }
+    logger.save();
+
+    // Mode planifié (si --schedule fourni)
+    if (SCHEDULE_CRON) {
+      startScheduler(apiKey, SCHEDULE_CRON);
+    } else {
+      logger.info("Sync terminée. À bientôt ! 👋");
+      process.exit(0);
+    }
+  } catch (err) {
+    logger.error(`ERREUR FATALE : ${err.message}`);
+    logger.save();
+    process.exit(1);
+  }
+}
+
+main();

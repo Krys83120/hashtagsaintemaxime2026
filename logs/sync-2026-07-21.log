@@ -1,0 +1,142 @@
+[2026-07-21T14:50:49.862Z] ✅ Clé API chargée
+[2026-07-21T14:50:49.867Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T14:50:49.867Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T14:50:49.868Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T14:50:49.869Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T14:50:49.872Z] ℹ️  8 produits existants chargés
+[2026-07-21T14:50:49.873Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T14:50:50.474Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T14:50:50.474Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T14:50:50.690Z] ❌ ERREUR FATALE : Printful API 404: Not Found
+[2026-07-21T15:06:50.344Z] ✅ Clé API chargée
+[2026-07-21T15:06:50.350Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:06:50.350Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T15:06:50.350Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:06:50.350Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T15:06:50.351Z] ℹ️  8 produits existants chargés
+[2026-07-21T15:06:50.351Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T15:06:50.833Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T15:06:50.834Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T15:06:51.173Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T15:06:56.234Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T15:06:56.239Z] ℹ️  8 produits manuels conservés
+[2026-07-21T15:06:56.243Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T15:06:56.243Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:06:56.243Z] ✅ RÉSUMÉ — Créés: 15 | Mis à jour: 0 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T15:06:56.243Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:06:56.244Z] ℹ️  🔨 Déclenchement du build Next.js...
+[2026-07-21T15:07:29.675Z] ❌ Build échoué : Command failed: npm run build
+[2026-07-21T15:08:51.832Z] ✅ Clé API chargée
+[2026-07-21T15:08:51.837Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:08:51.837Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T15:08:51.838Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:08:51.838Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T15:08:51.839Z] ℹ️  23 produits existants chargés
+[2026-07-21T15:08:51.839Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T15:08:52.296Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T15:08:52.296Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T15:08:52.566Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T15:08:57.617Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T15:08:57.619Z] ℹ️  8 produits manuels conservés
+[2026-07-21T15:08:57.622Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T15:08:57.622Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:08:57.622Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T15:08:57.622Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:08:57.622Z] ℹ️  🔨 Déclenchement du build Next.js...
+[2026-07-21T15:09:15.065Z] ❌ Build échoué : Command failed: npm run build
+[2026-07-21T15:09:40.204Z] ✅ Clé API chargée
+[2026-07-21T15:09:40.209Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:09:40.209Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T15:09:40.210Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:09:40.210Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T15:09:40.211Z] ℹ️  23 produits existants chargés
+[2026-07-21T15:09:40.211Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T15:09:40.685Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T15:09:40.686Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T15:09:40.964Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T15:09:45.853Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T15:09:45.855Z] ℹ️  8 produits manuels conservés
+[2026-07-21T15:09:45.859Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T15:09:45.859Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:09:45.859Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T15:09:45.859Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:16:47.562Z] ✅ Clé API chargée
+[2026-07-21T15:16:47.566Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:16:47.566Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T15:16:47.566Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:16:47.566Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T15:16:47.567Z] ℹ️  23 produits existants chargés
+[2026-07-21T15:16:47.567Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T15:16:48.046Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T15:16:48.047Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T15:16:48.341Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T15:16:53.109Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T15:16:53.112Z] ℹ️  8 produits manuels conservés
+[2026-07-21T15:16:53.114Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T15:16:53.115Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:16:53.115Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T15:16:53.115Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:18:57.190Z] ✅ Clé API chargée
+[2026-07-21T15:18:57.196Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:18:57.196Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T15:18:57.196Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:18:57.196Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T15:18:57.197Z] ℹ️  23 produits existants chargés
+[2026-07-21T15:18:57.197Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T15:18:57.663Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T15:18:57.664Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T15:18:57.939Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T15:19:02.901Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T15:19:02.913Z] ℹ️  8 produits manuels conservés
+[2026-07-21T15:19:02.918Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T15:19:02.918Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:19:02.919Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T15:19:02.919Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:22:00.236Z] ✅ Clé API chargée
+[2026-07-21T15:22:00.240Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:22:00.240Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T15:22:00.240Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:22:00.241Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T15:22:00.241Z] ℹ️  23 produits existants chargés
+[2026-07-21T15:22:00.241Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T15:22:00.725Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T15:22:00.725Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T15:22:01.008Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T15:22:05.849Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T15:22:05.851Z] ℹ️  8 produits manuels conservés
+[2026-07-21T15:22:05.854Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T15:22:05.854Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:22:05.854Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T15:22:05.855Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:29:58.818Z] ✅ Clé API chargée
+[2026-07-21T15:29:58.823Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:29:58.823Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T15:29:58.823Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T15:29:58.824Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T15:29:58.824Z] ℹ️  23 produits existants chargés
+[2026-07-21T15:29:58.825Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T15:29:59.331Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T15:29:59.331Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T15:29:59.641Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T15:30:04.807Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T15:30:04.810Z] ℹ️  8 produits manuels conservés
+[2026-07-21T15:30:04.813Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T15:30:04.813Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T15:30:04.813Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T15:30:04.813Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T18:53:17.213Z] ✅ Clé API chargée
+[2026-07-21T18:53:17.218Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T18:53:17.218Z] ℹ️    🖨️  AUTO-SYNC PRINTFUL → #SAINTEMAXIME
+[2026-07-21T18:53:17.219Z] ℹ️  ═══════════════════════════════════════════════
+[2026-07-21T18:53:17.219Z] ℹ️  Mode : ÉCRITURE
+[2026-07-21T18:53:17.220Z] ℹ️  23 produits existants chargés
+[2026-07-21T18:53:17.220Z] ℹ️  📡 Récupération des stores Printful...
+[2026-07-21T18:53:17.686Z] ✅ Store : #SAINTEMAXIME store (ID: 1720592)
+[2026-07-21T18:53:17.686Z] ℹ️  📡 Récupération des produits...
+[2026-07-21T18:53:18.035Z] ✅ 15 produits trouvés sur Printful
+[2026-07-21T18:53:23.081Z] ℹ️  🔄 Mapping et fusion incrémentale...
+[2026-07-21T18:53:23.088Z] ℹ️  8 produits manuels conservés
+[2026-07-21T18:53:23.092Z] ✅ Fichier sauvegardé : C:\Users\Pc-Krys\Documents\kimi\workspace\saintemaxime-2026\data\products.json
+[2026-07-21T18:53:23.092Z] ℹ️  ───────────────────────────────────────────────
+[2026-07-21T18:53:23.092Z] ✅ RÉSUMÉ — Créés: 0 | Mis à jour: 15 | Inchangés: 0 | Manuels conservés: 8
+[2026-07-21T18:53:23.092Z] ℹ️  ───────────────────────────────────────────────

@@ -24,7 +24,7 @@ export default function Footer() {
               La marque officielle déposée depuis 2019. Vêtements, accessoires & souvenirs uniques de Sainte-Maxime.
             </p>
             <div className="flex gap-4 pt-2">
-              <a href="https://instagram.com/hashtagsaintemaxime" target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
+              <a href="https://www.instagram.com/hashtag_saintemaxime/" target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
                 <Instagram className="w-5 h-5" />
               </a>
               <a href="https://facebook.com/hashtagsaintemaxime" target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">

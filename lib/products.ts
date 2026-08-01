@@ -6,6 +6,7 @@ export interface Product {
   originalPrice?: number;
   category: string;
   image: string;
+  images?: string[];
   badge?: string;
   description: string;
   details: string[];
@@ -14,6 +15,9 @@ export interface Product {
   reviews: Review[];
   inStock: boolean;
   stockCount?: number;
+  source?: "printful" | "manual";
+  printfulId?: string;
+  lastSyncedAt?: string;
 }
 
 export interface Review {
@@ -25,211 +29,11 @@ export interface Review {
   avatar?: string;
 }
 
-export const categories = [
-  { name: "Accessoires", count: 33, color: "bg-sm-cyan", slug: "accessoires" },
-  { name: "Vêtements Femme", count: 7, color: "bg-sm-coral", slug: "vetements-femme" },
-  { name: "Vêtements Homme", count: 6, color: "bg-sm-deep", slug: "vetements-homme" },
-  { name: "Vie Quotidienne", count: 28, color: "bg-sm-cyan", slug: "vie-quotidienne" },
-];
+// Import depuis le JSON généré par le script de sync
+import productsData from "../data/products.json";
 
-export const products: Product[] = [
-  {
-    id: "1",
-    slug: "t-shirt-saintemaxime-ete-2026",
-    name: "T-Shirt #SAINTEMAXIME",
-    price: 25.0,
-    category: "vetements-homme",
-    image: "/images/product-tshirt.jpg",
-    badge: "BESTSELLER",
-    description: "T-shirt premium 100% coton biologique. Design exclusif #SAINTEMAXIME estampillé sur la poitrine. Coupe moderne, confortable, idéal pour l'été dans le Golfe de Saint-Tropez.",
-    details: [
-      "100% coton biologique (180g/m²)",
-      "Impression DTG haute définition",
-      "Coupe unisexe moderne",
-      "Lavable en machine 30°C",
-      "Fabriqué à la demande via Printful",
-    ],
-    colors: [
-      { name: "Blanc", hex: "#FFFFFF" },
-      { name: "Bleu", hex: "#00D4E8" },
-      { name: "Noir", hex: "#1E293B" },
-    ],
-    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    reviews: [
-      { id: "r1", author: "Marie L.", rating: 5, date: "2026-06-10", text: "T-shirt super qualité, le design est trop beau et la livraison rapide dans le Var." },
-      { id: "r2", author: "Thomas B.", rating: 5, date: "2026-06-05", text: "Le t-shirt du golfe ! J'ai pris le bleu, il est incroyable." },
-      { id: "r3", author: "Julie M.", rating: 4, date: "2026-05-28", text: "Très bien, taille un peu grand je recommande de prendre une taille en dessous." },
-    ],
-    inStock: true,
-    stockCount: 12,
-  },
-  {
-    id: "2",
-    slug: "casquette-trucker-saintemaxime",
-    name: "Casquette Trucker #SAINTEMAXIME",
-    price: 20.0,
-    category: "accessoires",
-    image: "/images/product-casquette.jpg",
-    badge: "ÉDITION LIMITÉE",
-    description: "Casquette trucker classique avec mesh arrière. Logo #SAINTEMAXIME brodé en 3D. Le must-have de l'été pour les plages du Golfe.",
-    details: [
-      "Mesh aéré et léger",
-      "Brodé #SAINTEMAXIME",
-      "Visière courbée",
-      "Réglable à l'arrière",
-    ],
-    colors: [
-      { name: "Noir", hex: "#1E293B" },
-      { name: "Blanc", hex: "#FFFFFF" },
-      { name: "Rose", hex: "#FF6B8A" },
-    ],
-    sizes: ["One Size"],
-    reviews: [
-      { id: "r4", author: "Paul D.", rating: 5, date: "2026-06-12", text: "Casquette parfaite pour la plage !" },
-    ],
-    inStock: true,
-    stockCount: 5,
-  },
-  {
-    id: "3",
-    slug: "bouteille-sport-saintemaxime",
-    name: "Bouteille Sport #SAINTEMAXIME",
-    price: 27.0,
-    category: "vie-quotidienne",
-    image: "/images/product-bouteille.jpg",
-    badge: "NOUVEAU",
-    description: "Bouteille en acier inoxydable avec paille rétractable. Garde vos boissons fraîches 24h. Design exclusif logo 2026.",
-    details: [
-      "Acier inoxydable 304",
-      "Isolation double paroi",
-      "500ml",
-      "Paille rétractable intégrée",
-    ],
-    colors: [
-      { name: "Bleu", hex: "#00D4E8" },
-      { name: "Noir", hex: "#1E293B" },
-    ],
-    sizes: ["500ml"],
-    reviews: [],
-    inStock: true,
-    stockCount: 20,
-  },
-  {
-    id: "4",
-    slug: "serviette-plage-saintemaxime",
-    name: "Serviette de Plage #SAINTEMAXIME",
-    price: 35.0,
-    category: "vie-quotidienne",
-    image: "/images/product-serviette.jpg",
-    badge: "TENDANCE",
-    description: "Serviette de plage en microfibre grand format. Séchage ultra-rapide, design exclusif #SAINTEMAXIME. Indispensable de l'été sur les plages du Golfe.",
-    details: [
-      "Microfibre 100% polyester",
-      "160 x 80 cm",
-      "Séchage rapide",
-      "Impression sublimation",
-    ],
-    colors: [
-      { name: "Bleu Cyan", hex: "#00D4E8" },
-      { name: "Corail", hex: "#FF6B8A" },
-    ],
-    sizes: ["160x80cm"],
-    reviews: [
-      { id: "r5", author: "Sophie R.", rating: 5, date: "2026-06-15", text: "La serviette est immense et super belle. Je l'ai prise en corail, elle fait un carton sur la plage !" },
-    ],
-    inStock: true,
-    stockCount: 8,
-  },
-  {
-    id: "5",
-    slug: "mug-blanc-saintemaxime",
-    name: "Mug Blanc Brillant #SAINTEMAXIME",
-    price: 15.0,
-    category: "vie-quotidienne",
-    image: "/images/product-mug.jpg",
-    badge: "BESTSELLER",
-    description: "Mug en céramique blanc brillant 325ml. Design #SAINTEMAXIME imprimé haute définition. Cadeau souvenir idéal.",
-    details: [
-      "Céramique blanche brillante",
-      "325ml (11 oz)",
-      "Impression sublimation",
-      "Lavable au lave-vaisselle",
-    ],
-    colors: [{ name: "Blanc", hex: "#FFFFFF" }],
-    sizes: ["325ml"],
-    reviews: [
-      { id: "r6", author: "Nicolas F.", rating: 5, date: "2026-06-01", text: "Mug parfait pour mon café du matin, le souvenir de l'été à Sainte-Maxime !" },
-    ],
-    inStock: true,
-    stockCount: 25,
-  },
-  {
-    id: "6",
-    slug: "coque-telephone-saintemaxime",
-    name: "Coque Téléphone #SAINTEMAXIME",
-    price: 22.0,
-    category: "accessoires",
-    image: "/images/product-coque.jpg",
-    badge: "NOUVEAU",
-    description: "Coque de protection pour iPhone et Samsung. Design #SAINTEMAXIME lifestyle. Protection robuste et style Côte d'Azur.",
-    details: [
-      "Polycarbonate robuste",
-      "Impression UV haute définition",
-      "Compatible iPhone & Samsung",
-      "Protection anti-choc",
-    ],
-    colors: [
-      { name: "Bleu", hex: "#00D4E8" },
-      { name: "Transparent", hex: "#F8FAFC" },
-    ],
-    sizes: ["iPhone 14", "iPhone 15", "Samsung S24"],
-    reviews: [],
-    inStock: true,
-    stockCount: 15,
-  },
-  {
-    id: "7",
-    slug: "bougie-soja-saintemaxime",
-    name: "Bougie de Cire de Soja #SAINTEMAXIME",
-    price: 15.0,
-    category: "vie-quotidienne",
-    image: "/images/product-bougie.jpg",
-    description: "Bougie en cire de soja dans un pot de verre. Parfum marin inspiré du Golfe de Saint-Tropez. 40h de combustion.",
-    details: [
-      "Cire de soja 100% naturelle",
-      "Parfum marin",
-      "40h de combustion",
-      "Pot de verre réutilisable",
-    ],
-    colors: [{ name: "Blanc", hex: "#FFFFFF" }],
-    sizes: ["200g"],
-    reviews: [],
-    inStock: true,
-    stockCount: 10,
-  },
-  {
-    id: "8",
-    slug: "claquettes-homme-saintemaxime",
-    name: "Claquettes Homme #SAINTEMAXIME",
-    price: 35.0,
-    category: "vetements-homme",
-    image: "/images/product-claquettes.jpg",
-    description: "Claquettes confortables avec semelle moulée. Logo #SAINTEMAXIME estampillé. Le style plage parfait.",
-    details: [
-      "EVA léger et confortable",
-      "Semelle moulée",
-      "Impression sublimation",
-    ],
-    colors: [
-      { name: "Noir", hex: "#1E293B" },
-      { name: "Bleu", hex: "#00D4E8" },
-    ],
-    sizes: ["38-39", "40-41", "42-43", "44-45"],
-    reviews: [],
-    inStock: true,
-    stockCount: 6,
-  },
-];
+export const categories = productsData.categories;
+export const products: Product[] = productsData.products as Product[];
 
 export function getProductBySlug(slug: string): Product | undefined {
   return products.find((p) => p.slug === slug);
@@ -241,4 +45,16 @@ export function getProductsByCategory(category: string): Product[] {
 
 export function getAllProducts(): Product[] {
   return products;
+}
+
+export function getProductsByBadge(badge: string): Product[] {
+  return products.filter((p) => p.badge?.toLowerCase() === badge.toLowerCase());
+}
+
+export function getBestsellers(): Product[] {
+  return products.filter((p) => p.badge?.toLowerCase().includes("best"));
+}
+
+export function getNewArrivals(): Product[] {
+  return products.filter((p) => p.badge?.toLowerCase().includes("nouveau"));
 }

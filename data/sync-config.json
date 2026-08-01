@@ -1,0 +1,9 @@
+{
+  "marginMultiplier": 1.5,
+  "defaultBadgeNew": "NOUVEAU",
+  "defaultBadgeBestseller": "BESTSELLER",
+  "preserveManualFields": ["reviews", "badge", "description", "details", "stockCount", "image"],
+  "autoBuild": false,
+  "webhookSecret": null,
+  "logRetentionDays": 30
+}

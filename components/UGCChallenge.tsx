@@ -66,7 +66,7 @@ export default function UGCChallenge() {
             </div>
 
             <a
-              href="https://instagram.com/hashtagsaintemaxime"
+              href="https://www.instagram.com/hashtag_saintemaxime/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sm-coral to-sm-cyan text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity"
