@@ -3,7 +3,14 @@
 .env
 dist/
 build/
+<<<<<<< HEAD
 out/
 data/backups/
 logs/
 tsconfig.tsbuildinfo
+=======
+out/
+data/backups/
+logs/
+tsconfig.tsbuildinfo
+>>>>>>> 18ca6606f4b4641c000b1d95fc832895681559d2
