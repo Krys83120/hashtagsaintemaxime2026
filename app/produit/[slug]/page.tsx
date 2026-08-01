@@ -5,16 +5,11 @@ import { Star, Truck, RefreshCw, ShieldCheck } from "lucide-react";
 
 import Reviews from "@/components/Reviews";
 import ProductGallery from "@/components/ProductGallery";
-import { getProductBySlug, getAllProducts, getAllProductSlugs } from "@/lib/products";
+import { getProductBySlug, getAllProducts } from "@/lib/products";
 import { averageRating, formatPrice } from "@/lib/utils";
 
 interface Props {
   params: { slug: string };
-}
-
-export async function generateStaticParams() {
-  const slugs = await getAllProductSlugs();
-  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
