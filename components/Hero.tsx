@@ -1,32 +1,83 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 
+const slides = [
+  { src: "/images/hero/hero-1.jpg", alt: "Panneau #SAINTEMAXIME sur la plage, ciel bleu" },
+  { src: "/images/hero/hero-2.jpg", alt: "Panneau #SAINTEMAXIME face à la mer" },
+  { src: "/images/hero/hero-3.jpg", alt: "Panneau #SAINTEMAXIME sur la promenade" },
+  { src: "/images/hero/hero-4.jpg", alt: "Panneau #SAINTEMAXIME vue large plage" },
+  { src: "/images/hero/hero-5.jpg", alt: "Panneau #SAINTEMAXIME au coucher de soleil" },
+];
+
 export default function Hero() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-sm-cyan to-sm-deep py-24 sm:py-32">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 w-32 h-32 rounded-full border-2 border-white" />
-        <div className="absolute bottom-20 right-20 w-48 h-48 rounded-full border-2 border-white" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border border-white/30" />
+    <section className="relative overflow-hidden py-24 sm:py-32">
+      {/* Carrousel photo plein largeur */}
+      <div className="absolute inset-0">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={index}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={slides[index].src}
+              alt={slides[index].alt}
+              fill
+              priority={index === 0}
+              sizes="100vw"
+              className="object-cover"
+            />
+          </motion.div>
+        </AnimatePresence>
+        {/* Overlay pour garder le texte blanc lisible sur toutes les photos */}
+        <div className="absolute inset-0 bg-gradient-to-b from-sm-deep/70 via-sm-deep/50 to-sm-deep/80" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Indicateurs du carrousel */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setIndex(i)}
+            aria-label={`Voir la photo ${i + 1}`}
+            className={`h-1.5 rounded-full transition-all ${
+              i === index ? "w-8 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
+            }`}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold text-white tracking-tight mb-2">
+          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold text-white tracking-tight mb-2 drop-shadow-lg">
             #SAINTEMAXIME
           </h1>
-          <p className="text-white/90 text-lg sm:text-xl font-medium mb-2">
+          <p className="text-white text-lg sm:text-xl font-medium mb-2 drop-shadow">
             La Marque Officielle de Sainte-Maxime
           </p>
-          <p className="text-white/70 text-sm sm:text-base mb-8">
+          <p className="text-white/90 text-sm sm:text-base mb-8 drop-shadow">
             Vêtements · Accessoires · Souvenirs · Lifestyle
           </p>
         </motion.div>
@@ -46,9 +97,9 @@ export default function Hero() {
           </Link>
           <Link
             href="/le-coeur-au-sol/"
-            className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full hover:bg-white/30 transition-all border border-white/30"
+            className="inline-flex items-center gap-2 bg-white text-sm-deep font-semibold px-8 py-4 rounded-full hover:bg-white/90 transition-all shadow-lg"
           >
-            <Sparkles className="w-5 h-5" />
+            <Sparkles className="w-5 h-5 text-sm-coral" />
             Le Cœur au Sol
           </Link>
         </motion.div>
@@ -57,7 +108,7 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm text-sm-dark px-6 py-3 rounded-full text-sm font-medium shadow-sm"
+          className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm text-sm-dark px-6 py-3 rounded-full text-sm font-medium shadow-lg"
         >
           <span className="text-sm-coral">💎</span>
           <span>1 247 personnes ont adopté le style #SAINTEMAXIME ce mois-ci</span>
