@@ -2,20 +2,40 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Check } from "lucide-react";
+import { useState } from "react";
 import { Product } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/lib/store/cart";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const [added, setAdded] = useState(false);
+  const addItem = useCartStore((state) => state.addItem);
+
   const badgeColors: Record<string, string> = {
     BESTSELLER: "bg-sm-coral",
     "ÉDITION LIMITÉE": "bg-yellow-400 text-sm-dark",
     NOUVEAU: "bg-sm-cyan",
     TENDANCE: "bg-sm-cyan",
+  };
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addItem({
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      color: product.colors[0]?.name,
+      size: product.sizes[0],
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
   };
 
   return (
@@ -59,9 +79,21 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
       <div className="px-4 pb-4">
-        <button className="w-full flex items-center justify-center gap-2 bg-sm-cyan text-white font-medium py-2.5 rounded-xl hover:bg-sm-deep transition-colors text-sm">
-          <ShoppingCart className="w-4 h-4" />
-          Ajouter au panier
+        <button
+          onClick={handleQuickAdd}
+          disabled={!product.inStock}
+          className="w-full flex items-center justify-center gap-2 bg-sm-cyan text-white font-medium py-2.5 rounded-xl hover:bg-sm-deep transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {added ? (
+            <>
+              <Check className="w-4 h-4" /> Ajouté !
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-4 h-4" />
+              {product.inStock ? "Ajouter au panier" : "Rupture de stock"}
+            </>
+          )}
         </button>
       </div>
     </motion.div>

@@ -5,9 +5,13 @@ import Link from "next/link";
 import { ShoppingCart, Heart, Menu, X, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useCartStore } from "@/lib/store/cart";
+import CartDrawer from "@/components/CartDrawer";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const cartCount = useCartStore((state) => state.items.reduce((sum, i) => sum + i.quantity, 0));
 
   const navLinks = [
     { href: "/boutique/", label: "Boutique" },
@@ -55,11 +59,13 @@ export default function Header() {
             <button className="p-2 hover:bg-sm-cream rounded-full transition-colors">
               <Heart className="w-5 h-5 text-sm-dark" />
             </button>
-            <button className="p-2 hover:bg-sm-cream rounded-full transition-colors relative">
+            <button onClick={() => setCartOpen(true)} className="p-2 hover:bg-sm-cream rounded-full transition-colors relative">
               <ShoppingCart className="w-5 h-5 text-sm-dark" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-sm-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                0
-              </span>
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-sm-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </button>
 
             {/* Mobile toggle */}
@@ -97,6 +103,8 @@ export default function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }

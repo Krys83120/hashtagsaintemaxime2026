@@ -5,6 +5,7 @@ import { Star, Truck, RefreshCw, ShieldCheck } from "lucide-react";
 
 import Reviews from "@/components/Reviews";
 import ProductGallery from "@/components/ProductGallery";
+import AddToCart from "@/components/AddToCart";
 import { getProductBySlug, getAllProducts } from "@/lib/products";
 import { averageRating, formatPrice } from "@/lib/utils";
 
@@ -131,52 +132,7 @@ export default async function ProductPage({ params }: Props) {
               {product.description}
             </p>
 
-            <div>
-              <p className="font-semibold text-sm-dark mb-2">Couleur</p>
-              <div className="flex gap-2">
-                {product.colors.map((color) => (
-                  <button
-                    key={color.name}
-                    type="button"
-                    className="w-10 h-10 rounded-full border-2 border-sm-lightgray hover:border-sm-cyan transition-colors shadow-sm"
-                    style={{ backgroundColor: color.hex }}
-                    title={color.name}
-                    aria-label={`Couleur ${color.name}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="font-semibold text-sm-dark mb-2">Taille</p>
-              <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    className="px-4 py-2 rounded-lg border border-sm-lightgray text-sm font-medium hover:border-sm-cyan hover:bg-sm-cyan/5 transition-colors"
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                type="button"
-                className="flex-1 bg-sm-cyan text-white font-bold py-4 rounded-xl hover:bg-sm-deep transition-colors shadow-md hover:shadow-lg"
-              >
-                Ajouter au panier
-              </button>
-
-              <button
-                type="button"
-                className="flex-1 border-2 border-sm-cyan text-sm-cyan font-bold py-4 rounded-xl hover:bg-sm-cyan/5 transition-colors"
-              >
-                Ajouter à la Wishlist
-              </button>
-            </div>
+            <AddToCart product={product} />
 
             <div className="flex flex-wrap gap-4 text-sm text-sm-gray pt-4 border-t border-sm-lightgray">
               <span className="flex items-center gap-1">
