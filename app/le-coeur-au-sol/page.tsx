@@ -29,9 +29,6 @@ async function getTagembedWidgetId(): Promise<string> {
 export default async function CoeurAuSolPage() {
   const tagembedWidgetId = await getTagembedWidgetId();
 
-export default async function CoeurAuSolPage() {
-  const tagembedWidgetId = await getTagembedWidgetId();
-
   return (
     <div className="min-h-screen bg-sm-cream">
       <div className="bg-gradient-to-b from-sm-coral to-sm-cyan py-20 px-4 text-center">
@@ -105,11 +102,7 @@ export default async function CoeurAuSolPage() {
             />
           </div>
 
-<<<<<<< HEAD
           {/* Flux Instagram réel via Tagembed (ID réglable depuis l'admin > SEO & Config > Réseaux Sociaux) */}
-=======
-          {/* Flux Instagram réel via Tagembed */}
->>>>>>> 2d1e0d4e46832c142f8e0d741f12c0cdc6bb090a
           {tagembedWidgetId ? (
             <TagembedFeed widgetId={tagembedWidgetId} />
           ) : (
