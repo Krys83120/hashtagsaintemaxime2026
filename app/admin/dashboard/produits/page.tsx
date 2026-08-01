@@ -14,6 +14,7 @@ interface AdminProduct {
   originalPrice?: number;
   category: string;
   image: string;
+  images: string[];
   badge: string;
   description: string;
   details: string[];
@@ -36,6 +37,7 @@ function fromDbRow(row: any): AdminProduct {
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
     category: row.category,
     image: row.image || "",
+    images: row.images || [],
     badge: row.badge || "",
     description: row.description || "",
     details: row.details || [],
@@ -57,6 +59,7 @@ function toDbRow(p: AdminProduct) {
     original_price: p.originalPrice ?? null,
     category: p.category,
     image: p.image,
+    images: p.images,
     badge: p.badge || null,
     description: p.description,
     details: p.details,
@@ -141,6 +144,7 @@ export default function AdminProduitsPage() {
       price: 0,
       category: categories[0] || "accessoires",
       image: "/images/product-placeholder.jpg",
+      images: [],
       badge: "",
       description: "",
       details: [],
@@ -316,11 +320,70 @@ export default function AdminProduitsPage() {
                           onChange={(e) => updateProduct(p.id, "stockCount", parseInt(e.target.value))}
                           className="w-full px-3 py-2 rounded-xl border border-sm-lightgray focus:border-sm-cyan outline-none text-sm" />
                       </div>
-                      <div className="lg:col-span-2">
-                        <label className="block text-xs font-medium text-sm-gray mb-1">Image (URL)</label>
-                        <input type="text" value={p.image}
-                          onChange={(e) => updateProduct(p.id, "image", e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl border border-sm-lightgray focus:border-sm-cyan outline-none text-sm" />
+                      <div className="lg:col-span-3">
+                        <label className="block text-xs font-medium text-sm-gray mb-2">
+                          Photos ({p.images.length}) — clique sur ⭐ pour définir l'image principale, sur 🗑️ pour retirer une photo que tu ne veux pas garder
+                        </label>
+                        <div className="flex flex-wrap gap-3">
+                          {p.images.map((img, idx) => (
+                            <div key={idx} className={`relative group w-24 h-24 rounded-xl overflow-hidden border-2 ${img === p.image ? "border-sm-cyan" : "border-sm-lightgray"}`}>
+                              <img src={img} alt={`${p.name} ${idx + 1}`} className="w-full h-full object-cover" />
+                              {img === p.image && (
+                                <span className="absolute top-1 left-1 bg-sm-cyan text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                                  Principale
+                                </span>
+                              )}
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100">
+                                <button
+                                  type="button"
+                                  title="Définir comme image principale"
+                                  onClick={() => updateProduct(p.id, "image", img)}
+                                  className="w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-sm"
+                                >
+                                  ⭐
+                                </button>
+                                <button
+                                  type="button"
+                                  title="Retirer cette photo"
+                                  onClick={() => {
+                                    const nextImages = p.images.filter((_, i) => i !== idx);
+                                    updateProduct(p.id, "images", nextImages);
+                                    // Si on retire l'image principale, on bascule sur la suivante disponible
+                                    if (img === p.image) {
+                                      updateProduct(p.id, "image", nextImages[0] || "");
+                                    }
+                                  }}
+                                  className="w-7 h-7 rounded-full bg-white/90 hover:bg-red-500 hover:text-white flex items-center justify-center text-xs"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                          {p.images.length === 0 && (
+                            <div className="w-24 h-24 rounded-xl border-2 border-dashed border-sm-lightgray flex items-center justify-center text-sm-gray">
+                              <ImageIcon className="w-6 h-6" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          <input
+                            type="text"
+                            placeholder="Coller une URL d'image et Entrée pour l'ajouter"
+                            onKeyDown={(e) => {
+                              const target = e.target as HTMLInputElement;
+                              if (e.key === "Enter" && target.value.trim()) {
+                                e.preventDefault();
+                                const url = target.value.trim();
+                                const nextImages = [...p.images, url];
+                                updateProduct(p.id, "images", nextImages);
+                                if (!p.image) updateProduct(p.id, "image", url);
+                                target.value = "";
+                              }
+                            }}
+                            className="flex-1 px-3 py-2 rounded-xl border border-sm-lightgray focus:border-sm-cyan outline-none text-sm"
+                          />
+                        </div>
                       </div>
                       <div className="lg:col-span-3">
                         <label className="block text-xs font-medium text-sm-gray mb-1">Description</label>

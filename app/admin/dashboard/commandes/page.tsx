@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Search, Filter, Eye, Package, Truck, CheckCircle, Clock, XCircle, Download } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface Order {
-  id: string;
+  id: string; // UUID Supabase
+  orderNumber: string;
   customer: string;
   email: string;
   items: { name: string; qty: number; price: number }[];
@@ -18,39 +20,21 @@ interface Order {
   notes?: string;
 }
 
-const defaultOrders: Order[] = [
-  {
-    id: "ORD-2026-001", customer: "Marie Dupont", email: "marie@email.com",
-    items: [{ name: "T-Shirt #SAINTEMAXIME", qty: 2, price: 25 }],
-    total: 50, status: "delivered", date: "2026-07-15",
-    shippingAddress: "12 Rue de la Plage, 83120 Sainte-Maxime", trackingNumber: "TRK123456",
-  },
-  {
-    id: "ORD-2026-002", customer: "Thomas Martin", email: "thomas@email.com",
-    items: [{ name: "Casquette Trucker", qty: 1, price: 20 }, { name: "Mug Blanc", qty: 1, price: 15 }],
-    total: 35, status: "shipped", date: "2026-07-18",
-    shippingAddress: "45 Avenue du Golfe, 83120 Sainte-Maxime", trackingNumber: "TRK789012",
-  },
-  {
-    id: "ORD-2026-003", customer: "Sophie R", email: "sophie@email.com",
-    items: [{ name: "Serviette de Plage", qty: 1, price: 35 }],
-    total: 35, status: "processing", date: "2026-07-20",
-    shippingAddress: "8 Boulevard des Pins, 83120 Sainte-Maxime",
-  },
-  {
-    id: "ORD-2026-004", customer: "Paul D", email: "paul@email.com",
-    items: [{ name: "Coque Téléphone", qty: 1, price: 22 }],
-    total: 22, status: "pending", date: "2026-07-21",
-    shippingAddress: "3 Place du Marché, 83120 Sainte-Maxime",
-  },
-  {
-    id: "ORD-2026-005", customer: "Julie M", email: "julie@email.com",
-    items: [{ name: "Bouteille Sport", qty: 1, price: 27 }],
-    total: 27, status: "cancelled", date: "2026-07-10",
-    shippingAddress: "22 Route de la Corniche, 83120 Sainte-Maxime",
-    notes: "Client a annulé — changement d'avis",
-  },
-];
+function fromDbRow(row: any): Order {
+  return {
+    id: row.id,
+    orderNumber: row.order_number,
+    customer: row.customer_name,
+    email: row.customer_email,
+    items: row.items || [],
+    total: Number(row.total),
+    status: row.status,
+    date: row.created_at,
+    shippingAddress: row.customer_address?.formatted || "",
+    trackingNumber: row.customer_address?.trackingNumber || undefined,
+    notes: row.notes || undefined,
+  };
+}
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   pending: { label: "En attente", color: "bg-yellow-100 text-yellow-700", icon: Clock },
@@ -61,31 +45,46 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
 };
 
 export default function AdminCommandesPage() {
-  const [orders, setOrders] = useState<Order[]>(defaultOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [viewingOrder, setViewingOrder] = useState<string | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    const saved = localStorage.getItem("sm_admin_orders");
-    if (saved) {
-      try { setOrders(JSON.parse(saved)); } catch { /* ignore */ }
-    }
+    loadOrders();
   }, []);
 
-  const saveOrders = () => {
-    localStorage.setItem("sm_admin_orders", JSON.stringify(orders));
+  const loadOrders = async () => {
+    setLoading(true);
+    const { data, error: loadError } = await supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (loadError) {
+      setError("Erreur de chargement : " + loadError.message);
+    } else {
+      setOrders((data || []).map(fromDbRow));
+    }
+    setLoading(false);
   };
 
   const filtered = orders.filter((o) => {
-    const matchesSearch = o.id.toLowerCase().includes(search.toLowerCase()) || o.customer.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = o.orderNumber.toLowerCase().includes(search.toLowerCase()) || o.customer.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = !filterStatus || o.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
-  const updateStatus = (id: string, status: Order["status"]) => {
+  const updateStatus = async (id: string, status: Order["status"]) => {
     setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
-    saveOrders();
+    const { error: updateError } = await supabase.from("orders").update({ status }).eq("id", id);
+    if (updateError) {
+      setError("Erreur de mise à jour : " + updateError.message);
+      loadOrders();
+    }
   };
 
   const revenue = orders.filter((o) => o.status !== "cancelled").reduce((sum, o) => sum + o.total, 0);
@@ -138,6 +137,16 @@ export default function AdminCommandesPage() {
           </select>
         </div>
 
+        {error && (
+          <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium">⚠️ {error}</div>
+        )}
+
+        {loading && (
+          <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray text-sm-gray">
+            Chargement des commandes...
+          </div>
+        )}
+
         {/* Orders list */}
         <div className="space-y-3">
           {filtered.map((order) => {
@@ -152,10 +161,10 @@ export default function AdminCommandesPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm-dark">{order.id}</span>
+                      <span className="font-semibold text-sm-dark">{order.orderNumber}</span>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${cfg.color}`}>{cfg.label}</span>
                     </div>
-                    <p className="text-xs text-sm-gray">{order.customer} · {order.items.length} article(s) · {order.total.toFixed(2)}€ · {order.date}</p>
+                    <p className="text-xs text-sm-gray">{order.customer} · {order.items.length} article(s) · {order.total.toFixed(2)}€ · {new Date(order.date).toLocaleDateString("fr-FR")}</p>
                   </div>
                   <Eye className="w-4 h-4 text-sm-gray" />
                 </div>
@@ -229,7 +238,7 @@ export default function AdminCommandesPage() {
           })}
         </div>
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray">
             <Package className="w-12 h-12 text-sm-gray mx-auto mb-3" />
             <p className="text-sm-gray">Aucune commande trouvée.</p>
