@@ -13,6 +13,9 @@ interface Order {
   total: number;
   status: string;
   created_at: string;
+  tracking_number?: string;
+  carrier?: string;
+  tracking_token?: string;
 }
 
 interface AccountDashboardProps {
@@ -253,7 +256,12 @@ export default function AccountDashboard({ email, fullName, phone, address, orde
                       </p>
                     ))}
                   </div>
-                  <p className="font-bold text-sm-cyan text-right">{formatPrice(order.total)}</p>
+                  <p className="font-bold text-sm-cyan text-right mb-2">{formatPrice(order.total)}</p>
+                  {order.tracking_token && (order.status === "shipped" || order.status === "delivered") && (
+                    <a href={`/suivi/${order.tracking_token}/`} className="block text-right text-sm text-sm-cyan font-semibold hover:underline">
+                      Suivre ma commande →
+                    </a>
+                  )}
                 </div>
               );
             })

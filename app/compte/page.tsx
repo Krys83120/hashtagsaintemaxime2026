@@ -14,7 +14,7 @@ export default async function ComptePage() {
 
   const { data: orders } = await supabase
     .from("orders")
-    .select("*")
+    .select("id, order_number, items, total, status, created_at, tracking_number, carrier, tracking_token")
     .eq("customer_id", user.id)
     .order("created_at", { ascending: false });
 

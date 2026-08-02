@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
-import { Search, Filter, Eye, Package, Truck, CheckCircle, Clock, XCircle, Download } from "lucide-react";
+import { Search, Filter, Eye, Package, Truck, CheckCircle, Clock, XCircle, Download, Trash2, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface Order {
@@ -13,10 +13,11 @@ interface Order {
   email: string;
   items: { name: string; qty: number; price: number }[];
   total: number;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  status: "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
   date: string;
   shippingAddress: string;
   trackingNumber?: string;
+  carrier?: string;
   notes?: string;
 }
 
@@ -31,17 +32,20 @@ function fromDbRow(row: any): Order {
     status: row.status,
     date: row.created_at,
     shippingAddress: row.customer_address?.formatted || "",
-    trackingNumber: row.customer_address?.trackingNumber || undefined,
+    trackingNumber: row.tracking_number || undefined,
+    carrier: row.carrier || undefined,
     notes: row.notes || undefined,
   };
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   pending: { label: "En attente", color: "bg-yellow-100 text-yellow-700", icon: Clock },
+  paid: { label: "Payée", color: "bg-blue-100 text-blue-700", icon: Package },
   processing: { label: "En préparation", color: "bg-blue-100 text-blue-700", icon: Package },
   shipped: { label: "Expédiée", color: "bg-purple-100 text-purple-700", icon: Truck },
   delivered: { label: "Livrée", color: "bg-green-100 text-green-700", icon: CheckCircle },
   cancelled: { label: "Annulée", color: "bg-red-100 text-red-700", icon: XCircle },
+  refunded: { label: "Remboursée", color: "bg-gray-100 text-gray-700", icon: XCircle },
 };
 
 export default function AdminCommandesPage() {
@@ -51,6 +55,8 @@ export default function AdminCommandesPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [viewingOrder, setViewingOrder] = useState<string | null>(null);
+  const [trackingDrafts, setTrackingDrafts] = useState<Record<string, { number: string; carrier: string }>>({});
+  const [sendingShipEmail, setSendingShipEmail] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -80,11 +86,55 @@ export default function AdminCommandesPage() {
 
   const updateStatus = async (id: string, status: Order["status"]) => {
     setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
-    const { error: updateError } = await supabase.from("orders").update({ status }).eq("id", id);
-    if (updateError) {
-      setError("Erreur de mise à jour : " + updateError.message);
+    const res = await fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: id, status }),
+    });
+    if (!res.ok) {
+      const result = await res.json();
+      setError("Erreur de mise à jour : " + (result.error || ""));
       loadOrders();
     }
+  };
+
+  const markShippedWithTracking = async (order: Order) => {
+    const draft = trackingDrafts[order.id] || { number: order.trackingNumber || "", carrier: order.carrier || "Colissimo" };
+    if (!draft.number.trim()) {
+      setError("Merci de renseigner un numéro de suivi.");
+      return;
+    }
+    setSendingShipEmail(order.id);
+    setError("");
+
+    const res = await fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: order.id, status: "shipped", trackingNumber: draft.number.trim(), carrier: draft.carrier.trim() }),
+    });
+    const result = await res.json();
+    setSendingShipEmail(null);
+
+    if (!res.ok) {
+      setError(result.error || "Erreur lors de l'expédition.");
+      return;
+    }
+    loadOrders();
+  };
+
+  const deleteOrder = async (order: Order) => {
+    if (!confirm(`Supprimer définitivement la commande ${order.orderNumber} ?`)) return;
+    const res = await fetch("/api/admin/orders", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: order.id }),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      setError(result.error || "Erreur lors de la suppression.");
+      return;
+    }
+    setOrders((prev) => prev.filter((o) => o.id !== order.id));
   };
 
   const revenue = orders.filter((o) => o.status !== "cancelled").reduce((sum, o) => sum + o.total, 0);
@@ -167,6 +217,12 @@ export default function AdminCommandesPage() {
                     <p className="text-xs text-sm-gray">{order.customer} · {order.items.length} article(s) · {order.total.toFixed(2)}€ · {new Date(order.date).toLocaleDateString("fr-FR")}</p>
                   </div>
                   <Eye className="w-4 h-4 text-sm-gray" />
+                  <button
+                    onClick={(e) => { e.stopPropagation(); deleteOrder(order); }}
+                    className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
 
                 {isOpen && (
@@ -201,12 +257,56 @@ export default function AdminCommandesPage() {
                         </div>
                       </div>
 
-                      {order.trackingNumber && (
-                        <div>
-                          <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-1">Numéro de suivi</p>
-                          <p className="text-sm font-mono bg-sm-cream rounded-xl px-4 py-2">{order.trackingNumber}</p>
+                      <div className="p-4 bg-sm-cream rounded-xl space-y-3">
+                        <p className="text-xs font-bold text-sm-gray uppercase tracking-wider">Expédition & suivi</p>
+                        {order.trackingNumber && (
+                          <p className="text-sm text-sm-dark">
+                            Déjà renseigné : <span className="font-mono font-medium">{order.trackingNumber}</span>
+                            {order.carrier && ` (${order.carrier})`}
+                          </p>
+                        )}
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="text"
+                            placeholder="Numéro de suivi"
+                            defaultValue={order.trackingNumber || ""}
+                            onChange={(e) =>
+                              setTrackingDrafts((prev) => ({
+                                ...prev,
+                                [order.id]: { number: e.target.value, carrier: prev[order.id]?.carrier ?? order.carrier ?? "Colissimo" },
+                              }))
+                            }
+                            className="flex-1 px-3 py-2 rounded-lg border border-sm-lightgray focus:border-sm-cyan outline-none text-sm"
+                          />
+                          <select
+                            defaultValue={order.carrier || "Colissimo"}
+                            onChange={(e) =>
+                              setTrackingDrafts((prev) => ({
+                                ...prev,
+                                [order.id]: { number: prev[order.id]?.number ?? order.trackingNumber ?? "", carrier: e.target.value },
+                              }))
+                            }
+                            className="px-3 py-2 rounded-lg border border-sm-lightgray focus:border-sm-cyan outline-none text-sm bg-white"
+                          >
+                            <option value="Colissimo">Colissimo</option>
+                            <option value="Chronopost">Chronopost</option>
+                            <option value="Mondial Relay">Mondial Relay</option>
+                            <option value="UPS">UPS</option>
+                            <option value="DHL">DHL</option>
+                          </select>
+                          <button
+                            onClick={() => markShippedWithTracking(order)}
+                            disabled={sendingShipEmail === order.id}
+                            className="flex items-center justify-center gap-2 bg-sm-cyan text-white font-semibold px-4 py-2 rounded-lg hover:bg-sm-deep transition-colors text-sm disabled:opacity-60 whitespace-nowrap"
+                          >
+                            <Send className="w-4 h-4" />
+                            {sendingShipEmail === order.id ? "Envoi..." : "Expédier + email"}
+                          </button>
                         </div>
-                      )}
+                        <p className="text-xs text-sm-gray">
+                          Enregistre le numéro, passe la commande en "Expédiée" et envoie un email au client avec un lien de suivi.
+                        </p>
+                      </div>
 
                       {order.notes && (
                         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-800">
@@ -218,7 +318,7 @@ export default function AdminCommandesPage() {
                       <div>
                         <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-2">Changer le statut</p>
                         <div className="flex flex-wrap gap-2">
-                          {(["pending", "processing", "shipped", "delivered", "cancelled"] as const).map((s) => (
+                          {(["pending", "paid", "processing", "shipped", "delivered", "cancelled", "refunded"] as const).map((s) => (
                             <button key={s} onClick={() => updateStatus(order.id, s)}
                               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                                 order.status === s

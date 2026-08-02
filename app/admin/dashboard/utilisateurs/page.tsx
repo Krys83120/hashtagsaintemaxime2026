@@ -16,11 +16,14 @@ interface AdminAccount {
 }
 
 interface Customer {
-  name: string;
+  id: string;
   email: string;
+  fullName: string;
+  phone: string;
+  createdAt: string;
+  emailConfirmed: boolean;
   ordersCount: number;
   totalSpent: number;
-  lastOrderAt: string;
 }
 
 export default function AdminUtilisateursPage() {
@@ -58,16 +61,14 @@ export default function AdminUtilisateursPage() {
     }
 
     const { data: orderRows } = await supabase.from("orders").select("customer_name, customer_email, total, created_at");
-    const byEmail: Record<string, Customer> = {};
-    (orderRows || []).forEach((o: any) => {
-      if (!byEmail[o.customer_email]) {
-        byEmail[o.customer_email] = { name: o.customer_name, email: o.customer_email, ordersCount: 0, totalSpent: 0, lastOrderAt: o.created_at };
-      }
-      byEmail[o.customer_email].ordersCount += 1;
-      byEmail[o.customer_email].totalSpent += Number(o.total);
-      if (o.created_at > byEmail[o.customer_email].lastOrderAt) byEmail[o.customer_email].lastOrderAt = o.created_at;
-    });
-    setCustomers(Object.values(byEmail));
+
+    const custRes = await fetch("/api/admin/customers");
+    const custData = await custRes.json();
+    if (!custRes.ok) {
+      setError((prev) => prev || "Erreur de chargement des clients : " + (custData.error || ""));
+    } else {
+      setCustomers(custData.customers || []);
+    }
 
     setLoading(false);
   };
@@ -76,7 +77,7 @@ export default function AdminUtilisateursPage() {
     a.email.toLowerCase().includes(search.toLowerCase()) || (a.fullName || "").toLowerCase().includes(search.toLowerCase())
   );
   const filteredCustomers = customers.filter((c) =>
-    c.email.toLowerCase().includes(search.toLowerCase()) || c.name.toLowerCase().includes(search.toLowerCase())
+    c.email.toLowerCase().includes(search.toLowerCase()) || c.fullName.toLowerCase().includes(search.toLowerCase())
   );
 
   const createAdmin = async () => {
@@ -122,6 +123,21 @@ export default function AdminUtilisateursPage() {
     const { error: updateError } = await supabase.from("admin_users").update({ active: !a.active }).eq("id", a.id);
     if (updateError) {
       setError(updateError.message);
+      return;
+    }
+    loadAll();
+  };
+
+  const deleteCustomer = async (customer: Customer) => {
+    if (!confirm(`Supprimer le compte de ${customer.fullName || customer.email} ? Ses commandes resteront visibles mais ne seront plus liées à un compte.`)) return;
+    const res = await fetch("/api/admin/customers", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: customer.id }),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      setError(result.error || "Erreur lors de la suppression.");
       return;
     }
     loadAll();
@@ -264,38 +280,48 @@ export default function AdminUtilisateursPage() {
           </div>
         </div>
 
-        {/* Clients (calculés depuis les commandes) */}
+        {/* Clients (comptes réels) */}
         <div>
           <h2 className="text-lg font-bold text-sm-dark mb-1">🛍️ Clients</h2>
-          <p className="text-xs text-sm-gray mb-3">Calculé automatiquement à partir des commandes (pas de comptes clients sur le site pour l'instant).</p>
+          <p className="text-xs text-sm-gray mb-3">Comptes clients inscrits sur le site.</p>
           <div className="bg-white rounded-2xl border border-sm-lightgray overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-sm-cream border-b border-sm-lightgray text-sm-gray text-xs uppercase tracking-wider">
                     <th className="text-left py-3 px-4">Client</th>
+                    <th className="text-left py-3 px-4">Inscription</th>
                     <th className="text-left py-3 px-4">Commandes</th>
                     <th className="text-left py-3 px-4">Dépensé</th>
-                    <th className="text-left py-3 px-4">Dernière commande</th>
+                    <th className="text-left py-3 px-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredCustomers.map((c) => (
-                    <tr key={c.email} className="border-b border-sm-lightgray/50 hover:bg-sm-cream/50 transition-colors">
+                    <tr key={c.id} className="border-b border-sm-lightgray/50 hover:bg-sm-cream/50 transition-colors">
                       <td className="py-3 px-4">
-                        <p className="font-medium text-sm-dark">{c.name}</p>
-                        <p className="text-xs text-sm-gray flex items-center gap-1"><Mail className="w-3 h-3" /> {c.email}</p>
+                        <p className="font-medium text-sm-dark">{c.fullName || "—"}</p>
+                        <p className="text-xs text-sm-gray flex items-center gap-1">
+                          <Mail className="w-3 h-3" /> {c.email}
+                          {!c.emailConfirmed && <span className="text-yellow-600">(non confirmé)</span>}
+                        </p>
                       </td>
+                      <td className="py-3 px-4 text-sm-gray">{new Date(c.createdAt).toLocaleDateString("fr-FR")}</td>
                       <td className="py-3 px-4 text-sm-gray">{c.ordersCount}</td>
                       <td className="py-3 px-4 font-medium">{c.totalSpent.toFixed(2)}€</td>
-                      <td className="py-3 px-4 text-sm-gray">{new Date(c.lastOrderAt).toLocaleDateString("fr-FR")}</td>
+                      <td className="py-3 px-4">
+                        <button onClick={() => deleteCustomer(c)}
+                          className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-colors">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             {!loading && filteredCustomers.length === 0 && (
-              <div className="p-12 text-center text-sm-gray">Aucun client pour l'instant — les commandes n'ont pas encore été branchées à un système de paiement.</div>
+              <div className="p-12 text-center text-sm-gray">Aucun client inscrit pour l'instant.</div>
             )}
           </div>
         </div>
