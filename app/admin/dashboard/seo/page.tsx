@@ -16,6 +16,7 @@ interface SiteConfig {
   defaultCurrency: string;
   googleAnalyticsId: string;
   facebookPixelId: string;
+  smartlookProjectKey: string;
   emailContact: string;
   instagramUrl: string;
   facebookUrl: string;
@@ -39,6 +40,7 @@ const defaultConfig: SiteConfig = {
   defaultCurrency: "EUR",
   googleAnalyticsId: "",
   facebookPixelId: "",
+  smartlookProjectKey: "",
   emailContact: "contact@hashtagsaintemaxime.fr",
   instagramUrl: "https://www.instagram.com/hashtag_saintemaxime/",
   facebookUrl: "https://www.facebook.com/hashtagsaintemaxime/",
@@ -229,6 +231,19 @@ export default function AdminSEOPage() {
                   placeholder="XXXXXXXXXX"
                   className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-sm-dark mb-1">Smartlook Project Key</label>
+                <input
+                  type="text"
+                  value={config.smartlookProjectKey}
+                  onChange={(e) => updateField("smartlookProjectKey", e.target.value)}
+                  placeholder="ex: a1b2c3d4e5f6..."
+                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm font-mono"
+                />
+                <p className="text-xs text-sm-gray mt-1">
+                  Sur smartlook.com → Settings → Tracking code, copie la clé de projet.
+                </p>
               </div>
             </div>
           )}

@@ -8,6 +8,9 @@ import HeartLoader from "@/components/HeartLoader";
 import TrustBadge from "@/components/TrustBadge";
 import { getSiteLinks } from "@/lib/links";
 import { getPageContent } from "@/lib/pages-content";
+import { createClient } from "@/lib/supabase/server";
+import CookieConsent from "@/components/CookieConsent";
+import AnalyticsLoader from "@/components/AnalyticsLoader";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({
@@ -82,6 +85,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const links = await getSiteLinks();
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", "site_config")
+    .maybeSingle();
+  const siteConfig = (settingsRow?.value as any) || {};
   const homeContent = await getPageContent<{ bannerText?: string; bannerActive?: boolean }>("home");
 
   return (
@@ -140,6 +151,12 @@ export default async function RootLayout({
         <main>{children}</main>
         <Footer links={links} />
         <TrustBadge />
+        <CookieConsent />
+        <AnalyticsLoader
+          googleAnalyticsId={siteConfig.googleAnalyticsId}
+          facebookPixelId={siteConfig.facebookPixelId}
+          smartlookProjectKey={siteConfig.smartlookProjectKey}
+        />
       </body>
     </html>
   );
