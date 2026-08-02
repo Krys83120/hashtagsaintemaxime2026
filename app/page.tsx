@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Hero from "@/components/Hero";
 import CategoryCard from "@/components/CategoryCard";
-import ProductCard from "@/components/ProductCard";
+import InfiniteProductCarousel from "@/components/InfiniteProductCarousel";
 import UGCChallenge from "@/components/UGCChallenge";
 import Newsletter from "@/components/Newsletter";
 import SocialReviewsSection from "@/components/SocialReviewsSection";
@@ -25,7 +25,7 @@ export default async function HomePage() {
     getAllProducts(),
     getPageContent<{ heroTitle?: string; heroSubtitle?: string; heroButtonText?: string; newsletterTitle?: string; newsletterText?: string }>("home"),
   ]);
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts = [...products].sort(() => Math.random() - 0.5);
 
   const supabase = await createClient();
   const { data: settingsRow } = await supabase
@@ -76,11 +76,7 @@ export default async function HomePage() {
           <p className="text-center text-sm-gray mb-12 max-w-xl mx-auto">
             Nos produits phares, sélectionnés pour toi. Édition limitée, disponible uniquement cet été.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <InfiniteProductCarousel products={featuredProducts} />
           <div className="text-center mt-10">
             <a
               href="/boutique/"
