@@ -91,15 +91,26 @@ export default async function CoeurAuSolPage() {
             Les plus belles photos partagées avec <strong className="text-sm-cyan">#SAINTEMAXIME</strong>
           </p>
 
-          {/* Photo officielle du cœur, toujours affichée */}
-          <div className="max-w-xs mx-auto aspect-square rounded-xl overflow-hidden relative mb-8">
-            <Image
-              src="/images/coeur-au-sol.jpg"
-              alt="Le cœur #SAINTEMAXIME peint au sol à Sainte-Maxime"
-              fill
-              sizes="320px"
-              className="object-cover"
-            />
+          {/* Photos officielles du cœur, toujours affichées */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <div className="w-full max-w-[280px] aspect-square rounded-xl overflow-hidden relative">
+              <Image
+                src="/images/coeur-au-sol.jpg"
+                alt="Le cœur #SAINTEMAXIME peint au sol à Sainte-Maxime"
+                fill
+                sizes="280px"
+                className="object-cover"
+              />
+            </div>
+            <div className="w-full max-w-[280px] aspect-square rounded-xl overflow-hidden relative">
+              <Image
+                src="/images/coeur-au-sol-2.jpg"
+                alt="Le cœur #SAINTEMAXIME peint au sol dans une ruelle du centre-ville de Sainte-Maxime"
+                fill
+                sizes="280px"
+                className="object-cover"
+              />
+            </div>
           </div>
 
           {/* Flux Instagram réel via Tagembed (ID réglable depuis l'admin > SEO & Config > Réseaux Sociaux) */}
