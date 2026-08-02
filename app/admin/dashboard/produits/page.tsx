@@ -81,11 +81,18 @@ export default function AdminProduitsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
   const supabase = createClient();
 
   useEffect(() => {
     loadProducts();
+    loadCategories();
   }, []);
+
+  const loadCategories = async () => {
+    const { data } = await supabase.from("categories").select("slug").order("sort_order", { ascending: true });
+    setCategories((data || []).map((c: any) => c.slug));
+  };
 
   const loadProducts = async () => {
     setLoading(true);
@@ -107,8 +114,6 @@ export default function AdminProduitsPage() {
     const matchesCategory = !filterCategory || p.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
-
-  const categories = Array.from(new Set(products.map((p) => p.category)));
 
   const updateProduct = (id: string, field: keyof AdminProduct, value: any) => {
     setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
