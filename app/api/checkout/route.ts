@@ -39,11 +39,31 @@ export async function POST(request: Request) {
     if (promo && (!promo.expires_at || new Date(promo.expires_at) > new Date())
       && (!promo.usage_limit || promo.usage_count < promo.usage_limit)
       && subtotal >= (promo.min_order_amount || 0)) {
-      discount = promo.discount_type === "percent"
-        ? Math.round(subtotal * (promo.discount_value / 100) * 100) / 100
-        : Math.min(promo.discount_value, subtotal);
-      promoCode = promo.code;
-      await admin.from("promo_codes").update({ usage_count: (promo.usage_count || 0) + 1 }).eq("id", promo.id);
+
+      let alreadyUsedByCustomer = false;
+      if (promo.one_per_customer) {
+        const { data: usage } = await admin
+          .from("promo_code_usage")
+          .select("id")
+          .eq("promo_code_id", promo.id)
+          .eq("customer_email", String(customer.email).trim().toLowerCase())
+          .maybeSingle();
+        alreadyUsedByCustomer = !!usage;
+      }
+
+      if (!alreadyUsedByCustomer) {
+        discount = promo.discount_type === "percent"
+          ? Math.round(subtotal * (promo.discount_value / 100) * 100) / 100
+          : Math.min(promo.discount_value, subtotal);
+        promoCode = promo.code;
+        await admin.from("promo_codes").update({ usage_count: (promo.usage_count || 0) + 1 }).eq("id", promo.id);
+        if (promo.one_per_customer) {
+          await admin.from("promo_code_usage").insert({
+            promo_code_id: promo.id,
+            customer_email: String(customer.email).trim().toLowerCase(),
+          });
+        }
+      }
     }
   }
 

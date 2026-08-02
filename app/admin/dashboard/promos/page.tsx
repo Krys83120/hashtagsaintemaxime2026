@@ -13,6 +13,7 @@ interface PromoCode {
   discountValue: number;
   active: boolean;
   minOrderAmount: number;
+  onePerCustomer: boolean;
   usageLimit: number | null;
   usageCount: number;
   expiresAt: string | null;
@@ -26,6 +27,7 @@ function fromDbRow(row: any): PromoCode {
     discountValue: Number(row.discount_value),
     active: row.active,
     minOrderAmount: Number(row.min_order_amount || 0),
+    onePerCustomer: !!row.one_per_customer,
     usageLimit: row.usage_limit,
     usageCount: row.usage_count || 0,
     expiresAt: row.expires_at,
@@ -38,7 +40,7 @@ export default function AdminPromosPage() {
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [showAdd, setShowAdd] = useState(false);
-  const [newPromo, setNewPromo] = useState({ code: "", discountType: "percent" as "percent" | "fixed", discountValue: 10, minOrderAmount: 0 });
+  const [newPromo, setNewPromo] = useState({ code: "", discountType: "percent" as "percent" | "fixed", discountValue: 10, minOrderAmount: 0, onePerCustomer: false });
   const supabase = createClient();
 
   useEffect(() => {
@@ -66,6 +68,7 @@ export default function AdminPromosPage() {
       discount_type: newPromo.discountType,
       discount_value: newPromo.discountValue,
       min_order_amount: newPromo.minOrderAmount,
+      one_per_customer: newPromo.onePerCustomer,
       active: true,
     });
 
@@ -74,7 +77,7 @@ export default function AdminPromosPage() {
       setError(insertError.message.includes("duplicate") ? "Ce code existe déjà." : insertError.message);
       return;
     }
-    setNewPromo({ code: "", discountType: "percent", discountValue: 10, minOrderAmount: 0 });
+    setNewPromo({ code: "", discountType: "percent", discountValue: 10, minOrderAmount: 0, onePerCustomer: false });
     setShowAdd(false);
     loadPromos();
   };
@@ -126,6 +129,12 @@ export default function AdminPromosPage() {
                 onChange={(e) => setNewPromo((p) => ({ ...p, minOrderAmount: Number(e.target.value) }))}
                 className="px-4 py-2.5 rounded-xl border border-sm-lightgray focus:border-sm-cyan outline-none text-sm" />
             </div>
+            <label className="flex items-center gap-2 text-sm text-sm-dark">
+              <input type="checkbox" checked={newPromo.onePerCustomer}
+                onChange={(e) => setNewPromo((p) => ({ ...p, onePerCustomer: e.target.checked }))}
+                className="w-4 h-4 accent-sm-cyan" />
+              Limiter à une utilisation par client (par email)
+            </label>
             <div className="flex gap-3">
               <button onClick={addPromo} disabled={saving === "new"}
                 className="bg-green-500 text-white font-semibold px-6 py-2 rounded-xl hover:bg-green-600 transition-colors disabled:opacity-60">
@@ -162,7 +171,10 @@ export default function AdminPromosPage() {
                       <span className="font-mono font-bold text-sm-dark flex items-center gap-1"><Tag className="w-3.5 h-3.5 text-sm-cyan" /> {p.code}</span>
                     </td>
                     <td className="py-3 px-4">{p.discountType === "percent" ? `${p.discountValue}%` : `${p.discountValue}€`}</td>
-                    <td className="py-3 px-4 text-sm-gray">{p.minOrderAmount > 0 ? `${p.minOrderAmount}€` : "—"}</td>
+                    <td className="py-3 px-4 text-sm-gray">
+                      {p.minOrderAmount > 0 ? `${p.minOrderAmount}€` : "—"}
+                      {p.onePerCustomer && <span className="ml-1 text-[10px] bg-sm-cyan/10 text-sm-cyan font-bold px-1.5 py-0.5 rounded-full">1x/client</span>}
+                    </td>
                     <td className="py-3 px-4 text-sm-gray">{p.usageCount}{p.usageLimit ? ` / ${p.usageLimit}` : ""}</td>
                     <td className="py-3 px-4">
                       <button onClick={() => toggleActive(p)}

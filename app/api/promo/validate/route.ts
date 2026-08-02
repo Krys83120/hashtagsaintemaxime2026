@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
-  const { code, subtotal } = await request.json();
+  const { code, subtotal, email } = await request.json();
 
   if (!code) {
     return NextResponse.json({ error: "Code manquant." }, { status: 400 });
@@ -30,6 +30,20 @@ export async function POST(request: Request) {
       { error: `Ce code nécessite un minimum de ${promo.min_order_amount}€ d'achat.` },
       { status: 400 }
     );
+  }
+  if (promo.one_per_customer && email) {
+    const { data: alreadyUsed } = await supabase
+      .from("promo_code_usage")
+      .select("id")
+      .eq("promo_code_id", promo.id)
+      .eq("customer_email", email.trim().toLowerCase())
+      .maybeSingle();
+    if (alreadyUsed) {
+      return NextResponse.json(
+        { error: "Tu as déjà utilisé ce code promo (valable une seule fois par client)." },
+        { status: 400 }
+      );
+    }
   }
 
   const discount = promo.discount_type === "percent"

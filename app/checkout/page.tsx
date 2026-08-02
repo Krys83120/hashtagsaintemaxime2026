@@ -61,7 +61,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/promo/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: promoInput.trim(), subtotal }),
+        body: JSON.stringify({ code: promoInput.trim(), subtotal, email: form.email }),
       });
       const data = await res.json();
       if (!res.ok) {
