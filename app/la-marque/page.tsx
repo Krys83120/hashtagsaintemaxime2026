@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Image from "next/image";
 import { getPageContent } from "@/lib/pages-content";
 
 export const metadata: Metadata = {
@@ -26,6 +27,17 @@ export default async function LaMarquePage() {
         <p className="text-white/80 max-w-2xl mx-auto text-lg">
           {content?.subtitle || "Depuis 2019, on célèbre le style de vie du Golfe de Saint-Tropez."}
         </p>
+      </div>
+
+      <div className="relative w-full aspect-[21/9] sm:aspect-[3/1]">
+        <Image
+          src="/images/la-marque-hero.jpg"
+          alt="Le panneau #SAINTEMAXIME au coucher de soleil, face à la plage de Sainte-Maxime"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-16 space-y-16">
