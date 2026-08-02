@@ -22,6 +22,7 @@ interface SiteConfig {
   tiktokUrl: string;
   tagembedWidgetId: string;
   googleReviewsWidgetCode: string;
+  googleReviewsWidgetCode2: string;
   facebookWidgetCode: string;
   maintenanceMode: boolean;
 }
@@ -42,6 +43,7 @@ const defaultConfig: SiteConfig = {
   tiktokUrl: "https://www.tiktok.com/@hashtagsaintemaxime",
   tagembedWidgetId: "",
   googleReviewsWidgetCode: "",
+  googleReviewsWidgetCode2: "",
   facebookWidgetCode: "",
   maintenanceMode: false,
 };
@@ -330,6 +332,19 @@ export default function AdminSEOPage() {
                 <p className="text-xs text-sm-gray mt-1">
                   Sur trustindex.io, crée un widget "Google Reviews", récupère le code d'intégration
                   (<code className="bg-sm-cream px-1 rounded">loader.js?CE_CODE</code>) et colle uniquement la partie après le "?".
+                </p>
+              </div>
+			  <div>
+                <label className="block text-sm font-medium text-sm-dark mb-1">Trustindex — Code widget (avis Google, 2ème fiche : "Le Hashtag Géant")</label>
+                <input
+                  type="text"
+                  value={config.googleReviewsWidgetCode2}
+                  onChange={(e) => updateField("googleReviewsWidgetCode2", e.target.value)}
+                  placeholder="ex: 333fc333172844fptn489x753"
+                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm font-mono"
+                />
+                <p className="text-xs text-sm-gray mt-1">
+                  Même principe, mais avec un widget connecté à ta 2ème fiche Google Business (celle du hashtag géant).
                 </p>
               </div>
               <div>

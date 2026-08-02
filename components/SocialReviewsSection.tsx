@@ -13,17 +13,19 @@ async function getWidgetCodes() {
     const value = (data?.value as any) || {};
     return {
       googleReviewsWidgetCode: value.googleReviewsWidgetCode || "",
+      googleReviewsWidgetCode2: value.googleReviewsWidgetCode2 || "",
       facebookWidgetCode: value.facebookWidgetCode || "",
     };
   } catch {
-    return { googleReviewsWidgetCode: "", facebookWidgetCode: "" };
+    return { googleReviewsWidgetCode: "", googleReviewsWidgetCode2: "", facebookWidgetCode: "" };
   }
 }
 
 export default async function SocialReviewsSection() {
-  const { googleReviewsWidgetCode, facebookWidgetCode } = await getWidgetCodes();
+  const { googleReviewsWidgetCode, googleReviewsWidgetCode2, facebookWidgetCode } = await getWidgetCodes();
+  const hasGoogle = !!googleReviewsWidgetCode || !!googleReviewsWidgetCode2;
 
-  if (!googleReviewsWidgetCode && !facebookWidgetCode) return null;
+  if (!hasGoogle && !facebookWidgetCode) return null;
 
   return (
     <section className="py-16 px-4 max-w-6xl mx-auto">
@@ -31,11 +33,12 @@ export default async function SocialReviewsSection() {
         Ce qu'on dit de nous
       </h2>
 
-      <div className={`grid gap-10 ${googleReviewsWidgetCode && facebookWidgetCode ? "lg:grid-cols-2" : ""}`}>
-        {googleReviewsWidgetCode && (
-          <div>
-            <h3 className="font-semibold text-sm-gray text-sm uppercase tracking-wider mb-4 text-center">Avis Google</h3>
-            <TrustindexWidget widgetCode={googleReviewsWidgetCode} />
+      <div className={`grid gap-10 ${hasGoogle && facebookWidgetCode ? "lg:grid-cols-2" : ""}`}>
+        {hasGoogle && (
+          <div className="space-y-8">
+            <h3 className="font-semibold text-sm-gray text-sm uppercase tracking-wider text-center">Avis Google</h3>
+            {googleReviewsWidgetCode && <TrustindexWidget widgetCode={googleReviewsWidgetCode} />}
+            {googleReviewsWidgetCode2 && <TrustindexWidget widgetCode={googleReviewsWidgetCode2} />}
           </div>
         )}
         {facebookWidgetCode && (
