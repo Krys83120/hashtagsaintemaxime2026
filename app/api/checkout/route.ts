@@ -21,9 +21,18 @@ export async function POST(request: Request) {
   const { data: { user } } = await serverSupabase.auth.getUser();
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const shipping = subtotal >= 60 ? 0 : 4.9;
 
   const admin = createAdminClient();
+
+  const { data: settingsRow } = await admin
+    .from("site_settings")
+    .select("value")
+    .eq("key", "site_config")
+    .maybeSingle();
+  const siteConfig = (settingsRow?.value as any) || {};
+  const freeShippingThreshold = siteConfig.freeShippingThreshold ?? 60;
+  const shippingCost = siteConfig.shippingCost ?? 4.9;
+  const shipping = subtotal >= freeShippingThreshold ? 0 : shippingCost;
 
   // On revalide le code promo côté serveur : jamais confiance dans une réduction envoyée par le client
   let discount = 0;

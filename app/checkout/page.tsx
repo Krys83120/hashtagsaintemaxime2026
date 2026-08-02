@@ -25,27 +25,43 @@ export default function CheckoutPage() {
   const [promoError, setPromoError] = useState("");
   const [applyingPromo, setApplyingPromo] = useState(false);
 
+  const [shippingConfig, setShippingConfig] = useState({ freeShippingThreshold: 60, shippingCost: 4.9 });
+
   useEffect(() => {
     const prefill = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const meta = user.user_metadata as any;
-      setForm((prev) => ({
-        ...prev,
-        name: meta?.full_name || prev.name,
-        email: user.email || prev.email,
-        phone: meta?.phone || prev.phone,
-        line1: meta?.address?.line1 || prev.line1,
-        postalCode: meta?.address?.postalCode || prev.postalCode,
-        city: meta?.address?.city || prev.city,
-      }));
+      if (user) {
+        const meta = user.user_metadata as any;
+        setForm((prev) => ({
+          ...prev,
+          name: meta?.full_name || prev.name,
+          email: user.email || prev.email,
+          phone: meta?.phone || prev.phone,
+          line1: meta?.address?.line1 || prev.line1,
+          postalCode: meta?.address?.postalCode || prev.postalCode,
+          city: meta?.address?.city || prev.city,
+        }));
+      }
+
+      const { data: settingsRow } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "site_config")
+        .maybeSingle();
+      const siteConfig = (settingsRow?.value as any) || {};
+      if (siteConfig.freeShippingThreshold != null || siteConfig.shippingCost != null) {
+        setShippingConfig({
+          freeShippingThreshold: siteConfig.freeShippingThreshold ?? 60,
+          shippingCost: siteConfig.shippingCost ?? 4.9,
+        });
+      }
     };
     prefill();
   }, []);
 
   const subtotal = totalPrice();
-  const shipping = subtotal >= 60 || subtotal === 0 ? 0 : 4.9;
+  const shipping = subtotal === 0 || subtotal >= shippingConfig.freeShippingThreshold ? 0 : shippingConfig.shippingCost;
   const discount = promo?.discount || 0;
   const total = Math.max(0, subtotal + shipping - discount);
 
