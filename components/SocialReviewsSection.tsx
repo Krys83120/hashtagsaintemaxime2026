@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import TagembedFeed from "@/components/TagembedFeed";
+import TrustindexWidget from "@/components/TrustindexWidget";
 
-async function getWidgetIds() {
+async function getWidgetCodes() {
   try {
     const supabase = await createClient();
     const { data } = await supabase
@@ -12,18 +12,18 @@ async function getWidgetIds() {
 
     const value = (data?.value as any) || {};
     return {
-      googleReviewsWidgetId: value.googleReviewsWidgetId || "",
-      facebookWidgetId: value.facebookWidgetId || "",
+      googleReviewsWidgetCode: value.googleReviewsWidgetCode || "",
+      facebookWidgetCode: value.facebookWidgetCode || "",
     };
   } catch {
-    return { googleReviewsWidgetId: "", facebookWidgetId: "" };
+    return { googleReviewsWidgetCode: "", facebookWidgetCode: "" };
   }
 }
 
 export default async function SocialReviewsSection() {
-  const { googleReviewsWidgetId, facebookWidgetId } = await getWidgetIds();
+  const { googleReviewsWidgetCode, facebookWidgetCode } = await getWidgetCodes();
 
-  if (!googleReviewsWidgetId && !facebookWidgetId) return null;
+  if (!googleReviewsWidgetCode && !facebookWidgetCode) return null;
 
   return (
     <section className="py-16 px-4 max-w-6xl mx-auto">
@@ -31,17 +31,17 @@ export default async function SocialReviewsSection() {
         Ce qu'on dit de nous
       </h2>
 
-      <div className={`grid gap-10 ${googleReviewsWidgetId && facebookWidgetId ? "lg:grid-cols-2" : ""}`}>
-        {googleReviewsWidgetId && (
+      <div className={`grid gap-10 ${googleReviewsWidgetCode && facebookWidgetCode ? "lg:grid-cols-2" : ""}`}>
+        {googleReviewsWidgetCode && (
           <div>
             <h3 className="font-semibold text-sm-gray text-sm uppercase tracking-wider mb-4 text-center">Avis Google</h3>
-            <TagembedFeed widgetId={googleReviewsWidgetId} />
+            <TrustindexWidget widgetCode={googleReviewsWidgetCode} />
           </div>
         )}
-        {facebookWidgetId && (
+        {facebookWidgetCode && (
           <div>
             <h3 className="font-semibold text-sm-gray text-sm uppercase tracking-wider mb-4 text-center">Facebook</h3>
-            <TagembedFeed widgetId={facebookWidgetId} />
+            <TrustindexWidget widgetCode={facebookWidgetCode} />
           </div>
         )}
       </div>

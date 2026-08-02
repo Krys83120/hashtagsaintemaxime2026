@@ -21,8 +21,8 @@ interface SiteConfig {
   facebookUrl: string;
   tiktokUrl: string;
   tagembedWidgetId: string;
-  googleReviewsWidgetId: string;
-  facebookWidgetId: string;
+  googleReviewsWidgetCode: string;
+  facebookWidgetCode: string;
   maintenanceMode: boolean;
 }
 
@@ -41,8 +41,8 @@ const defaultConfig: SiteConfig = {
   facebookUrl: "https://www.facebook.com/hashtagsaintemaxime/",
   tiktokUrl: "https://www.tiktok.com/@hashtagsaintemaxime",
   tagembedWidgetId: "",
-  googleReviewsWidgetId: "",
-  facebookWidgetId: "",
+  googleReviewsWidgetCode: "",
+  facebookWidgetCode: "",
   maintenanceMode: false,
 };
 
@@ -319,29 +319,30 @@ export default function AdminSEOPage() {
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-sm-dark mb-1">Tagembed Widget ID (avis Google, page d'accueil)</label>
+                <label className="block text-sm font-medium text-sm-dark mb-1">Trustindex — Code widget (avis Google, page d'accueil)</label>
                 <input
                   type="text"
-                  value={config.googleReviewsWidgetId}
-                  onChange={(e) => updateField("googleReviewsWidgetId", e.target.value)}
-                  placeholder="ex: 123456"
-                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                  value={config.googleReviewsWidgetCode}
+                  onChange={(e) => updateField("googleReviewsWidgetCode", e.target.value)}
+                  placeholder="ex: 111fa111950c622dern267v531"
+                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm font-mono"
                 />
                 <p className="text-xs text-sm-gray mt-1">
-                  Widget de type "Google Reviews" connecté à ta fiche Google Business, créé sur tagembed.com.
+                  Sur trustindex.io, crée un widget "Google Reviews", récupère le code d'intégration
+                  (<code className="bg-sm-cream px-1 rounded">loader.js?CE_CODE</code>) et colle uniquement la partie après le "?".
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-sm-dark mb-1">Tagembed Widget ID (page Facebook, page d'accueil)</label>
+                <label className="block text-sm font-medium text-sm-dark mb-1">Trustindex — Code widget (avis Facebook, page d'accueil)</label>
                 <input
                   type="text"
-                  value={config.facebookWidgetId}
-                  onChange={(e) => updateField("facebookWidgetId", e.target.value)}
-                  placeholder="ex: 123456"
-                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                  value={config.facebookWidgetCode}
+                  onChange={(e) => updateField("facebookWidgetCode", e.target.value)}
+                  placeholder="ex: 222fb222061733eosn378w642"
+                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm font-mono"
                 />
                 <p className="text-xs text-sm-gray mt-1">
-                  Widget de type "Facebook" connecté à facebook.com/HashtagSainteMaxime, créé sur tagembed.com.
+                  Même principe avec un widget "Facebook Reviews" connecté à facebook.com/HashtagSainteMaxime.
                 </p>
               </div>
             </div>
