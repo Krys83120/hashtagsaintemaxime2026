@@ -33,7 +33,7 @@ export default async function LaMarquePage() {
     <div className="min-h-screen bg-white">
       <div className="bg-gradient-to-b from-sm-cyan to-sm-deep py-20 px-4 text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-          {content?.title || "La Marque #SAINTEMAXIME"}
+          {content?.title || "La Marque #SAINTEMAXIME®"}
         </h1>
         <p className="text-white/80 max-w-2xl mx-auto text-lg">
           {content?.subtitle || "Depuis 2019, on célèbre le style de vie du Golfe de Saint-Tropez."}
