@@ -41,13 +41,82 @@ function detectCategory(name: string, type: string) {
 }
 
 function colorToHex(colorName: string) {
-  const map: Record<string, string> = {
-    white: "#FFFFFF", black: "#1E293B", blue: "#00D4E8", navy: "#0085A1",
-    red: "#FF6B8A", pink: "#FF6B8A", coral: "#FF6B8A", green: "#10B981",
-    yellow: "#FFD700", gold: "#FFD700", orange: "#F97316", purple: "#8B5CF6",
-    gray: "#64748B", grey: "#64748B",
+  const name = (colorName || "").trim().toLowerCase();
+
+  // Dictionnaire des noms de couleurs standards Printful / Bella+Canvas / Gildan
+  const exactMap: Record<string, string> = {
+    "white": "#FFFFFF",
+    "black": "#0B0B0C",
+    "solid black blend": "#0B0B0C",
+    "maroon": "#5C1A2E",
+    "forest": "#3B4F3A",
+    "forest green": "#3B4F3A",
+    "navy": "#1F2A44",
+    "true navy": "#1F2A44",
+    "royal": "#2547A0",
+    "true royal": "#2547A0",
+    "royal blue": "#2547A0",
+    "dark grey heather": "#5B5E62",
+    "deep heather": "#5B5E62",
+    "heather deep teal": "#0F5E63",
+    "heather forest": "#4B5D48",
+    "athletic heather": "#A9ABAE",
+    "heather grey": "#B3B5B8",
+    "sport grey": "#9EA2A6",
+    "ice grey": "#D5D7DA",
+    "ice blue": "#AFD9E8",
+    "asphalt": "#464A4E",
+    "charcoal": "#3A3B3C",
+    "olive": "#5B5A38",
+    "mauve": "#9C7B84",
+    "mustard": "#D8A93A",
+    "steel blue": "#4C7C9E",
+    "heather blue": "#5D7A9E",
+    "heather green": "#7C9473",
+    "kelly": "#3E8E4F",
+    "kelly green": "#3E8E4F",
+    "red": "#C22232",
+    "cardinal": "#8E1A26",
+    "burgundy": "#5C1A2E",
+    "pink": "#E8879E",
+    "heather pink": "#E8A3B5",
+    "yellow": "#F5C518",
+    "gold": "#C9A227",
+    "orange": "#E06A26",
+    "purple": "#5F4B8B",
+    "team purple": "#5F4B8B",
+    "brown": "#5A4632",
+    "sand": "#D8CBB0",
+    "natural": "#E8E1D3",
   };
-  return map[(colorName || "").toLowerCase()] || "#E2E8F0";
+  if (exactMap[name]) return exactMap[name];
+
+  // Repli par mot-clé si le nom exact n'est pas dans le dictionnaire ci-dessus
+  const keywordMap: [RegExp, string][] = [
+    [/black/, "#0B0B0C"],
+    [/white/, "#FFFFFF"],
+    [/navy/, "#1F2A44"],
+    [/royal/, "#2547A0"],
+    [/teal/, "#0F5E63"],
+    [/maroon|burgundy|wine/, "#5C1A2E"],
+    [/forest|olive|green/, "#3B4F3A"],
+    [/red|cardinal/, "#C22232"],
+    [/pink|rose/, "#E8879E"],
+    [/purple|violet/, "#5F4B8B"],
+    [/gold|mustard|yellow/, "#D8A93A"],
+    [/orange/, "#E06A26"],
+    [/brown|coffee/, "#5A4632"],
+    [/sand|natural|beige|cream/, "#D8CBB0"],
+    [/ice/, "#D5D7DA"],
+    [/charcoal|asphalt|dark grey|dark gray/, "#3A3B3C"],
+    [/heather|grey|gray/, "#9EA2A6"],
+    [/blue/, "#4C7C9E"],
+  ];
+  for (const [pattern, hex] of keywordMap) {
+    if (pattern.test(name)) return hex;
+  }
+
+  return "#B0B4B8"; // gris neutre, seulement si vraiment aucune correspondance
 }
 
 function extractVariantAttribute(variantName: string, attribute: "size" | "color") {
