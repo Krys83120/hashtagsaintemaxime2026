@@ -49,6 +49,14 @@ export default function AdminPrintfulPage() {
           </div>
         </div>
 
+        <div className="p-4 bg-yellow-50 text-yellow-800 rounded-xl text-sm flex items-start gap-2">
+          <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div>
+            <strong>Prix :</strong> calculé une seule fois, au tout premier import — les synchros suivantes ne le touchent plus, pour respecter tes ajustements manuels dans Produits. S'il y a plusieurs prix selon la taille/couleur, le prix le plus bas est utilisé.<br />
+            <strong>Images :</strong> les doublons (même photo en version nette et en miniature floue) sont automatiquement détectés et filtrés — seule la version la plus nette est gardée.
+          </div>
+        </div>
+
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-sm-lightgray">
           <h2 className="text-lg font-bold text-sm-dark mb-4 flex items-center gap-2">
             <RefreshCw className="w-5 h-5 text-sm-cyan" />

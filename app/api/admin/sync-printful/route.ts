@@ -56,13 +56,32 @@ function extractVariantAttribute(variantName: string, attribute: "size" | "color
   return parts[0] || "";
 }
 
+function imageGroupKey(url: string): string {
+  try {
+    const last = url.split("/").pop() || url;
+    const withoutExt = last.replace(/\.[a-zA-Z0-9]+(\?.*)?$/, "");
+    // Retire les suffixes de variante de résolution Printful (_preview, _thumb, _small, _medium, _large, _display)
+    return withoutExt.replace(/_(preview|thumb|thumbnail|small|medium|large|display)$/i, "");
+  } catch {
+    return url;
+  }
+}
+
+function imageQualityScore(url: string): number {
+  const lower = url.toLowerCase();
+  if (lower.includes("_preview") || lower.includes("_large") || lower.includes("_display")) return 3;
+  if (lower.includes("_medium")) return 2;
+  if (lower.includes("_thumb") || lower.includes("_small")) return 0;
+  return 1; // pas de suffixe identifié : qualité neutre
+}
+
 function extractProductImages(product: any): string[] {
-  const urls: string[] = [];
+  const candidates: string[] = [];
   const add = (value: any) => {
     if (typeof value !== "string") return;
     const url = value.trim();
     if (!url || url.includes("product-placeholder")) return;
-    if (!urls.includes(url)) urls.push(url);
+    candidates.push(url);
   };
 
   add(product.thumbnail_url);
@@ -82,7 +101,22 @@ function extractProductImages(product: any): string[] {
       add(file.url);
     }
   }
-  return urls;
+
+  // Regroupe les URLs qui représentent la même image (juste une résolution différente)
+  // et ne garde que la version la plus nette de chaque groupe, dans l'ordre de première apparition.
+  const bestByGroup = new Map<string, string>();
+  const groupOrder: string[] = [];
+  for (const url of candidates) {
+    const key = imageGroupKey(url);
+    if (!bestByGroup.has(key)) {
+      bestByGroup.set(key, url);
+      groupOrder.push(key);
+    } else if (imageQualityScore(url) > imageQualityScore(bestByGroup.get(key)!)) {
+      bestByGroup.set(key, url);
+    }
+  }
+
+  return groupOrder.map((key) => bestByGroup.get(key)!);
 }
 
 async function printfulFetch(endpoint: string, apiKey: string, storeId?: string | number) {
@@ -133,7 +167,7 @@ export async function POST() {
     const productList: any[] = Array.isArray(productsRes.result) ? productsRes.result : [];
 
     const admin = createAdminClient();
-    const { data: existingProducts } = await admin.from("products").select("slug, printful_id, image, images");
+    const { data: existingProducts } = await admin.from("products").select("slug, printful_id, image, images, price, details");
 
     const results: { name: string; status: "ok" | "error"; message?: string }[] = [];
 
@@ -153,8 +187,17 @@ export async function POST() {
         )).map((c: any) => ({ name: c, hex: colorToHex(c) }));
 
         const category = detectCategory(product.name, product.type);
-        const retailPrice = variants[0]?.retail_price || variants[0]?.price || 0;
-        const price = Math.round(parseFloat(retailPrice) * 1.5);
+
+        // Prend le prix le plus bas parmi toutes les variantes (résultat stable, peu importe
+        // l'ordre renvoyé par Printful) et repère s'il y a plusieurs prix différents.
+        const variantPrices = variants
+          .map((v: any) => parseFloat(v.retail_price ?? v.price ?? "0"))
+          .filter((p: number) => p > 0);
+        const minRetailPrice = variantPrices.length ? Math.min(...variantPrices) : 0;
+        const maxRetailPrice = variantPrices.length ? Math.max(...variantPrices) : 0;
+        const hasPriceVariations = maxRetailPrice > minRetailPrice;
+        const computedPrice = Math.round(minRetailPrice * 1.5 * 100) / 100;
+
         const slug = slugify(product.name);
         const images = extractProductImages(product);
         const existing = (existingProducts || []).find(
@@ -162,6 +205,18 @@ export async function POST() {
         );
         const finalImages = images.length > 0 ? images : existing?.images || [];
         const mainImage = finalImages[0] || "/images/product-placeholder.jpg";
+
+        // Le prix n'est calculé qu'à la toute première importation.
+        // Les synchros suivantes ne touchent plus au prix, pour respecter tes ajustements manuels.
+        const price = existing ? undefined : computedPrice;
+
+        let details: string[] | undefined = undefined;
+        if (!existing) {
+          details = [];
+          if (hasPriceVariations) {
+            details.push(`Prix à partir de ${(minRetailPrice * 1.5).toFixed(2)}€ selon la taille/couleur choisie.`);
+          }
+        }
 
         const { error: upsertError } = await admin.from("products").upsert(
           {
@@ -177,6 +232,7 @@ export async function POST() {
             source: "printful",
             printful_id: String(product.id),
             description: existing ? undefined : `${product.name} — Produit officiel #SAINTEMAXIME.`,
+            details,
           },
           { onConflict: "slug" }
         );
