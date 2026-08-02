@@ -81,7 +81,7 @@ export default async function LaMarquePage() {
             </div>
             <div className="bg-sm-cream p-6 rounded-2xl">
               <h3 className="font-bold text-xl text-sm-cyan mb-2">📸 Instagrammable</h3>
-              <p className="text-sm-dark">Nos produits sont faits pour être vus, partagés, aimés. Le cœur au sol est notre emblème.</p>
+              <p className="text-sm-dark">Nos produits sont faits pour être vus, partagés, aimés. Le grand #SAINTEMAXIME sur la promenade, à côté de la plage, est notre emblème — et son petit cœur se retrouve peint au sol dans la rue piétonne.</p>
             </div>
             <div className="bg-sm-cream p-6 rounded-2xl">
               <h3 className="font-bold text-xl text-sm-coral mb-2">🤝 Communauté</h3>
