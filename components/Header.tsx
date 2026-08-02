@@ -10,8 +10,8 @@ import { useWishlistStore } from "@/lib/store/wishlist";
 import CartDrawer from "@/components/CartDrawer";
 import SearchModal from "@/components/SearchModal";
 
-import type { SiteLink } from "@/lib/links";
-import { linksBySection } from "@/lib/links";
+import type { SiteLink } from "@/lib/links-types";
+import { linksBySection } from "@/lib/links-types";
 
 interface HeaderProps {
   links?: SiteLink[];

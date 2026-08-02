@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Instagram, Facebook, Twitter } from "lucide-react";
-import type { SiteLink } from "@/lib/links";
-import { linksBySection } from "@/lib/links";
+import type { SiteLink } from "@/lib/links-types";
+import { linksBySection } from "@/lib/links-types";
 
 interface FooterProps {
   links?: SiteLink[];
