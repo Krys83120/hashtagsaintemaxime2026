@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Star, Truck, RefreshCw, ShieldCheck } from "lucide-react";
+import { Star, Truck, RefreshCw, ShieldCheck, Eye } from "lucide-react";
 
 import Reviews from "@/components/Reviews";
 import ReviewForm from "@/components/ReviewForm";
 import ProductGallery from "@/components/ProductGallery";
 import AddToCart from "@/components/AddToCart";
-import { getProductBySlug, getAllProducts } from "@/lib/products";
+import { getProductBySlug, getAllProducts, incrementProductViews } from "@/lib/products";
 import { averageRating, formatPrice } from "@/lib/utils";
 
 interface Props {
@@ -39,6 +39,8 @@ export default async function ProductPage({ params }: Props) {
   if (!product) {
     notFound();
   }
+
+  await incrementProductViews(product.id);
 
   const avgRating = averageRating(product.reviews);
 
@@ -107,6 +109,12 @@ export default async function ProductPage({ params }: Props) {
               {product.reviews.length > 0 && (
                 <span className="text-sm-cyan text-sm underline">
                   ({product.reviews.length} avis)
+                </span>
+              )}
+
+              {!!product.viewCount && product.viewCount > 0 && (
+                <span className="flex items-center gap-1 text-sm-gray text-xs">
+                  <Eye className="w-3.5 h-3.5" /> {product.viewCount} vues
                 </span>
               )}
             </div>

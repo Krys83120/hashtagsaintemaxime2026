@@ -21,6 +21,7 @@ export interface Product {
   source?: "printful" | "manual";
   printfulId?: string;
   lastSyncedAt?: string;
+  viewCount?: number;
 }
 
 export interface Review {
@@ -64,6 +65,7 @@ function mapProductRow(row: any, reviews: Review[] = []): Product {
     source: row.source,
     printfulId: row.printful_id || undefined,
     lastSyncedAt: row.last_synced_at || undefined,
+    viewCount: row.view_count || 0,
   };
 }
 
@@ -144,6 +146,15 @@ export async function getBestsellers(): Promise<Product[]> {
 
 export async function getNewArrivals(): Promise<Product[]> {
   return getProductsByBadge("nouveau");
+}
+
+export async function incrementProductViews(productId: string): Promise<void> {
+  try {
+    const supabase = await createClient();
+    await supabase.rpc("increment_product_views", { p_product_id: productId });
+  } catch {
+    // Ne bloque jamais l'affichage de la page si l'incrément échoue
+  }
 }
 
 export async function getAllProductSlugs(): Promise<string[]> {

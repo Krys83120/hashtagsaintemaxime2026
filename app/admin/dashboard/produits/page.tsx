@@ -25,6 +25,7 @@ interface AdminProduct {
   stockCount: number;
   source?: string;
   printfulId?: string;
+  viewCount: number;
 }
 
 const badgeOptions = ["", "BESTSELLER", "ÉDITION LIMITÉE", "NOUVEAU", "TENDANCE", "SOLDES", "EXCLUSIF"];
@@ -49,6 +50,7 @@ function fromDbRow(row: any): AdminProduct {
     stockCount: row.stock_count || 0,
     source: row.source,
     printfulId: row.printful_id,
+    viewCount: row.view_count || 0,
   };
 }
 
@@ -176,6 +178,7 @@ export default function AdminProduitsPage() {
       inStock: true,
       stockCount: 0,
       source: "manual",
+      viewCount: 0,
     };
     setProducts((prev) => [...prev, newProduct]);
     setEditingId(newProduct.id);
@@ -280,7 +283,7 @@ export default function AdminProduitsPage() {
                         <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full">Printful</span>
                       )}
                     </div>
-                    <p className="text-xs text-sm-gray">{p.price}€ · {p.categories.join(", ")} · Stock: {p.stockCount} · {p.inStock ? "✅ En stock" : "❌ Rupture"}</p>
+                    <p className="text-xs text-sm-gray">{p.price}€ · {p.categories.join(", ")} · Stock: {p.stockCount} · {p.inStock ? "✅ En stock" : "❌ Rupture"} · 👁 {p.viewCount} vues</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={(e) => { e.stopPropagation(); updateProduct(p.id, "inStock", !p.inStock); }}
