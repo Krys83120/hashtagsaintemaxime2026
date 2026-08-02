@@ -104,21 +104,21 @@ export default async function CoeurAuSolPage() {
 
           {/* Photos officielles du cœur, toujours affichées */}
           <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <div className="w-full max-w-[280px] aspect-square rounded-xl overflow-hidden relative">
+            <div className="w-full max-w-[560px] aspect-[4/5] rounded-xl overflow-hidden relative">
               <Image
                 src={image1.url}
                 alt={image1.alt}
                 fill
-                sizes="280px"
+                sizes="560px"
                 className="object-cover"
               />
             </div>
-            <div className="w-full max-w-[280px] aspect-square rounded-xl overflow-hidden relative">
+            <div className="w-full max-w-[560px] aspect-[4/5] rounded-xl overflow-hidden relative">
               <Image
                 src={image2.url}
                 alt={image2.alt}
                 fill
-                sizes="280px"
+                sizes="560px"
                 className="object-cover"
               />
             </div>
