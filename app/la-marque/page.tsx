@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { getPageContent } from "@/lib/pages-content";
+import { createClient } from "@/lib/supabase/server";
+import { SITE_IMAGE_SLOTS, resolveSiteImage } from "@/lib/site-images";
 
 export const metadata: Metadata = {
   title: "La Marque #SAINTEMAXIME® | Histoire, Valeurs & Lifestyle | Depuis 2019",
@@ -18,6 +20,15 @@ export default async function LaMarquePage() {
   const content = await getPageContent<LaMarqueContent>("la-marque");
   const storySection = content?.sections?.find((s) => s.id === "story" && s.active && s.content);
 
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", "site_config")
+    .maybeSingle();
+  const siteConfig = (settingsRow?.value as any) || {};
+  const heroImage = resolveSiteImage(siteConfig.siteImages, SITE_IMAGE_SLOTS[1]);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-gradient-to-b from-sm-cyan to-sm-deep py-20 px-4 text-center">
@@ -31,8 +42,8 @@ export default async function LaMarquePage() {
 
       <div className="relative w-full aspect-[21/9] sm:aspect-[3/1]">
         <Image
-          src="/images/la-marque-hero.jpg"
-          alt="Le panneau #SAINTEMAXIME au coucher de soleil, face à la plage de Sainte-Maxime"
+          src={heroImage.url}
+          alt={heroImage.alt}
           fill
           priority
           sizes="100vw"

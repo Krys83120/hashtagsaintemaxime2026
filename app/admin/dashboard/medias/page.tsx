@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Upload, Trash2, ImageIcon, Copy, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import SiteImagesManager from "@/components/admin/SiteImagesManager";
 
 interface MediaFile {
   id: string;
@@ -153,6 +154,8 @@ export default function AdminMediasPage() {
         <p className="text-xs text-sm-gray -mt-2">
           Astuce : un fichier dont le nom contient "logo" (ex: <code className="bg-sm-cream px-1 rounded">logo-header.png</code>) est automatiquement classé comme Logo.
         </p>
+
+        <SiteImagesManager />
 
         {error && (
           <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium">⚠️ {error}</div>

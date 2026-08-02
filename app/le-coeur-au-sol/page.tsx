@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import TagembedFeed from "@/components/TagembedFeed";
 import { createClient } from "@/lib/supabase/server";
+import { SITE_IMAGE_SLOTS, resolveSiteImage } from "@/lib/site-images";
 
 export const metadata: Metadata = {
   title: "Le Cœur au Sol #SAINTEMAXIME® | Spot Instagrammable | Guide & Concours 2026",
@@ -28,6 +29,16 @@ async function getTagembedWidgetId(): Promise<string> {
 
 export default async function CoeurAuSolPage() {
   const tagembedWidgetId = await getTagembedWidgetId();
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", "site_config")
+    .maybeSingle();
+  const siteConfig = (settingsRow?.value as any) || {};
+  const image1 = resolveSiteImage(siteConfig.siteImages, SITE_IMAGE_SLOTS[2]);
+  const image2 = resolveSiteImage(siteConfig.siteImages, SITE_IMAGE_SLOTS[3]);
 
   return (
     <div className="min-h-screen bg-sm-cream">
@@ -95,8 +106,8 @@ export default async function CoeurAuSolPage() {
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <div className="w-full max-w-[280px] aspect-square rounded-xl overflow-hidden relative">
               <Image
-                src="/images/coeur-au-sol.jpg"
-                alt="Le cœur #SAINTEMAXIME peint au sol à Sainte-Maxime"
+                src={image1.url}
+                alt={image1.alt}
                 fill
                 sizes="280px"
                 className="object-cover"
@@ -104,8 +115,8 @@ export default async function CoeurAuSolPage() {
             </div>
             <div className="w-full max-w-[280px] aspect-square rounded-xl overflow-hidden relative">
               <Image
-                src="/images/coeur-au-sol-2.jpg"
-                alt="Le cœur #SAINTEMAXIME peint au sol dans une ruelle du centre-ville de Sainte-Maxime"
+                src={image2.url}
+                alt={image2.alt}
                 fill
                 sizes="280px"
                 className="object-cover"

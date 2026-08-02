@@ -10,6 +10,7 @@ import { getCategories, getAllProducts } from "@/lib/products";
 import { getPageContent } from "@/lib/pages-content";
 import { createClient } from "@/lib/supabase/server";
 import SocialCounters from "@/components/SocialCounters";
+import { SITE_IMAGE_SLOTS, resolveSiteImage } from "@/lib/site-images";
 import { Star, Truck, Shield, RefreshCw } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default async function HomePage() {
     .eq("key", "site_config")
     .maybeSingle();
   const siteConfig = (settingsRow?.value as any) || {};
+  const heroImage = resolveSiteImage(siteConfig.siteImages, SITE_IMAGE_SLOTS[0]);
 
   return (
     <div>
@@ -40,6 +42,8 @@ export default async function HomePage() {
         title={homeContent?.heroTitle}
         subtitle={homeContent?.heroSubtitle}
         buttonText={homeContent?.heroButtonText}
+        imageUrl={heroImage.url}
+        imageAlt={heroImage.alt}
       />
 
       <SocialCounters

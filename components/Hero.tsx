@@ -9,16 +9,21 @@ interface HeroProps {
   title?: string;
   subtitle?: string;
   buttonText?: string;
+  imageUrl?: string;
+  imageAlt?: string;
 }
 
-export default function Hero({ title, subtitle, buttonText }: HeroProps) {
+export default function Hero({ title, subtitle, buttonText, imageUrl, imageAlt }: HeroProps) {
+  const src = imageUrl || "/images/hero/saintemaxime.jpg";
+  const alt = imageAlt || "#SAINTEMAXIME — panneau emblématique en bord de plage à Sainte-Maxime";
+
   return (
     <section className="relative overflow-hidden py-24 sm:py-32 min-h-[600px] sm:min-h-[720px] flex items-center">
       {/* Photo fixe #SAINTEMAXIME */}
       <div className="absolute inset-0">
         {/* Arrière-plan flouté (même photo, agrandie) pour combler les bords sans recadrer la photo nette */}
         <Image
-          src="/images/hero/saintemaxime.jpg"
+          src={src}
           alt=""
           fill
           aria-hidden
@@ -27,8 +32,8 @@ export default function Hero({ title, subtitle, buttonText }: HeroProps) {
         />
         {/* Photo nette, entière, jamais recadrée */}
         <Image
-          src="/images/hero/saintemaxime.jpg"
-          alt="#SAINTEMAXIME — panneau emblématique en bord de plage à Sainte-Maxime"
+          src={src}
+          alt={alt}
           fill
           priority
           sizes="100vw"
