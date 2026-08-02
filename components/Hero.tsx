@@ -50,7 +50,7 @@ export default function Hero({ title, subtitle, buttonText, imageUrl, imageAlt }
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold text-white tracking-tight mb-2 drop-shadow-lg">
-            #SAINTEMAXIME
+            #SAINTEMAXIME<span className="text-2xl sm:text-3xl lg:text-4xl align-top">®</span>
           </h1>
           <p className="text-white text-lg sm:text-xl font-medium mb-2 drop-shadow">
             {title || "La Marque Officielle de Sainte-Maxime"}
