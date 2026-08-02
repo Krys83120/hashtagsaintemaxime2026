@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
-import { Save, Plus, Trash2, Search, Filter, ChevronDown, ChevronUp, ImageIcon, Package } from "lucide-react";
+import { Save, Plus, Trash2, Search, Filter, ChevronDown, ChevronUp, ImageIcon, Package, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface AdminProduct {
@@ -87,6 +87,7 @@ export default function AdminProduitsPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
+  const [generatingDesc, setGeneratingDesc] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -184,6 +185,28 @@ export default function AdminProduitsPage() {
     setEditingId(newProduct.id);
   };
 
+  const generateDescriptions = async () => {
+    if (!confirm("Générer une description SEO pour tous les produits sans description (ou avec la description générique) ? Les descriptions déjà personnalisées ne seront pas touchées.")) return;
+    setGeneratingDesc(true);
+    setError("");
+
+    const res = await fetch("/api/admin/generate-descriptions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ overwriteAll: false }),
+    });
+    const result = await res.json();
+    setGeneratingDesc(false);
+
+    if (!res.ok) {
+      setError(result.error || "Erreur lors de la génération.");
+      return;
+    }
+
+    alert(`✅ ${result.updated} description(s) générée(s) sur ${result.total} produits.`);
+    loadProducts();
+  };
+
   const deleteProduct = async (p: AdminProduct) => {
     if (!confirm("Supprimer ce produit ?")) return;
     if (!p.id.startsWith("new-")) {
@@ -207,6 +230,10 @@ export default function AdminProduitsPage() {
             <p className="text-sm-gray">{products.length} produits au total</p>
           </div>
           <div className="flex gap-3">
+            <button onClick={generateDescriptions} disabled={generatingDesc}
+              className="flex items-center gap-2 bg-purple-500 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-purple-600 transition-colors disabled:opacity-60">
+              <Sparkles className="w-4 h-4" /> {generatingDesc ? "Génération..." : "Générer les descriptions"}
+            </button>
             <button onClick={addProduct} className="flex items-center gap-2 bg-sm-cyan text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-sm-deep transition-colors">
               <Plus className="w-4 h-4" /> Ajouter
             </button>
