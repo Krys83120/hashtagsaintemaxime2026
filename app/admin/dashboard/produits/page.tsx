@@ -13,6 +13,7 @@ interface AdminProduct {
   price: number;
   originalPrice?: number;
   category: string;
+  categories: string[];
   image: string;
   images: string[];
   badge: string;
@@ -36,6 +37,7 @@ function fromDbRow(row: any): AdminProduct {
     price: Number(row.price),
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
     category: row.category,
+    categories: Array.isArray(row.categories) && row.categories.length ? row.categories : [row.category].filter(Boolean),
     image: row.image || "",
     images: row.images || [],
     badge: row.badge || "",
@@ -57,7 +59,8 @@ function toDbRow(p: AdminProduct) {
     name: p.name,
     price: p.price,
     original_price: p.originalPrice ?? null,
-    category: p.category,
+    category: p.categories[0] || p.category,
+    categories: p.categories,
     image: p.image,
     images: p.images,
     badge: p.badge || null,
@@ -111,12 +114,26 @@ export default function AdminProduitsPage() {
 
   const filtered = products.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.slug.includes(search.toLowerCase());
-    const matchesCategory = !filterCategory || p.category === filterCategory;
+    const matchesCategory = !filterCategory || p.categories.includes(filterCategory);
     return matchesSearch && matchesCategory;
   });
 
   const updateProduct = (id: string, field: keyof AdminProduct, value: any) => {
     setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
+  };
+
+  const toggleProductCategory = (id: string, categorySlug: string) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id !== id) return p;
+        const has = p.categories.includes(categorySlug);
+        const nextCategories = has
+          ? p.categories.filter((c) => c !== categorySlug)
+          : [...p.categories, categorySlug];
+        // Toujours garder au moins une catégorie cochée
+        return nextCategories.length ? { ...p, categories: nextCategories } : p;
+      })
+    );
   };
 
   const saveProducts = async () => {
@@ -148,6 +165,7 @@ export default function AdminProduitsPage() {
       name: "Nouveau Produit",
       price: 0,
       category: categories[0] || "accessoires",
+      categories: categories[0] ? [categories[0]] : ["accessoires"],
       image: "/images/product-placeholder.jpg",
       images: [],
       badge: "",
@@ -262,7 +280,7 @@ export default function AdminProduitsPage() {
                         <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full">Printful</span>
                       )}
                     </div>
-                    <p className="text-xs text-sm-gray">{p.price}€ · {p.category} · Stock: {p.stockCount} · {p.inStock ? "✅ En stock" : "❌ Rupture"}</p>
+                    <p className="text-xs text-sm-gray">{p.price}€ · {p.categories.join(", ")} · Stock: {p.stockCount} · {p.inStock ? "✅ En stock" : "❌ Rupture"}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={(e) => { e.stopPropagation(); updateProduct(p.id, "inStock", !p.inStock); }}
@@ -312,12 +330,31 @@ export default function AdminProduitsPage() {
                           {badgeOptions.map((b) => <option key={b} value={b}>{b || "Aucun"}</option>)}
                         </select>
                       </div>
-                      <div>
-                        <label className="block text-xs font-medium text-sm-gray mb-1">Catégorie</label>
-                        <select value={p.category} onChange={(e) => updateProduct(p.id, "category", e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl border border-sm-lightgray focus:border-sm-cyan outline-none text-sm bg-white">
-                          {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-                        </select>
+                      <div className="lg:col-span-2">
+                        <label className="block text-xs font-medium text-sm-gray mb-1">
+                          Catégories (coche-en plusieurs pour un produit mixte, ex: unisexe)
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {categories.map((c) => {
+                            const checked = p.categories.includes(c);
+                            return (
+                              <label
+                                key={c}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
+                                  checked ? "bg-sm-cyan/10 border-sm-cyan text-sm-cyan" : "border-sm-lightgray text-sm-gray hover:border-sm-cyan"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={() => toggleProductCategory(p.id, c)}
+                                  className="w-3.5 h-3.5 accent-sm-cyan"
+                                />
+                                {c}
+                              </label>
+                            );
+                          })}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-sm-gray mb-1">Stock</label>

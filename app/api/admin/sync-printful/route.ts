@@ -293,6 +293,7 @@ export async function POST() {
             name: product.name,
             price,
             category,
+            categories: existing ? undefined : [category],
             image: mainImage,
             images: finalImages,
             colors: colors.length ? colors : [{ name: "Blanc", hex: "#FFFFFF" }],

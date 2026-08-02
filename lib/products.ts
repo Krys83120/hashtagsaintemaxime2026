@@ -7,6 +7,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   category: string;
+  categories: string[];
   image: string;
   images?: string[];
   badge?: string;
@@ -49,6 +50,7 @@ function mapProductRow(row: any, reviews: Review[] = []): Product {
     price: Number(row.price),
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
     category: row.category,
+    categories: Array.isArray(row.categories) && row.categories.length ? row.categories : [row.category].filter(Boolean),
     image: row.image || "",
     images: row.images || [],
     badge: row.badge || undefined,
@@ -89,11 +91,14 @@ export async function getCategories(): Promise<Category[]> {
   const supabase = await createClient();
   const [{ data: cats }, { data: prods }] = await Promise.all([
     supabase.from("categories").select("*").eq("active", true).order("sort_order", { ascending: true }),
-    supabase.from("products").select("category"),
+    supabase.from("products").select("category, categories"),
   ]);
   const counts: Record<string, number> = {};
   (prods || []).forEach((p: any) => {
-    counts[p.category] = (counts[p.category] || 0) + 1;
+    const list: string[] = Array.isArray(p.categories) && p.categories.length ? p.categories : [p.category].filter(Boolean);
+    list.forEach((slug) => {
+      counts[slug] = (counts[slug] || 0) + 1;
+    });
   });
   return (cats || []).map((row) => mapCategoryRow(row, counts[row.slug] || 0));
 }
@@ -123,7 +128,7 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
 
 export async function getProductsByCategory(category: string): Promise<Product[]> {
   const supabase = await createClient();
-  const { data } = await supabase.from("products").select("*").eq("category", category);
+  const { data } = await supabase.from("products").select("*").contains("categories", [category]);
   return (data || []).map((row) => mapProductRow(row));
 }
 

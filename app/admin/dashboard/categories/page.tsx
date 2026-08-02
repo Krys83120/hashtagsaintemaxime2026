@@ -65,10 +65,13 @@ export default function AdminCategoriesPage() {
     }
 
     // Compte les produits par catégorie (par slug)
-    const { data: prods } = await supabase.from("products").select("category");
+    const { data: prods } = await supabase.from("products").select("category, categories");
     const counts: Record<string, number> = {};
-    (prods || []).forEach((p) => {
-      counts[p.category] = (counts[p.category] || 0) + 1;
+    (prods || []).forEach((p: any) => {
+      const list: string[] = Array.isArray(p.categories) && p.categories.length ? p.categories : [p.category].filter(Boolean);
+      list.forEach((slug) => {
+        counts[slug] = (counts[slug] || 0) + 1;
+      });
     });
 
     setCategories(
