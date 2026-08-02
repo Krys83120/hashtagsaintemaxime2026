@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Heart, Menu, X, Search } from "lucide-react";
+import { ShoppingCart, Heart, Menu, X, Search, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
@@ -56,6 +56,9 @@ export default function Header() {
             <button className="p-2 hover:bg-sm-cream rounded-full transition-colors">
               <Search className="w-5 h-5 text-sm-dark" />
             </button>
+            <Link href="/compte/" className="p-2 hover:bg-sm-cream rounded-full transition-colors">
+              <User className="w-5 h-5 text-sm-dark" />
+            </Link>
             <button className="p-2 hover:bg-sm-cream rounded-full transition-colors">
               <Heart className="w-5 h-5 text-sm-dark" />
             </button>

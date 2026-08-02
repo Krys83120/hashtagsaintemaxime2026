@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/lib/store/cart";
 import { formatPrice } from "@/lib/utils";
 import { ShoppingBag, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CheckoutPage() {
   const { items, totalPrice } = useCartStore();
@@ -18,6 +19,25 @@ export default function CheckoutPage() {
     city: "",
     phone: "",
   });
+
+  useEffect(() => {
+    const prefill = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const meta = user.user_metadata as any;
+      setForm((prev) => ({
+        ...prev,
+        name: meta?.full_name || prev.name,
+        email: user.email || prev.email,
+        phone: meta?.phone || prev.phone,
+        line1: meta?.address?.line1 || prev.line1,
+        postalCode: meta?.address?.postalCode || prev.postalCode,
+        city: meta?.address?.city || prev.city,
+      }));
+    };
+    prefill();
+  }, []);
 
   const subtotal = totalPrice();
   const shipping = subtotal >= 60 || subtotal === 0 ? 0 : 4.9;

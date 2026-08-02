@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createSumupCheckout } from "@/lib/sumup";
 import type { CartItem } from "@/lib/store/cart";
 
@@ -15,6 +16,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Informations client incomplètes." }, { status: 400 });
   }
 
+  // Si le client est connecté, on relie la commande à son compte (facultatif : achat invité toujours possible)
+  const serverSupabase = await createServerClient();
+  const { data: { user } } = await serverSupabase.auth.getUser();
+
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shipping = subtotal >= 60 ? 0 : 4.9;
   const total = Math.round((subtotal + shipping) * 100) / 100;
@@ -28,6 +33,7 @@ export async function POST(request: Request) {
   // pour avoir le détail complet (articles, adresse) dès la confirmation.
   const { error: insertError } = await admin.from("orders").insert({
     order_number: orderNumber,
+    customer_id: user?.id || null,
     customer_name: customer.name,
     customer_email: customer.email,
     customer_address: {
