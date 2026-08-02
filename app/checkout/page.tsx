@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/lib/store/cart";
 import { formatPrice } from "@/lib/utils";
-import { ShoppingBag, Loader2 } from "lucide-react";
+import { ShoppingBag, Loader2, Tag, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function CheckoutPage() {
@@ -19,6 +19,11 @@ export default function CheckoutPage() {
     city: "",
     phone: "",
   });
+
+  const [promoInput, setPromoInput] = useState("");
+  const [promo, setPromo] = useState<{ code: string; discount: number } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  const [applyingPromo, setApplyingPromo] = useState(false);
 
   useEffect(() => {
     const prefill = async () => {
@@ -41,10 +46,41 @@ export default function CheckoutPage() {
 
   const subtotal = totalPrice();
   const shipping = subtotal >= 60 || subtotal === 0 ? 0 : 4.9;
-  const total = subtotal + shipping;
+  const discount = promo?.discount || 0;
+  const total = Math.max(0, subtotal + shipping - discount);
 
   const updateField = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const applyPromo = async () => {
+    if (!promoInput.trim()) return;
+    setApplyingPromo(true);
+    setPromoError("");
+    try {
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput.trim(), subtotal }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPromoError(data.error || "Code invalide.");
+        setPromo(null);
+      } else {
+        setPromo({ code: data.code, discount: data.discount });
+        setPromoInput("");
+      }
+    } catch {
+      setPromoError("Erreur réseau, réessaie.");
+    } finally {
+      setApplyingPromo(false);
+    }
+  };
+
+  const removePromo = () => {
+    setPromo(null);
+    setPromoError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,6 +104,7 @@ export default function CheckoutPage() {
             email: form.email,
             address: { line1: form.line1, postalCode: form.postalCode, city: form.city, phone: form.phone },
           },
+          promoCode: promo?.code || null,
         }),
       });
       const data = await res.json();
@@ -174,7 +211,7 @@ export default function CheckoutPage() {
               `Payer ${formatPrice(total)}`
             )}
           </button>
-          <p className="text-xs text-sm-gray text-center">Paiement sécurisé par Stripe. Tes données de carte ne transitent jamais par notre site.</p>
+          <p className="text-xs text-sm-gray text-center">Paiement sécurisé par SumUp. Tes données de carte ne transitent jamais par notre site.</p>
         </form>
 
         {/* Récap panier */}
@@ -194,11 +231,47 @@ export default function CheckoutPage() {
                 </div>
               ))}
             </div>
+            <div className="border-t border-sm-lightgray/70 pt-3">
+              {promo ? (
+                <div className="flex items-center justify-between bg-green-50 text-green-700 rounded-xl px-3 py-2 text-sm mb-3">
+                  <span className="flex items-center gap-1.5 font-medium"><Tag className="w-3.5 h-3.5" /> {promo.code} appliqué</span>
+                  <button type="button" onClick={removePromo} className="hover:text-green-900">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    placeholder="Code promo"
+                    value={promoInput}
+                    onChange={(e) => setPromoInput(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-xl border border-sm-lightgray focus:border-sm-cyan outline-none text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={applyPromo}
+                    disabled={applyingPromo || !promoInput.trim()}
+                    className="px-4 py-2 rounded-xl bg-sm-dark text-white text-sm font-semibold hover:bg-sm-deep transition-colors disabled:opacity-50"
+                  >
+                    {applyingPromo ? "..." : "Appliquer"}
+                  </button>
+                </div>
+              )}
+              {promoError && <p className="text-xs text-red-600 mb-3">{promoError}</p>}
+            </div>
+
             <div className="border-t border-sm-lightgray/70 pt-3 space-y-2 text-sm">
               <div className="flex justify-between text-sm-gray">
                 <span>Sous-total</span>
                 <span>{formatPrice(subtotal)}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Réduction ({promo?.code})</span>
+                  <span>-{formatPrice(discount)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm-gray">
                 <span>Livraison</span>
                 <span>{shipping === 0 ? "Offerte" : formatPrice(shipping)}</span>

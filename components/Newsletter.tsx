@@ -4,7 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Send } from "lucide-react";
 
-export default function Newsletter() {
+interface NewsletterProps {
+  title?: string;
+  text?: string;
+}
+
+export default function Newsletter({ title, text }: NewsletterProps) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -23,10 +28,10 @@ export default function Newsletter() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-sm-cyan mb-4">
-            Rejoins la #SAINTEMAXIME Family
+            {title || "Rejoins la #SAINTEMAXIME Family"}
           </h2>
           <p className="text-white/80 mb-8 text-lg">
-            10% de bienvenue + accès aux ventes privées et aux nouveautés avant tout le monde
+            {text || "10% de bienvenue + accès aux ventes privées et aux nouveautés avant tout le monde"}
           </p>
 
           {!submitted ? (

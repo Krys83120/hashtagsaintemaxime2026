@@ -22,12 +22,35 @@ export async function POST(request: Request) {
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shipping = subtotal >= 60 ? 0 : 4.9;
-  const total = Math.round((subtotal + shipping) * 100) / 100;
+
+  const admin = createAdminClient();
+
+  // On revalide le code promo côté serveur : jamais confiance dans une réduction envoyée par le client
+  let discount = 0;
+  let promoCode: string | null = null;
+  if (body.promoCode) {
+    const { data: promo } = await admin
+      .from("promo_codes")
+      .select("*")
+      .eq("code", String(body.promoCode).trim().toUpperCase())
+      .eq("active", true)
+      .maybeSingle();
+
+    if (promo && (!promo.expires_at || new Date(promo.expires_at) > new Date())
+      && (!promo.usage_limit || promo.usage_count < promo.usage_limit)
+      && subtotal >= (promo.min_order_amount || 0)) {
+      discount = promo.discount_type === "percent"
+        ? Math.round(subtotal * (promo.discount_value / 100) * 100) / 100
+        : Math.min(promo.discount_value, subtotal);
+      promoCode = promo.code;
+      await admin.from("promo_codes").update({ usage_count: (promo.usage_count || 0) + 1 }).eq("id", promo.id);
+    }
+  }
+
+  const total = Math.max(0, Math.round((subtotal + shipping - discount) * 100) / 100);
 
   const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "";
   const orderNumber = `SM-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`;
-
-  const admin = createAdminClient();
 
   // On enregistre la commande en "pending" AVANT de rediriger vers SumUp,
   // pour avoir le détail complet (articles, adresse) dès la confirmation.
@@ -42,6 +65,8 @@ export async function POST(request: Request) {
     },
     items: items.map((i) => ({ name: i.name, qty: i.quantity, price: i.price, color: i.color, size: i.size })),
     total,
+    promo_code: promoCode,
+    discount_amount: discount,
     status: "pending",
     payment_method: "sumup",
   });

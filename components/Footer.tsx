@@ -2,8 +2,21 @@
 
 import Link from "next/link";
 import { Instagram, Facebook, Twitter } from "lucide-react";
+import type { SiteLink } from "@/lib/links";
+import { linksBySection } from "@/lib/links";
 
-export default function Footer() {
+interface FooterProps {
+  links?: SiteLink[];
+}
+
+export default function Footer({ links = [] }: FooterProps) {
+  const socialLinks = linksBySection(links, "social");
+  const footerLinks = linksBySection(links, "footer");
+  const legalLinks = linksBySection(links, "legal");
+
+  const instagramUrl = socialLinks.find((l) => l.label.toLowerCase().includes("instagram"))?.url || "https://www.instagram.com/hashtag_saintemaxime/";
+  const facebookUrl = socialLinks.find((l) => l.label.toLowerCase().includes("facebook"))?.url || "https://facebook.com/hashtagsaintemaxime";
+  const tiktokUrl = socialLinks.find((l) => l.label.toLowerCase().includes("tiktok"))?.url || "https://tiktok.com/@hashtagsaintemaxime";
   return (
     <footer className="bg-white border-t border-sm-lightgray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -24,13 +37,13 @@ export default function Footer() {
               La marque officielle déposée depuis 2019. Vêtements, accessoires & souvenirs uniques de Sainte-Maxime.
             </p>
             <div className="flex gap-4 pt-2">
-              <a href="https://www.instagram.com/hashtag_saintemaxime/" target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
+              <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="https://facebook.com/hashtagsaintemaxime" target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
+              <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="https://tiktok.com/@hashtagsaintemaxime" target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
+              <a href={tiktokUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-sm-cream rounded-full hover:bg-sm-cyan hover:text-white transition-all">
                 <Twitter className="w-5 h-5" />
               </a>
             </div>
@@ -59,9 +72,17 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-sm-dark mb-4">Aide</h4>
             <ul className="space-y-2 text-sm text-sm-gray">
-              <li><Link href="/" className="hover:text-sm-cyan transition-colors">Livraison & Retours</Link></li>
-              <li><Link href="/" className="hover:text-sm-cyan transition-colors">Guide des tailles</Link></li>
-              <li><Link href="/" className="hover:text-sm-cyan transition-colors">Contact</Link></li>
+              {footerLinks.length > 0 ? (
+                footerLinks.map((l) => (
+                  <li key={l.label}><Link href={l.url} className="hover:text-sm-cyan transition-colors">{l.label}</Link></li>
+                ))
+              ) : (
+                <>
+                  <li><Link href="/" className="hover:text-sm-cyan transition-colors">Livraison & Retours</Link></li>
+                  <li><Link href="/" className="hover:text-sm-cyan transition-colors">Guide des tailles</Link></li>
+                  <li><Link href="/" className="hover:text-sm-cyan transition-colors">Contact</Link></li>
+                </>
+              )}
             </ul>
           </div>
         </div>
@@ -69,9 +90,17 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-sm-lightgray text-center text-sm text-sm-gray">
           <p>© 2026 #SAINTEMAXIME® – Marque déposée – contact@hashtagsaintemaxime.fr</p>
           <div className="flex justify-center gap-6 mt-2">
-            <Link href="/" className="hover:text-sm-cyan transition-colors">CGV</Link>
-            <Link href="/" className="hover:text-sm-cyan transition-colors">Confidentialité</Link>
-            <Link href="/" className="hover:text-sm-cyan transition-colors">Mentions légales</Link>
+            {legalLinks.length > 0 ? (
+              legalLinks.map((l) => (
+                <Link key={l.label} href={l.url} className="hover:text-sm-cyan transition-colors">{l.label}</Link>
+              ))
+            ) : (
+              <>
+                <Link href="/" className="hover:text-sm-cyan transition-colors">CGV</Link>
+                <Link href="/" className="hover:text-sm-cyan transition-colors">Confidentialité</Link>
+                <Link href="/" className="hover:text-sm-cyan transition-colors">Mentions légales</Link>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Save, Home, Store, Heart, Info, Truck, FileText, Eye } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface PageContent {
   title: string;
@@ -83,18 +84,61 @@ export default function AdminPagesPage() {
   const [activeTab, setActiveTab] = useState<"home" | string>("home");
   const [homeContent, setHomeContent] = useState<HomeContent>(defaultHome);
   const [pageContents, setPageContents] = useState<Record<string, PageContent>>(pageDefaults);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+  const supabase = createClient();
 
   useEffect(() => {
-    const savedHome = localStorage.getItem("sm_admin_home");
-    if (savedHome) setHomeContent({ ...defaultHome, ...JSON.parse(savedHome) });
-    const savedPages = localStorage.getItem("sm_admin_pages");
-    if (savedPages) setPageContents({ ...pageDefaults, ...JSON.parse(savedPages) });
+    loadContent();
   }, []);
 
-  const save = () => {
-    localStorage.setItem("sm_admin_home", JSON.stringify(homeContent));
-    localStorage.setItem("sm_admin_pages", JSON.stringify(pageContents));
+  const loadContent = async () => {
+    setLoading(true);
+    const { data, error: loadError } = await supabase
+      .from("pages_content")
+      .select("page_key, content");
+
+    if (loadError) {
+      setError("Erreur de chargement : " + loadError.message);
+      setLoading(false);
+      return;
+    }
+
+    const homeRow = (data || []).find((r) => r.page_key === "home");
+    if (homeRow) setHomeContent({ ...defaultHome, ...(homeRow.content as object) });
+
+    const nextPages = { ...pageDefaults };
+    (data || []).forEach((row) => {
+      if (row.page_key !== "home" && nextPages[row.page_key]) {
+        nextPages[row.page_key] = { ...nextPages[row.page_key], ...(row.content as object) };
+      }
+    });
+    setPageContents(nextPages);
+    setLoading(false);
+  };
+
+  const save = async () => {
+    setSaving(true);
+    setError("");
+
+    const rows = [
+      { page_key: "home", content: homeContent, updated_at: new Date().toISOString() },
+      ...Object.entries(pageContents).map(([key, content]) => ({
+        page_key: key,
+        content,
+        updated_at: new Date().toISOString(),
+      })),
+    ];
+
+    const { error: upsertError } = await supabase.from("pages_content").upsert(rows, { onConflict: "page_key" });
+    setSaving(false);
+
+    if (upsertError) {
+      setError("Erreur de sauvegarde : " + upsertError.message);
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -135,17 +179,27 @@ export default function AdminPagesPage() {
             <h1 className="text-3xl font-bold text-sm-dark">📄 Pages & Accueil</h1>
             <p className="text-sm-gray">Personnalise le contenu de chaque page du site</p>
           </div>
-          <button onClick={save}
-            className="flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-600 transition-colors">
-            <Save className="w-4 h-4" /> Sauvegarder
+          <button onClick={save} disabled={saving}
+            className="flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-600 transition-colors disabled:opacity-60">
+            <Save className="w-4 h-4" /> {saving ? "Sauvegarde..." : "Sauvegarder"}
           </button>
         </div>
 
         {saved && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
             className="p-4 bg-green-50 text-green-700 rounded-xl text-sm font-medium">
-            ✅ Contenu sauvegardé !
+            ✅ Contenu sauvegardé ! Visible sur le site immédiatement.
           </motion.div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium">⚠️ {error}</div>
+        )}
+
+        {loading && (
+          <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray text-sm-gray">
+            Chargement...
+          </div>
         )}
 
         {/* Tabs */}

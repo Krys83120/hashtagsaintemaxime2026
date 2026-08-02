@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
 import HeartLoader from "@/components/HeartLoader";
 import TrustBadge from "@/components/TrustBadge";
+import { getSiteLinks } from "@/lib/links";
+import { getPageContent } from "@/lib/pages-content";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({
@@ -74,11 +76,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const links = await getSiteLinks();
+  const homeContent = await getPageContent<{ bannerText?: string; bannerActive?: boolean }>("home");
+
   return (
     <html lang="fr" className={`${inter.variable} ${playfair.variable}`}>
       <head>
@@ -130,10 +135,10 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-white text-sm-dark">
         <HeartLoader />
-        <TopBar />
-        <Header />
+        <TopBar text={homeContent?.bannerText} active={homeContent?.bannerActive ?? true} />
+        <Header links={links} />
         <main>{children}</main>
-        <Footer />
+        <Footer links={links} />
         <TrustBadge />
       </body>
     </html>

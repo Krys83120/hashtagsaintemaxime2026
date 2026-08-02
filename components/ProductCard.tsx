@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShoppingCart, Check } from "lucide-react";
+import { ShoppingCart, Check, Heart } from "lucide-react";
 import { useState } from "react";
 import { Product } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
+import { useWishlistStore } from "@/lib/store/wishlist";
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +16,13 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const [added, setAdded] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const toggleWishlist = useWishlistStore((state) => state.toggleItem);
+  const isWishlisted = useWishlistStore((state) => state.isInWishlist(product.id));
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toggleWishlist({ productId: product.id, slug: product.slug, name: product.name, price: product.price, image: product.image });
+  };
 
   const badgeColors: Record<string, string> = {
     BESTSELLER: "bg-sm-coral",
@@ -51,6 +59,13 @@ export default function ProductCard({ product }: ProductCardProps) {
               {product.badge}
             </span>
           )}
+          <button
+            onClick={handleWishlistToggle}
+            className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-sm transition-colors"
+            aria-label={isWishlisted ? "Retirer de la liste de souhaits" : "Ajouter à la liste de souhaits"}
+          >
+            <Heart className={`w-4 h-4 ${isWishlisted ? "fill-sm-coral text-sm-coral" : "text-sm-dark"}`} />
+          </button>
           <div className="w-full h-full flex items-center justify-center">
   {product.image ? (
     <img

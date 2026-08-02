@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Star, Truck, RefreshCw, ShieldCheck } from "lucide-react";
 
 import Reviews from "@/components/Reviews";
+import ReviewForm from "@/components/ReviewForm";
 import ProductGallery from "@/components/ProductGallery";
 import AddToCart from "@/components/AddToCart";
 import { getProductBySlug, getAllProducts } from "@/lib/products";
@@ -174,6 +175,9 @@ export default async function ProductPage({ params }: Props) {
                 Avis Clients
               </h3>
               <Reviews reviews={product.reviews} />
+              <div className="mt-6">
+                <ReviewForm productId={product.id} />
+              </div>
             </div>
           </div>
         </div>

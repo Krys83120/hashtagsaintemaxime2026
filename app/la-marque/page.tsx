@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getPageContent } from "@/lib/pages-content";
 
 export const metadata: Metadata = {
   title: "La Marque #SAINTEMAXIME® | Histoire, Valeurs & Lifestyle | Depuis 2019",
@@ -6,27 +7,42 @@ export const metadata: Metadata = {
     "#SAINTEMAXIME est une marque déposée depuis 2019. Découvre notre histoire, nos valeurs et notre engagement pour le style Côte d'Azur. Devenez ambassadeur.",
 };
 
-export default function LaMarquePage() {
+interface LaMarqueContent {
+  title?: string;
+  subtitle?: string;
+  sections?: { id: string; title: string; content: string; active: boolean }[];
+}
+
+export default async function LaMarquePage() {
+  const content = await getPageContent<LaMarqueContent>("la-marque");
+  const storySection = content?.sections?.find((s) => s.id === "story" && s.active && s.content);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-gradient-to-b from-sm-cyan to-sm-deep py-20 px-4 text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-          La Marque #SAINTEMAXIME
+          {content?.title || "La Marque #SAINTEMAXIME"}
         </h1>
         <p className="text-white/80 max-w-2xl mx-auto text-lg">
-          Depuis 2019, on célèbre le style de vie du Golfe de Saint-Tropez.
+          {content?.subtitle || "Depuis 2019, on célèbre le style de vie du Golfe de Saint-Tropez."}
         </p>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-16 space-y-16">
         <section>
           <h2 className="text-3xl font-bold text-sm-deep mb-6">Notre Histoire</h2>
-          <p className="text-sm-dark leading-relaxed mb-4">
-            La Marque <strong>#SAINTEMAXIME</strong> est déposée depuis 2019. Le Site Officiel de la Marque a été créé dans le but de rassembler et vous proposer des Produits Uniques estampillés de la Marque, représentants la ville de Sainte Maxime.
-          </p>
-          <p className="text-sm-dark leading-relaxed">
-            Vous y trouverez de nombreux produits Souvenirs <strong>#saintemaxime</strong> : Vêtements Homme & Femmes, Accessoires, produits de plage, et du quotidien. Serviettes de plage à vos couleurs préférées, Coques de Téléphones, Coussins, Vêtements Hommes et Femmes, Bracelets en Silicone.
-          </p>
+          {storySection ? (
+            <p className="text-sm-dark leading-relaxed whitespace-pre-line">{storySection.content}</p>
+          ) : (
+            <>
+              <p className="text-sm-dark leading-relaxed mb-4">
+                La Marque <strong>#SAINTEMAXIME</strong> est déposée depuis 2019. Le Site Officiel de la Marque a été créé dans le but de rassembler et vous proposer des Produits Uniques estampillés de la Marque, représentants la ville de Sainte Maxime.
+              </p>
+              <p className="text-sm-dark leading-relaxed">
+                Vous y trouverez de nombreux produits Souvenirs <strong>#saintemaxime</strong> : Vêtements Homme & Femmes, Accessoires, produits de plage, et du quotidien. Serviettes de plage à vos couleurs préférées, Coques de Téléphones, Coussins, Vêtements Hommes et Femmes, Bracelets en Silicone.
+              </p>
+            </>
+          )}
         </section>
 
         <section>

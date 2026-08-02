@@ -6,20 +6,34 @@ import { ShoppingCart, Heart, Menu, X, Search, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
+import { useWishlistStore } from "@/lib/store/wishlist";
 import CartDrawer from "@/components/CartDrawer";
+import SearchModal from "@/components/SearchModal";
 
-export default function Header() {
+import type { SiteLink } from "@/lib/links";
+import { linksBySection } from "@/lib/links";
+
+interface HeaderProps {
+  links?: SiteLink[];
+}
+
+export default function Header({ links = [] }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const cartCount = useCartStore((state) => state.items.reduce((sum, i) => sum + i.quantity, 0));
+  const wishlistCount = useWishlistStore((state) => state.items.length);
 
-  const navLinks = [
-    { href: "/boutique/", label: "Boutique" },
-    { href: "/boutique/", label: "Accessoires" },
-    { href: "/boutique/", label: "Vêtements" },
-    { href: "/le-coeur-au-sol/", label: "Le Cœur au Sol" },
-    { href: "/la-marque/", label: "La Marque" },
-  ];
+  const dynamicHeaderLinks = linksBySection(links, "header");
+  const navLinks = dynamicHeaderLinks.length > 0
+    ? dynamicHeaderLinks.map((l) => ({ href: l.url, label: l.label }))
+    : [
+        { href: "/boutique/", label: "Boutique" },
+        { href: "/boutique/", label: "Accessoires" },
+        { href: "/boutique/", label: "Vêtements" },
+        { href: "/le-coeur-au-sol/", label: "Le Cœur au Sol" },
+        { href: "/la-marque/", label: "La Marque" },
+      ];
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-glass border-b border-sm-lightgray/50">
@@ -53,15 +67,20 @@ export default function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-sm-cream rounded-full transition-colors">
+            <button onClick={() => setSearchOpen(true)} className="p-2 hover:bg-sm-cream rounded-full transition-colors">
               <Search className="w-5 h-5 text-sm-dark" />
             </button>
             <Link href="/compte/" className="p-2 hover:bg-sm-cream rounded-full transition-colors">
               <User className="w-5 h-5 text-sm-dark" />
             </Link>
-            <button className="p-2 hover:bg-sm-cream rounded-full transition-colors">
+            <Link href="/wishlist/" className="p-2 hover:bg-sm-cream rounded-full transition-colors relative">
               <Heart className="w-5 h-5 text-sm-dark" />
-            </button>
+              {wishlistCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-sm-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
             <button onClick={() => setCartOpen(true)} className="p-2 hover:bg-sm-cream rounded-full transition-colors relative">
               <ShoppingCart className="w-5 h-5 text-sm-dark" />
               {cartCount > 0 && (
@@ -108,6 +127,7 @@ export default function Header() {
       </AnimatePresence>
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

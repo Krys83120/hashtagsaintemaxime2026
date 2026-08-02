@@ -5,7 +5,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-export default function Hero() {
+interface HeroProps {
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+}
+
+export default function Hero({ title, subtitle, buttonText }: HeroProps) {
   return (
     <section className="relative overflow-hidden py-24 sm:py-32 min-h-[600px] sm:min-h-[720px] flex items-center">
       {/* Photo fixe #SAINTEMAXIME */}
@@ -42,10 +48,10 @@ export default function Hero() {
             #SAINTEMAXIME
           </h1>
           <p className="text-white text-lg sm:text-xl font-medium mb-2 drop-shadow">
-            La Marque Officielle de Sainte-Maxime
+            {title || "La Marque Officielle de Sainte-Maxime"}
           </p>
           <p className="text-white/90 text-sm sm:text-base mb-8 drop-shadow">
-            Vêtements · Accessoires · Souvenirs · Lifestyle
+            {subtitle || "Vêtements · Accessoires · Souvenirs · Lifestyle"}
           </p>
         </motion.div>
 
@@ -59,7 +65,7 @@ export default function Hero() {
             href="/boutique/"
             className="inline-flex items-center gap-2 bg-sm-coral text-white font-semibold px-8 py-4 rounded-full hover:bg-sm-coral/90 transition-all shadow-coral hover:shadow-lg hover:-translate-y-0.5"
           >
-            Découvrir la Collection Été
+            {buttonText || "Découvrir la Collection Été"}
             <ArrowRight className="w-5 h-5" />
           </Link>
           <Link

@@ -4,8 +4,10 @@ import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
 import UGCChallenge from "@/components/UGCChallenge";
 import Newsletter from "@/components/Newsletter";
+import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import SpinWheel from "@/components/SpinWheel";
 import { getCategories, getAllProducts } from "@/lib/products";
+import { getPageContent } from "@/lib/pages-content";
 import { Star, Truck, Shield, RefreshCw } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -15,12 +17,20 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [categories, products] = await Promise.all([getCategories(), getAllProducts()]);
+  const [categories, products, homeContent] = await Promise.all([
+    getCategories(),
+    getAllProducts(),
+    getPageContent<{ heroTitle?: string; heroSubtitle?: string; heroButtonText?: string; newsletterTitle?: string; newsletterText?: string }>("home"),
+  ]);
   const featuredProducts = products.slice(0, 4);
 
   return (
     <div>
-      <Hero />
+      <Hero
+        title={homeContent?.heroTitle}
+        subtitle={homeContent?.heroSubtitle}
+        buttonText={homeContent?.heroButtonText}
+      />
 
       {/* Categories */}
       <section className="bg-sm-cream py-20 px-4">
@@ -136,7 +146,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Newsletter />
+      <GoogleReviewsSection />
+      <Newsletter title={homeContent?.newsletterTitle} text={homeContent?.newsletterText} />
 
       <SpinWheel />
     </div>

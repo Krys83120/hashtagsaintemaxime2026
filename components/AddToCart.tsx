@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Heart } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart";
+import { useWishlistStore } from "@/lib/store/wishlist";
 import type { Product } from "@/lib/products";
 
 interface AddToCartProps {
@@ -14,6 +15,8 @@ export default function AddToCart({ product }: AddToCartProps) {
   const [size, setSize] = useState(product.sizes[0] || "");
   const [added, setAdded] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const toggleWishlist = useWishlistStore((state) => state.toggleItem);
+  const isWishlisted = useWishlistStore((state) => state.isInWishlist(product.id));
 
   const handleAdd = () => {
     addItem({
@@ -96,9 +99,13 @@ export default function AddToCart({ product }: AddToCartProps) {
 
         <button
           type="button"
-          className="flex-1 border-2 border-sm-cyan text-sm-cyan font-bold py-4 rounded-xl hover:bg-sm-cyan/5 transition-colors"
+          onClick={() => toggleWishlist({ productId: product.id, slug: product.slug, name: product.name, price: product.price, image: product.image })}
+          className={`flex-1 border-2 font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 ${
+            isWishlisted ? "border-sm-coral bg-sm-coral/5 text-sm-coral" : "border-sm-cyan text-sm-cyan hover:bg-sm-cyan/5"
+          }`}
         >
-          Ajouter à la Wishlist
+          <Heart className={`w-5 h-5 ${isWishlisted ? "fill-sm-coral" : ""}`} />
+          {isWishlisted ? "Dans ta Wishlist" : "Ajouter à la Wishlist"}
         </button>
       </div>
     </>
