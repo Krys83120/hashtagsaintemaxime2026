@@ -8,6 +8,8 @@ import SocialReviewsSection from "@/components/SocialReviewsSection";
 import SpinWheel from "@/components/SpinWheel";
 import { getCategories, getAllProducts } from "@/lib/products";
 import { getPageContent } from "@/lib/pages-content";
+import { createClient } from "@/lib/supabase/server";
+import SocialCounters from "@/components/SocialCounters";
 import { Star, Truck, Shield, RefreshCw } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -24,12 +26,27 @@ export default async function HomePage() {
   ]);
   const featuredProducts = products.slice(0, 4);
 
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", "site_config")
+    .maybeSingle();
+  const siteConfig = (settingsRow?.value as any) || {};
+
   return (
     <div>
       <Hero
         title={homeContent?.heroTitle}
         subtitle={homeContent?.heroSubtitle}
         buttonText={homeContent?.heroButtonText}
+      />
+
+      <SocialCounters
+        facebookCount={siteConfig.facebookFollowerCount}
+        instagramCount={siteConfig.instagramFollowerCount}
+        facebookUrl={siteConfig.facebookUrl}
+        instagramUrl={siteConfig.instagramUrl}
       />
 
       {/* Categories */}

@@ -24,6 +24,8 @@ interface SiteConfig {
   googleReviewsWidgetCode: string;
   googleReviewsWidgetCode2: string;
   facebookWidgetCode: string;
+  facebookFollowerCount: number;
+  instagramFollowerCount: number;
   maintenanceMode: boolean;
 }
 
@@ -45,6 +47,8 @@ const defaultConfig: SiteConfig = {
   googleReviewsWidgetCode: "",
   googleReviewsWidgetCode2: "",
   facebookWidgetCode: "",
+  facebookFollowerCount: 0,
+  instagramFollowerCount: 0,
   maintenanceMode: false,
 };
 
@@ -360,6 +364,32 @@ export default function AdminSEOPage() {
                   Même principe avec un widget "Facebook Reviews" connecté à facebook.com/HashtagSainteMaxime.
                 </p>
               </div>
+
+              <div className="grid sm:grid-cols-2 gap-4 pt-4 border-t border-sm-lightgray">
+                <div>
+                  <label className="block text-sm font-medium text-sm-dark mb-1">Nombre d'abonnés Facebook (affiché sur l'accueil)</label>
+                  <input
+                    type="number"
+                    value={config.facebookFollowerCount}
+                    onChange={(e) => updateField("facebookFollowerCount", Number(e.target.value))}
+                    placeholder="ex: 1957"
+                    className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-sm-dark mb-1">Nombre d'abonnés Instagram (affiché sur l'accueil)</label>
+                  <input
+                    type="number"
+                    value={config.instagramFollowerCount}
+                    onChange={(e) => updateField("instagramFollowerCount", Number(e.target.value))}
+                    placeholder="ex: 255"
+                    className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-sm-gray -mt-2">
+                Laisse à 0 pour ne pas afficher ce compteur. Comme les réseaux ne donnent pas facilement ce chiffre en temps réel, mets-le à jour manuellement de temps en temps.
+              </p>
             </div>
           )}
 
