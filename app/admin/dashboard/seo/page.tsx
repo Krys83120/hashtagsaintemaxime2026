@@ -21,6 +21,8 @@ interface SiteConfig {
   facebookUrl: string;
   tiktokUrl: string;
   tagembedWidgetId: string;
+  googleReviewsWidgetId: string;
+  facebookWidgetId: string;
   maintenanceMode: boolean;
 }
 
@@ -39,6 +41,8 @@ const defaultConfig: SiteConfig = {
   facebookUrl: "https://www.facebook.com/hashtagsaintemaxime/",
   tiktokUrl: "https://www.tiktok.com/@hashtagsaintemaxime",
   tagembedWidgetId: "",
+  googleReviewsWidgetId: "",
+  facebookWidgetId: "",
   maintenanceMode: false,
 };
 
@@ -312,6 +316,32 @@ export default function AdminSEOPage() {
                 />
                 <p className="text-xs text-sm-gray mt-1">
                   Récupère cet ID depuis ton tableau de bord sur tagembed.com (widget de type "Instagram Hashtag" configuré sur #SAINTEMAXIME).
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-sm-dark mb-1">Tagembed Widget ID (avis Google, page d'accueil)</label>
+                <input
+                  type="text"
+                  value={config.googleReviewsWidgetId}
+                  onChange={(e) => updateField("googleReviewsWidgetId", e.target.value)}
+                  placeholder="ex: 123456"
+                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                />
+                <p className="text-xs text-sm-gray mt-1">
+                  Widget de type "Google Reviews" connecté à ta fiche Google Business, créé sur tagembed.com.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-sm-dark mb-1">Tagembed Widget ID (page Facebook, page d'accueil)</label>
+                <input
+                  type="text"
+                  value={config.facebookWidgetId}
+                  onChange={(e) => updateField("facebookWidgetId", e.target.value)}
+                  placeholder="ex: 123456"
+                  className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                />
+                <p className="text-xs text-sm-gray mt-1">
+                  Widget de type "Facebook" connecté à facebook.com/HashtagSainteMaxime, créé sur tagembed.com.
                 </p>
               </div>
             </div>

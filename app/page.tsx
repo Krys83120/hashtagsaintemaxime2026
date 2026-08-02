@@ -4,7 +4,7 @@ import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
 import UGCChallenge from "@/components/UGCChallenge";
 import Newsletter from "@/components/Newsletter";
-import GoogleReviewsSection from "@/components/GoogleReviewsSection";
+import SocialReviewsSection from "@/components/SocialReviewsSection";
 import SpinWheel from "@/components/SpinWheel";
 import { getCategories, getAllProducts } from "@/lib/products";
 import { getPageContent } from "@/lib/pages-content";
@@ -146,7 +146,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <GoogleReviewsSection />
+      <SocialReviewsSection />
       <Newsletter title={homeContent?.newsletterTitle} text={homeContent?.newsletterText} />
 
       <SpinWheel />
