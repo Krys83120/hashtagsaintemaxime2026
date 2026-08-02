@@ -40,14 +40,24 @@ export default async function LaMarquePage() {
         </p>
       </div>
 
-      <div className="relative w-full aspect-[21/9] sm:aspect-[3/1]">
+      <div className="relative w-full aspect-[21/9] sm:aspect-[3/1] overflow-hidden">
+        {/* Arrière-plan flouté (même photo, agrandie) pour combler les bords sans recadrer la photo nette */}
+        <Image
+          src={heroImage.url}
+          alt=""
+          fill
+          aria-hidden
+          sizes="100vw"
+          className="object-cover scale-125 blur-2xl brightness-50"
+        />
+        {/* Photo nette, entière, jamais recadrée */}
         <Image
           src={heroImage.url}
           alt={heroImage.alt}
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-contain"
         />
       </div>
 
