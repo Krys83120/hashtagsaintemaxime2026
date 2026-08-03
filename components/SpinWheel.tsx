@@ -3,8 +3,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Gift } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
-const WHEEL_SEGMENTS = [
+interface WheelSegment {
+  label: string;
+  color: string;
+  weight: number;
+  promoCode?: string;
+}
+
+const DEFAULT_SEGMENTS: WheelSegment[] = [
   { label: "-10%", color: "#00D4E8", weight: 30 },
   { label: "Livraison Offerte", color: "#FF6B8A", weight: 25 },
   { label: "-15% dès 50€", color: "#0085A1", weight: 20 },
@@ -12,31 +20,74 @@ const WHEEL_SEGMENTS = [
   { label: "-20%", color: "#FF6B8A", weight: 10 },
 ];
 
+function pickWeightedSegment(segments: WheelSegment[]): { segment: WheelSegment; index: number } {
+  const total = segments.reduce((sum, s) => sum + s.weight, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < segments.length; i++) {
+    r -= segments[i].weight;
+    if (r <= 0) return { segment: segments[i], index: i };
+  }
+  return { segment: segments[segments.length - 1], index: segments.length - 1 };
+}
+
 export default function SpinWheel() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const [result, setResult] = useState<string | null>(null);
+  const [result, setResult] = useState<WheelSegment | null>(null);
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [segments, setSegments] = useState<WheelSegment[]>(DEFAULT_SEGMENTS);
+  const [title, setTitle] = useState("🎰 Roue de la Fortune");
+  const [subtitle, setSubtitle] = useState("Tourne la roue et gagne jusqu'à -20% ou une livraison offerte !");
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsOpen(true), 5000);
-    return () => clearTimeout(timer);
+    const init = async () => {
+      const supabase = createClient();
+      const { data: settingsRow } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "spin_wheel_config")
+        .maybeSingle();
+
+      const config = (settingsRow?.value as any) || {};
+      if (config.enabled === false) return;
+      if (config.segments?.length) setSegments(config.segments);
+      if (config.title) setTitle(config.title);
+      if (config.subtitle) setSubtitle(config.subtitle);
+
+      const delaySeconds = config.delaySeconds ?? 5;
+
+      // Vérifie côté serveur (par IP) si la roue peut s'afficher (limite de fréquence)
+      try {
+        const res = await fetch("/api/spin-wheel/check");
+        const data = await res.json();
+        if (!data.allowed) return;
+      } catch {
+        return; // en cas d'erreur réseau, on n'affiche pas plutôt que de spammer
+      }
+
+      const timer = setTimeout(() => setIsOpen(true), delaySeconds * 1000);
+      return () => clearTimeout(timer);
+    };
+    init();
   }, []);
 
   const spin = () => {
     if (isSpinning || !email) return;
     setIsSpinning(true);
+
+    const { segment, index } = pickWeightedSegment(segments);
+    const segmentAngle = 360 / segments.length;
+    // Centre le segment choisi sous le repère du haut, avec plusieurs tours pour l'effet
+    const targetAngle = 360 - (index * segmentAngle + segmentAngle / 2);
     const extraSpins = 5;
-    const randomDeg = Math.floor(Math.random() * 360);
-    const newRotation = rotation + extraSpins * 360 + randomDeg;
+    const newRotation = rotation + extraSpins * 360 + targetAngle - (rotation % 360);
+
     setRotation(newRotation);
 
     setTimeout(() => {
       setIsSpinning(false);
-      const segmentIndex = Math.floor((360 - (newRotation % 360)) / (360 / WHEEL_SEGMENTS.length)) % WHEEL_SEGMENTS.length;
-      setResult(WHEEL_SEGMENTS[segmentIndex].label);
+      setResult(segment);
     }, 3000);
   };
 
@@ -68,15 +119,13 @@ export default function SpinWheel() {
               <X className="w-5 h-5 text-sm-gray" />
             </button>
 
-            {!submitted && !result ? (
+            {!result ? (
               <div className="text-center">
                 <div className="w-16 h-16 bg-sm-cyan/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Gift className="w-8 h-8 text-sm-cyan" />
                 </div>
-                <h3 className="text-2xl font-bold text-sm-dark mb-2">🎰 Roue de la Fortune</h3>
-                <p className="text-sm-gray text-sm mb-6">
-                  Tourne la roue et gagne jusqu'à -20% ou une livraison offerte !
-                </p>
+                <h3 className="text-2xl font-bold text-sm-dark mb-2">{title}</h3>
+                <p className="text-sm-gray text-sm mb-6">{subtitle}</p>
 
                 <div className="relative w-64 h-64 mx-auto mb-6">
                   <motion.div
@@ -85,13 +134,13 @@ export default function SpinWheel() {
                     transition={{ duration: 3, ease: "easeOut" }}
                     style={{ transformOrigin: "center" }}
                   >
-                    {WHEEL_SEGMENTS.map((segment, i) => (
+                    {segments.map((segment, i) => (
                       <div
                         key={i}
                         className="absolute w-full h-full"
                         style={{
-                          background: `conic-gradient(from ${i * (360 / WHEEL_SEGMENTS.length)}deg, ${segment.color} 0deg, ${segment.color} ${360 / WHEEL_SEGMENTS.length}deg, transparent ${360 / WHEEL_SEGMENTS.length}deg)`,
-                          clipPath: `polygon(50% 50%, ${50 + 50 * Math.cos((i * (360 / WHEEL_SEGMENTS.length) - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin((i * (360 / WHEEL_SEGMENTS.length) - 90) * Math.PI / 180)}%, ${50 + 50 * Math.cos(((i + 1) * (360 / WHEEL_SEGMENTS.length) - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin(((i + 1) * (360 / WHEEL_SEGMENTS.length) - 90) * Math.PI / 180)}%)`,
+                          background: `conic-gradient(from ${i * (360 / segments.length)}deg, ${segment.color} 0deg, ${segment.color} ${360 / segments.length}deg, transparent ${360 / segments.length}deg)`,
+                          clipPath: `polygon(50% 50%, ${50 + 50 * Math.cos((i * (360 / segments.length) - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin((i * (360 / segments.length) - 90) * Math.PI / 180)}%, ${50 + 50 * Math.cos(((i + 1) * (360 / segments.length) - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin(((i + 1) * (360 / segments.length) - 90) * Math.PI / 180)}%)`,
                         }}
                       />
                     ))}
@@ -119,7 +168,7 @@ export default function SpinWheel() {
                   {isSpinning ? "La roue tourne..." : "Tourner la Roue !"}
                 </button>
               </div>
-            ) : result ? (
+            ) : (
               <div className="text-center py-8">
                 <motion.div
                   initial={{ scale: 0 }}
@@ -129,10 +178,16 @@ export default function SpinWheel() {
                   🎉
                 </motion.div>
                 <h3 className="text-2xl font-bold text-sm-dark mb-2">Tu as gagné !</h3>
-                <p className="text-3xl font-black text-sm-coral mb-4">{result}</p>
-                <p className="text-sm text-sm-gray mb-6">
-                  Utilise le code envoyé par email pour ta prochaine commande.
-                </p>
+                <p className="text-3xl font-black text-sm-coral mb-4">{result.label}</p>
+                {result.promoCode ? (
+                  <p className="text-sm text-sm-gray mb-6">
+                    Utilise le code <strong className="text-sm-dark font-mono">{result.promoCode}</strong> lors de ton prochain achat.
+                  </p>
+                ) : (
+                  <p className="text-sm text-sm-gray mb-6">
+                    Un email va bientôt t'être envoyé avec ton code de réduction.
+                  </p>
+                )}
                 <button
                   onClick={close}
                   className="bg-sm-cyan text-white font-bold px-8 py-3 rounded-xl hover:bg-sm-deep transition-colors"
@@ -140,7 +195,7 @@ export default function SpinWheel() {
                   Continuer mes achats
                 </button>
               </div>
-            ) : null}
+            )}
           </motion.div>
         </motion.div>
       )}
