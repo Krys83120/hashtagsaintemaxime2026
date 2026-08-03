@@ -27,6 +27,7 @@ interface SiteConfig {
   facebookWidgetCode: string;
   facebookFollowerCount: number;
   instagramFollowerCount: number;
+  instagramHashtagCount: number;
   maintenanceMode: boolean;
 }
 
@@ -51,6 +52,7 @@ const defaultConfig: SiteConfig = {
   facebookWidgetCode: "",
   facebookFollowerCount: 0,
   instagramFollowerCount: 0,
+  instagramHashtagCount: 218000,
   maintenanceMode: false,
 };
 
@@ -400,6 +402,19 @@ export default function AdminSEOPage() {
                     placeholder="ex: 255"
                     className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-sm-dark mb-1">Nombre de photos/vidéos #SAINTEMAXIME sur Instagram</label>
+                  <input
+                    type="number"
+                    value={config.instagramHashtagCount}
+                    onChange={(e) => updateField("instagramHashtagCount", Number(e.target.value))}
+                    placeholder="ex: 218000"
+                    className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none text-sm"
+                  />
+                  <p className="text-xs text-sm-gray mt-1">
+                    Instagram ne fournit pas ce chiffre par API — va vérifier toi-même sur Instagram (recherche #saintemaxime) et mets-le à jour ici de temps en temps.
+                  </p>
                 </div>
               </div>
               <p className="text-xs text-sm-gray -mt-2">

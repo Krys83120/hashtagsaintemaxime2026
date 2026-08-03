@@ -1,10 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Camera, MapPin, QrCode } from "lucide-react";
+import { Camera, MapPin } from "lucide-react";
 import Image from "next/image";
 
-export default function UGCChallenge() {
+interface UGCChallengeProps {
+  instagramHashtagCount?: number;
+}
+
+function formatCount(n: number): string {
+  // Format avec des points tous les 3 chiffres, ex: 218.000
+  return n.toLocaleString("de-DE");
+}
+
+export default function UGCChallenge({ instagramHashtagCount = 218000 }: UGCChallengeProps) {
   return (
     <section className="bg-sm-cream py-20 px-4">
       <div className="max-w-7xl mx-auto">
@@ -49,19 +58,12 @@ export default function UGCChallenge() {
               Prends une photo au cœur <strong>#SAINTEMAXIME</strong> au sol, partage-la avec le hashtag et gagne <strong className="text-sm-coral">-15%</strong> sur ta prochaine commande + une chance de remporter le <strong>Kit Été Complet</strong> !
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <div className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
+            <div className="mb-8">
+              <div className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm max-w-xs">
                 <MapPin className="w-5 h-5 text-sm-cyan mt-0.5" />
                 <div>
                   <p className="font-semibold text-sm-dark text-sm">Localisation</p>
                   <p className="text-sm-gray text-sm">Rue piétonne, Sainte-Maxime</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
-                <QrCode className="w-5 h-5 text-sm-coral mt-0.5" />
-                <div>
-                  <p className="font-semibold text-sm-dark text-sm">QR Code</p>
-                  <p className="text-sm-gray text-sm">Scanne au cœur pour -10%</p>
                 </div>
               </div>
             </div>
@@ -77,7 +79,7 @@ export default function UGCChallenge() {
             </a>
 
             <p className="text-sm-gray text-sm mt-4">
-              📸 <strong>2 847 photos</strong> déjà partagées avec #SAINTEMAXIME
+              📸 <strong>{formatCount(instagramHashtagCount)} photos et vidéos</strong> avec la mention #SAINTEMAXIME sur Instagram, partagez les vôtres !
             </p>
           </motion.div>
         </div>

@@ -125,7 +125,7 @@ export default async function HomePage() {
       </section>
 
       {/* UGC / Viral Section */}
-      <UGCChallenge />
+      <UGCChallenge instagramHashtagCount={siteConfig.instagramHashtagCount} />
 
       {/* Gamification Banner */}
       <section className="bg-sm-cyan py-12 px-4">
