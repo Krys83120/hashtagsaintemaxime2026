@@ -59,13 +59,19 @@ export default function UGCChallenge({ instagramHashtagCount = 218000 }: UGCChal
             </p>
 
             <div className="mb-8">
-              <div className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm max-w-xs">
+              <a
+                href="https://maps.app.goo.gl/1erWn4UA46BBbUsK6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm max-w-xs hover:shadow-md hover:ring-2 hover:ring-sm-cyan/30 transition-all"
+              >
                 <MapPin className="w-5 h-5 text-sm-cyan mt-0.5" />
                 <div>
                   <p className="font-semibold text-sm-dark text-sm">Localisation</p>
                   <p className="text-sm-gray text-sm">Rue piétonne, Sainte-Maxime</p>
+                  <p className="text-sm-cyan text-xs mt-1 font-medium">Voir sur la carte →</p>
                 </div>
-              </div>
+              </a>
             </div>
 
             <a
