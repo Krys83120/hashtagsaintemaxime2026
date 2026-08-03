@@ -35,14 +35,14 @@ export default async function SocialReviewsSection() {
 
       <div className={`grid gap-10 ${hasGoogle && facebookWidgetCode ? "lg:grid-cols-2" : ""}`}>
         {hasGoogle && (
-          <div className="space-y-8">
+          <div className="space-y-8 mx-auto w-full text-center trustindex-center">
             <h3 className="font-semibold text-sm-gray text-sm uppercase tracking-wider text-center">Avis Google</h3>
             {googleReviewsWidgetCode && <TrustindexWidget widgetCode={googleReviewsWidgetCode} />}
             {googleReviewsWidgetCode2 && <TrustindexWidget widgetCode={googleReviewsWidgetCode2} />}
           </div>
         )}
         {facebookWidgetCode && (
-          <div>
+          <div className="mx-auto w-full text-center trustindex-center">
             <h3 className="font-semibold text-sm-gray text-sm uppercase tracking-wider mb-4 text-center">Facebook</h3>
             <TrustindexWidget widgetCode={facebookWidgetCode} />
           </div>
