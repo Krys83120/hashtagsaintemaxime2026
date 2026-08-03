@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, Printer, Package, Tags, Users, ShoppingCart,
-  FileText, ImageIcon, Link2, Settings, LogOut, ChevronLeft, Menu, X, Tag, Gift
+  FileText, ImageIcon, Link2, Settings, LogOut, ChevronLeft, Menu, X, Tag, Gift, Mail
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -35,6 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin/dashboard/commandes", label: "Commandes", icon: ShoppingCart },
         { href: "/admin/dashboard/promos", label: "Codes promo", icon: Tag },
         { href: "/admin/dashboard/roue", label: "Roue de la Fortune", icon: Gift },
+        { href: "/admin/dashboard/newsletter", label: "Newsletter", icon: Mail },
       ],
     },
     {

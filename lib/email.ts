@@ -67,3 +67,55 @@ export async function sendShippingEmail(params: {
     `,
   });
 }
+
+export async function sendNewsletterWelcomeEmail(params: { to: string }) {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("RESEND_API_KEY non configurée, email de bienvenue newsletter non envoyé.");
+    return { skipped: true };
+  }
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: params.to,
+    subject: "Ton code -10% t'attend ! 🎁 — #SAINTEMAXIME®",
+    html: `
+      <div style="background-color:#f0fdff;padding:40px 20px;font-family:Helvetica,Arial,sans-serif;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+          <tr>
+            <td style="background:linear-gradient(135deg,#00D4E8,#FF6B8A);padding:32px 24px;text-align:center;">
+              <span style="font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">#SAINTEMAXIME</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:36px 32px;text-align:center;">
+              <h1 style="font-size:20px;color:#1E293B;margin:0 0 16px;">Bienvenue dans la Family ! 🎉</h1>
+              <p style="font-size:15px;line-height:1.6;color:#475569;margin:0 0 24px;">
+                Merci de t'être inscrit·e à notre newsletter. Voici ton code de bienvenue, valable sur ta prochaine commande :
+              </p>
+              <div style="background:#f0fdff;border:2px dashed #00D4E8;border-radius:16px;padding:20px;margin:0 0 24px;">
+                <p style="font-size:12px;color:#64748B;margin:0 0 4px;text-transform:uppercase;letter-spacing:1px;">Ton code</p>
+                <p style="font-size:28px;font-weight:800;color:#00D4E8;margin:0;letter-spacing:2px;">NEWSLETTER10</p>
+                <p style="font-size:13px;color:#64748B;margin:8px 0 0;">-10% sur ta commande</p>
+              </div>
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td style="border-radius:999px;background:#FF6B8A;">
+                    <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://hashtagsaintemaxime.fr"}/boutique/" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">
+                      Découvrir la boutique
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px;background:#f8fafc;text-align:center;">
+              <p style="font-size:12px;color:#94A3B8;margin:0;">#SAINTEMAXIME® — Sainte-Maxime, France</p>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `,
+  });
+}
