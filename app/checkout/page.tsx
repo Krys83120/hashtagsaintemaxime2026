@@ -26,12 +26,16 @@ export default function CheckoutPage() {
   const [applyingPromo, setApplyingPromo] = useState(false);
 
   const [shippingConfig, setShippingConfig] = useState({ freeShippingThreshold: 60, shippingCost: 4.9 });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [createAccount, setCreateAccount] = useState(false);
+  const [accountPassword, setAccountPassword] = useState("");
 
   useEffect(() => {
     const prefill = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        setIsLoggedIn(true);
         const meta = user.user_metadata as any;
         setForm((prev) => ({
           ...prev,
@@ -107,8 +111,40 @@ export default function CheckoutPage() {
       setError("Merci de remplir tous les champs obligatoires.");
       return;
     }
+    if (createAccount && accountPassword.length < 8) {
+      setError("Le mot de passe du compte doit faire au moins 8 caractères.");
+      return;
+    }
 
     setLoading(true);
+
+    let newAccountUserId: string | null = null;
+    if (createAccount && !isLoggedIn) {
+      const supabase = createClient();
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: form.email,
+        password: accountPassword,
+        options: {
+          data: {
+            full_name: form.name,
+            phone: form.phone,
+            address: { line1: form.line1, postalCode: form.postalCode, city: form.city },
+          },
+        },
+      });
+
+      if (signUpError) {
+        setError(
+          signUpError.message === "User already registered"
+            ? "Un compte existe déjà avec cet email — connecte-toi d'abord, ou décoche la création de compte."
+            : "Erreur lors de la création du compte : " + signUpError.message
+        );
+        setLoading(false);
+        return;
+      }
+      newAccountUserId = signUpData.user?.id || null;
+    }
+
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -121,6 +157,7 @@ export default function CheckoutPage() {
             address: { line1: form.line1, postalCode: form.postalCode, city: form.city, phone: form.phone },
           },
           promoCode: promo?.code || null,
+          newAccountUserId,
         }),
       });
       const data = await res.json();
@@ -209,6 +246,35 @@ export default function CheckoutPage() {
               />
             </div>
           </div>
+
+          {!isLoggedIn && (
+            <div className="bg-sm-cream rounded-xl p-4 space-y-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={createAccount}
+                  onChange={(e) => setCreateAccount(e.target.checked)}
+                  className="w-5 h-5 mt-0.5 accent-sm-cyan"
+                />
+                <span className="text-sm text-sm-dark">
+                  <strong>Créer mon compte</strong> pour suivre facilement mes commandes et gagner du temps la prochaine fois
+                </span>
+              </label>
+              {createAccount && (
+                <div>
+                  <label className="block text-sm font-medium text-sm-dark mb-1">Mot de passe</label>
+                  <input
+                    type="password"
+                    required={createAccount}
+                    value={accountPassword}
+                    onChange={(e) => setAccountPassword(e.target.value)}
+                    placeholder="8 caractères minimum"
+                    className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 rounded-xl p-3">{error}</p>

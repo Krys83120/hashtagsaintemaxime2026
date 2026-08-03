@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShoppingCart, Heart, Menu, X, Search, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -18,11 +19,20 @@ interface HeaderProps {
 }
 
 export default function Header({ links = [] }: HeaderProps) {
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const cartCount = useCartStore((state) => state.items.reduce((sum, i) => sum + i.quantity, 0));
   const wishlistCount = useWishlistStore((state) => state.items.length);
+
+  // Garde-fou : ferme le panier/la recherche/le menu à chaque changement de page,
+  // quelle que soit la façon dont on y arrive (clic, retour navigateur, etc.)
+  useEffect(() => {
+    setCartOpen(false);
+    setSearchOpen(false);
+    setMobileOpen(false);
+  }, [pathname]);
 
   const dynamicHeaderLinks = linksBySection(links, "header");
   const navLinks = dynamicHeaderLinks.length > 0

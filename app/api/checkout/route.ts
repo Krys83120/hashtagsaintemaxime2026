@@ -8,6 +8,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   const items: CartItem[] = body.items || [];
   const customer = body.customer || {};
+  const newAccountUserId: string | null = body.newAccountUserId || null;
 
   if (items.length === 0) {
     return NextResponse.json({ error: "Le panier est vide." }, { status: 400 });
@@ -16,9 +17,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Informations client incomplètes." }, { status: 400 });
   }
 
-  // Si le client est connecté, on relie la commande à son compte (facultatif : achat invité toujours possible)
+  // Si le client est connecté OU vient de créer un compte à l'instant, on relie la commande à son compte
+  // (facultatif : achat invité toujours possible)
   const serverSupabase = await createServerClient();
   const { data: { user } } = await serverSupabase.auth.getUser();
+  const customerId = user?.id || newAccountUserId || null;
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
@@ -85,7 +88,7 @@ export async function POST(request: Request) {
   // pour avoir le détail complet (articles, adresse) dès la confirmation.
   const { error: insertError } = await admin.from("orders").insert({
     order_number: orderNumber,
-    customer_id: user?.id || null,
+    customer_id: customerId,
     customer_name: customer.name,
     customer_email: customer.email,
     customer_address: {
