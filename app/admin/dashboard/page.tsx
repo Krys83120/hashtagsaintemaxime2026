@@ -3,26 +3,51 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
-import { ShoppingBag, Users, TrendingUp, DollarSign, Package, Eye } from "lucide-react";
+import { Users, DollarSign, Package, Eye } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
-    totalProducts: 8,
-    totalViews: 1247,
+    totalProducts: 0,
+    totalViews: 0,
     subscribers: 0,
     revenue: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
-    const saved = localStorage.getItem("sm_admin_stats");
-    if (saved) setStats(JSON.parse(saved));
+    loadStats();
   }, []);
+
+  const loadStats = async () => {
+    setLoading(true);
+
+    const [{ count: totalProducts }, { data: viewsData }, { count: subscribers }, { data: ordersData }] =
+      await Promise.all([
+        supabase.from("products").select("*", { count: "exact", head: true }),
+        supabase.from("products").select("view_count"),
+        supabase.from("newsletter_subscribers").select("*", { count: "exact", head: true }).eq("active", true),
+        supabase.from("orders").select("total, status").in("status", ["paid", "processing", "shipped", "delivered"]),
+      ]);
+
+    const totalViews = (viewsData || []).reduce((sum, p: any) => sum + (p.view_count || 0), 0);
+    const revenue = (ordersData || []).reduce((sum, o: any) => sum + Number(o.total || 0), 0);
+
+    setStats({
+      totalProducts: totalProducts || 0,
+      totalViews,
+      subscribers: subscribers || 0,
+      revenue: Math.round(revenue * 100) / 100,
+    });
+    setLoading(false);
+  };
 
   const cards = [
     { label: "Produits", value: stats.totalProducts, icon: Package, color: "bg-sm-cyan" },
-    { label: "Vues du site", value: stats.totalViews, icon: Eye, color: "bg-sm-deep" },
+    { label: "Vues des fiches produits", value: stats.totalViews, icon: Eye, color: "bg-sm-deep" },
     { label: "Inscrits newsletter", value: stats.subscribers, icon: Users, color: "bg-sm-coral" },
-    { label: "Revenus estimés", value: `${stats.revenue}€`, icon: DollarSign, color: "bg-green-500" },
+    { label: "Revenus (commandes payées)", value: `${stats.revenue.toFixed(2)}€`, icon: DollarSign, color: "bg-green-500" },
   ];
 
   return (
@@ -33,25 +58,31 @@ export default function AdminDashboardPage() {
           <p className="text-sm-gray">Vue d'ensemble de ta boutique #SAINTEMAXIME</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cards.map((card, i) => (
-            <motion.div
-              key={card.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-sm-lightgray"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 ${card.color} rounded-xl flex items-center justify-center text-white`}>
-                  <card.icon className="w-6 h-6" />
+        {loading ? (
+          <div className="bg-white rounded-2xl p-12 text-center border border-sm-lightgray text-sm-gray">
+            Chargement des statistiques...
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {cards.map((card, i) => (
+              <motion.div
+                key={card.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-sm-lightgray"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-12 h-12 ${card.color} rounded-xl flex items-center justify-center text-white`}>
+                    <card.icon className="w-6 h-6" />
+                  </div>
                 </div>
-              </div>
-              <p className="text-3xl font-bold text-sm-dark">{card.value}</p>
-              <p className="text-sm text-sm-gray">{card.label}</p>
-            </motion.div>
-          ))}
-        </div>
+                <p className="text-3xl font-bold text-sm-dark">{card.value}</p>
+                <p className="text-sm text-sm-gray">{card.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-sm-lightgray">
@@ -76,18 +107,18 @@ export default function AdminDashboardPage() {
             <h2 className="text-lg font-bold text-sm-dark mb-4">📋 Checklist lancement</h2>
             <div className="space-y-2">
               {[
-                { label: "Configurer la clé API Printful", done: false },
-                { label: "Synchroniser les produits", done: false },
-                { label: "Vérifier les prix et marges", done: false },
-                { label: "Configurer les frais de livraison", done: false },
-                { label: "Tester une commande", done: false },
-                { label: "Connecter le domaine (Vercel)", done: false },
-                { label: "Activer Google Analytics", done: false },
-                { label: "Soumettre le sitemap Google", done: false },
-              ].map((item, i) => (
+                "Configurer la clé API Printful",
+                "Synchroniser les produits",
+                "Vérifier les prix et marges",
+                "Configurer les frais de livraison",
+                "Tester une commande",
+                "Connecter le domaine (Vercel)",
+                "Activer Google Analytics",
+                "Soumettre le sitemap Google",
+              ].map((label, i) => (
                 <label key={i} className="flex items-center gap-3 cursor-pointer hover:bg-sm-cream p-2 rounded-lg transition-colors">
-                  <input type="checkbox" defaultChecked={item.done} className="w-5 h-5 accent-sm-cyan rounded" />
-                  <span className={`text-sm ${item.done ? "text-sm-gray line-through" : "text-sm-dark"}`}>{item.label}</span>
+                  <input type="checkbox" className="w-5 h-5 accent-sm-cyan rounded" />
+                  <span className="text-sm text-sm-dark">{label}</span>
                 </label>
               ))}
             </div>
