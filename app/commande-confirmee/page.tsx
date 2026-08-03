@@ -2,13 +2,14 @@ import Link from "next/link";
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSumupCheckout } from "@/lib/sumup";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 import ClearCartOnMount from "@/components/ClearCartOnMount";
 
 interface Props {
   searchParams: { ref?: string };
 }
 
-async function verifyAndFinalizeOrder(orderNumber: string) {
+async function verifyAndFinalizeOrder(orderNumber: string, origin: string) {
   const admin = createAdminClient();
 
   const { data: order } = await admin
@@ -30,6 +31,23 @@ async function verifyAndFinalizeOrder(orderNumber: string) {
 
     if (sumupCheckout.status === "PAID") {
       await admin.from("orders").update({ status: "paid" }).eq("order_number", orderNumber);
+
+      if (!order.confirmation_email_sent) {
+        try {
+          await sendOrderConfirmationEmail({
+            to: order.customer_email,
+            customerName: order.customer_name,
+            orderNumber: order.order_number,
+            items: order.items || [],
+            total: Number(order.total),
+            trackingUrl: `${origin}/suivi/${order.tracking_token}/`,
+          });
+          await admin.from("orders").update({ confirmation_email_sent: true }).eq("order_number", orderNumber);
+        } catch (err: any) {
+          console.error("Erreur envoi email confirmation:", err.message);
+        }
+      }
+
       return { status: "paid" as const };
     }
     if (sumupCheckout.status === "FAILED" || sumupCheckout.status === "EXPIRED") {
@@ -57,7 +75,8 @@ export default async function OrderConfirmedPage({ searchParams }: Props) {
     );
   }
 
-  const result = await verifyAndFinalizeOrder(ref);
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://hashtagsaintemaxime.fr";
+  const result = await verifyAndFinalizeOrder(ref, origin);
 
   if (result.status === "not_found") {
     return (

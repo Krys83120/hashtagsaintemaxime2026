@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendShippingEmail } from "@/lib/email";
+import { sendShippingEmail, sendProcessingEmail } from "@/lib/email";
 
 async function requireActiveAdmin() {
   const supabase = await createServerClient();
@@ -53,8 +53,19 @@ export async function PATCH(request: Request) {
     order.status !== "shipped" && // évite de renvoyer l'email si déjà marquée expédiée
     (trackingNumber || order.tracking_number);
 
+  const willTriggerProcessingEmail =
+    status === "processing" &&
+    order.status !== "processing" &&
+    !order.processing_email_sent;
+
   if (willTriggerShippingEmail) {
     updates.shipped_at = new Date().toISOString();
+  }
+  if (willTriggerProcessingEmail) {
+    updates.processing_email_sent = true;
+  }
+  if (status === "delivered" && order.status !== "delivered") {
+    updates.delivered_at = new Date().toISOString();
   }
 
   const { error: updateError } = await admin.from("orders").update(updates).eq("id", orderId);
@@ -62,8 +73,22 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
+  const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "";
+
+  if (willTriggerProcessingEmail) {
+    try {
+      await sendProcessingEmail({
+        to: order.customer_email,
+        customerName: order.customer_name,
+        orderNumber: order.order_number,
+        trackingUrl: `${origin}/suivi/${order.tracking_token}/`,
+      });
+    } catch (err: any) {
+      console.error("Erreur envoi email preparation:", err.message);
+    }
+  }
+
   if (willTriggerShippingEmail) {
-    const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "";
     try {
       await sendShippingEmail({
         to: order.customer_email,
