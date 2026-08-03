@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Heart } from "lucide-react";
 
 export default function HeartLoader() {
   const [visible, setVisible] = useState(true);
@@ -18,27 +19,28 @@ export default function HeartLoader() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6 }}
-          className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center"
+          className="fixed inset-0 z-[200] w-screen h-screen bg-white flex flex-col items-center justify-center px-4"
         >
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="flex items-center gap-1 mb-4"
+            className="flex items-center justify-center gap-1 mb-4"
           >
-            <span className="text-6xl font-bold text-sm-cyan">#</span>
+            <span className="text-6xl font-bold text-sm-cyan leading-none">#</span>
             <motion.span
               animate={{ scale: [1, 1.15, 1] }}
               transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-              className="text-5xl text-sm-coral"
+              className="flex items-center justify-center"
             >
-              ❤
+              <Heart className="w-10 h-10 sm:w-12 sm:h-12 text-sm-coral fill-sm-coral" />
             </motion.span>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
+            className="text-center"
           >
             <span className="text-3xl font-bold text-sm-cyan tracking-tight">
               SAINTEMAXIME
@@ -54,7 +56,7 @@ export default function HeartLoader() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="font-script italic text-sm-coral text-xl mt-3"
+            className="font-script italic text-sm-coral text-xl mt-3 text-center"
           >
             lifestyle
           </motion.p>
