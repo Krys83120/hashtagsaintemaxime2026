@@ -95,6 +95,9 @@ export async function POST(request: Request) {
       ...customer.address,
       formatted: [customer.address.line1, customer.address.postalCode, customer.address.city].filter(Boolean).join(", "),
     },
+    shipping_address: body.shippingAddress
+      ? { ...body.shippingAddress, formatted: [body.shippingAddress.line1, body.shippingAddress.postalCode, body.shippingAddress.city].filter(Boolean).join(", ") }
+      : null,
     items: items.map((i) => ({ productId: i.productId, slug: i.slug, name: i.name, qty: i.quantity, price: i.price, color: i.color, size: i.size })),
     total,
     promo_code: promoCode,

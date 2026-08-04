@@ -29,6 +29,13 @@ export default function CheckoutPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [createAccount, setCreateAccount] = useState(false);
   const [accountPassword, setAccountPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState({ name: "", line1: "", postalCode: "", city: "" });
+
+  const updateShippingField = (field: keyof typeof deliveryInfo, value: string) => {
+    setDeliveryInfo((prev) => ({ ...prev, [field]: value }));
+  };
 
   useEffect(() => {
     const prefill = async () => {
@@ -111,6 +118,14 @@ export default function CheckoutPage() {
       setError("Merci de remplir tous les champs obligatoires.");
       return;
     }
+    if (!acceptedTerms) {
+      setError("Merci d'accepter les conditions générales pour continuer.");
+      return;
+    }
+    if (shipToDifferentAddress && (!deliveryInfo.name || !deliveryInfo.line1 || !deliveryInfo.postalCode || !deliveryInfo.city)) {
+      setError("Merci de compléter l'adresse de livraison.");
+      return;
+    }
     if (createAccount && accountPassword.length < 8) {
       setError("Le mot de passe du compte doit faire au moins 8 caractères.");
       return;
@@ -158,6 +173,9 @@ export default function CheckoutPage() {
           },
           promoCode: promo?.code || null,
           newAccountUserId,
+          shippingAddress: shipToDifferentAddress
+            ? { name: deliveryInfo.name, line1: deliveryInfo.line1, postalCode: deliveryInfo.postalCode, city: deliveryInfo.city }
+            : null,
         }),
       });
       const data = await res.json();
@@ -247,6 +265,58 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={shipToDifferentAddress}
+                onChange={(e) => setShipToDifferentAddress(e.target.checked)}
+                className="w-5 h-5 accent-sm-cyan"
+              />
+              <span className="text-sm text-sm-dark font-medium">Livrer à une adresse différente</span>
+            </label>
+
+            {shipToDifferentAddress && (
+              <div className="mt-4 space-y-4 bg-sm-cream rounded-xl p-4">
+                <div>
+                  <label className="block text-sm font-medium text-sm-dark mb-1">Nom du destinataire *</label>
+                  <input
+                    type="text" required={shipToDifferentAddress} value={deliveryInfo.name}
+                    onChange={(e) => updateShippingField("name", e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-sm-dark mb-1">Adresse de livraison *</label>
+                  <input
+                    type="text" required={shipToDifferentAddress} value={deliveryInfo.line1}
+                    onChange={(e) => updateShippingField("line1", e.target.value)}
+                    placeholder="N° et nom de rue"
+                    className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none bg-white"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-sm-dark mb-1">Code postal *</label>
+                    <input
+                      type="text" required={shipToDifferentAddress} value={deliveryInfo.postalCode}
+                      onChange={(e) => updateShippingField("postalCode", e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-sm-dark mb-1">Ville *</label>
+                    <input
+                      type="text" required={shipToDifferentAddress} value={deliveryInfo.city}
+                      onChange={(e) => updateShippingField("city", e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-sm-lightgray focus:border-sm-cyan focus:ring-2 focus:ring-sm-cyan/20 outline-none bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {!isLoggedIn && (
             <div className="bg-sm-cream rounded-xl p-4 space-y-3">
               <label className="flex items-start gap-3 cursor-pointer">
@@ -280,6 +350,19 @@ export default function CheckoutPage() {
             <p className="text-sm text-red-600 bg-red-50 rounded-xl p-3">{error}</p>
           )}
 
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              required
+              className="w-5 h-5 mt-0.5 accent-sm-cyan"
+            />
+            <span className="text-sm text-sm-dark">
+              J'ai lu et j'accepte les <Link href="/cgv/" target="_blank" className="font-semibold text-sm-cyan hover:underline">conditions générales</Link> *
+            </span>
+          </label>
+
           <button
             type="submit"
             disabled={loading}
@@ -293,7 +376,20 @@ export default function CheckoutPage() {
               `Payer ${formatPrice(total)}`
             )}
           </button>
-          <p className="text-xs text-sm-gray text-center">Paiement sécurisé par SumUp. Tes données de carte ne transitent jamais par notre site.</p>
+
+          <div className="bg-sm-cream rounded-xl p-4 text-center space-y-3">
+            <p className="text-xs text-sm-gray">
+              Paiement 100% sécurisé. Tes données ne sont jamais stockées sur nos serveurs.
+            </p>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <span className="px-3 py-1.5 bg-white rounded-lg border border-sm-lightgray text-xs font-bold text-[#1A1F71]">VISA</span>
+              <span className="px-3 py-1.5 bg-white rounded-lg border border-sm-lightgray flex items-center gap-0.5">
+                <span className="w-3 h-3 rounded-full bg-[#EB001B]" />
+                <span className="w-3 h-3 rounded-full bg-[#F79E1B] -ml-1.5" />
+              </span>
+              <span className="px-3 py-1.5 bg-white rounded-lg border border-sm-lightgray text-xs font-bold text-[#006FCF]">AMEX</span>
+            </div>
+          </div>
         </form>
 
         {/* Récap panier */}

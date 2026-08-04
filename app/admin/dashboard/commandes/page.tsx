@@ -16,6 +16,7 @@ interface Order {
   status: "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
   date: string;
   shippingAddress: string;
+  deliveryAddress?: string;
   trackingNumber?: string;
   carrier?: string;
   notes?: string;
@@ -32,6 +33,7 @@ function fromDbRow(row: any): Order {
     status: row.status,
     date: row.created_at,
     shippingAddress: row.customer_address?.formatted || "",
+    deliveryAddress: row.shipping_address?.formatted || undefined,
     trackingNumber: row.tracking_number || undefined,
     carrier: row.carrier || undefined,
     notes: row.notes || undefined,
@@ -272,9 +274,17 @@ export default function AdminCommandesPage() {
                       {/* Shipping */}
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div>
-                          <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-1">Adresse de livraison</p>
+                          <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-1">
+                            {order.deliveryAddress ? "Adresse de facturation" : "Adresse de livraison"}
+                          </p>
                           <p className="text-sm text-sm-dark bg-sm-cream rounded-xl px-4 py-3">{order.shippingAddress}</p>
                         </div>
+                        {order.deliveryAddress && (
+                          <div>
+                            <p className="text-xs font-bold text-sm-coral uppercase tracking-wider mb-1">📦 Livrer plutôt à</p>
+                            <p className="text-sm text-sm-dark bg-sm-coral/10 border border-sm-coral/30 rounded-xl px-4 py-3 font-medium">{order.deliveryAddress}</p>
+                          </div>
+                        )}
                         <div>
                           <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-1">Contact</p>
                           <p className="text-sm text-sm-dark bg-sm-cream rounded-xl px-4 py-3">{order.customer}<br/>{order.email}</p>
