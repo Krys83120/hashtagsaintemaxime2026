@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Package, Truck, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Package, Truck, CheckCircle2, Clock, XCircle, ExternalLink } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatPrice } from "@/lib/utils";
+import { getCarrierTrackingUrl } from "@/lib/carrier-tracking";
 
 interface Props {
   params: { token: string };
@@ -86,7 +87,21 @@ export default async function SuiviCommandePage({ params }: Props) {
       {order.tracking_number && (
         <div className="bg-sm-cream rounded-2xl p-6 mb-8 text-center">
           <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-1">Numéro de suivi {order.carrier ? `(${order.carrier})` : ""}</p>
-          <p className="text-lg font-mono font-bold text-sm-dark">{order.tracking_number}</p>
+          <p className="text-lg font-mono font-bold text-sm-dark mb-4">{order.tracking_number}</p>
+          {(() => {
+            const trackingUrl = getCarrierTrackingUrl(order.carrier, order.tracking_number);
+            return trackingUrl ? (
+              <a
+                href={trackingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-sm-cyan text-white font-semibold px-6 py-3 rounded-full hover:bg-sm-deep transition-colors text-sm"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Suivre sur le site {order.carrier || "du transporteur"}
+              </a>
+            ) : null;
+          })()}
         </div>
       )}
 
