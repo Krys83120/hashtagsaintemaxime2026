@@ -57,6 +57,7 @@ export default function AdminCommandesPage() {
   const [viewingOrder, setViewingOrder] = useState<string | null>(null);
   const [trackingDrafts, setTrackingDrafts] = useState<Record<string, { number: string; carrier: string }>>({});
   const [sendingShipEmail, setSendingShipEmail] = useState<string | null>(null);
+  const [sendingReviewRequest, setSendingReviewRequest] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -120,6 +121,29 @@ export default function AdminCommandesPage() {
       return;
     }
     loadOrders();
+  };
+
+  const sendReviewRequest = async (order: Order) => {
+    setSendingReviewRequest(order.id);
+    setError("");
+
+    const res = await fetch("/api/admin/orders/send-review-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: order.id }),
+    });
+    const result = await res.json();
+    setSendingReviewRequest(null);
+
+    if (!res.ok) {
+      setError(result.error || "Erreur lors de l'envoi de la demande d'avis.");
+      return;
+    }
+    if (result.alreadyReviewed) {
+      alert("✅ Ce client a déjà évalué tous les articles de cette commande — rien à demander de plus !");
+      return;
+    }
+    alert(`✅ Demande d'avis envoyée pour ${result.itemsSent} article(s) sur ${result.totalItems}.`);
   };
 
   const deleteOrder = async (order: Order) => {
@@ -305,6 +329,19 @@ export default function AdminCommandesPage() {
                         </div>
                         <p className="text-xs text-sm-gray">
                           Enregistre le numéro, passe la commande en "Expédiée" et envoie un email au client avec un lien de suivi.
+                        </p>
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t border-sm-lightgray/50">
+                        <button
+                          onClick={() => sendReviewRequest(order)}
+                          disabled={sendingReviewRequest === order.id}
+                          className="flex items-center gap-2 bg-yellow-400 text-sm-dark font-semibold px-4 py-2 rounded-lg hover:bg-yellow-300 transition-colors text-sm disabled:opacity-60"
+                        >
+                          ⭐ {sendingReviewRequest === order.id ? "Envoi..." : "Demander un avis"}
+                        </button>
+                        <p className="text-xs text-sm-gray mt-1">
+                          Envoie un rappel amical pour évaluer les produits — n'envoie que pour les articles pas encore évalués par ce client (si son compte est connu).
                         </p>
                       </div>
 

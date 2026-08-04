@@ -44,6 +44,7 @@ export default function ReviewForm({ productId, onSubmitted }: ReviewFormProps) 
     const { error: insertError } = await supabase.from("reviews").insert({
       product_id: productId,
       author: user!.name,
+      user_id: user!.id,
       rating,
       text: text.trim(),
     });

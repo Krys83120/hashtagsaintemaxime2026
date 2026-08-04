@@ -34,11 +34,12 @@ export async function GET(request: Request) {
 
   for (const order of orders || []) {
     try {
-      const items = (order.items || []).map((i: any) => ({ name: i.name }));
+      const items = (order.items || []).map((i: any) => ({ name: i.name, slug: i.slug }));
       await sendReviewRequestEmail({
         to: order.customer_email,
         customerName: order.customer_name,
         orderNumber: order.order_number,
+        orderDate: new Date(order.created_at).toLocaleDateString("fr-FR"),
         items,
       });
       await admin.from("orders").update({ review_email_sent: true }).eq("id", order.id);

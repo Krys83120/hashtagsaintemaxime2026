@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       ...customer.address,
       formatted: [customer.address.line1, customer.address.postalCode, customer.address.city].filter(Boolean).join(", "),
     },
-    items: items.map((i) => ({ name: i.name, qty: i.quantity, price: i.price, color: i.color, size: i.size })),
+    items: items.map((i) => ({ productId: i.productId, slug: i.slug, name: i.name, qty: i.quantity, price: i.price, color: i.color, size: i.size })),
     total,
     promo_code: promoCode,
     discount_amount: discount,

@@ -239,6 +239,7 @@ export async function sendReviewRequestEmail(params: {
   to: string;
   customerName: string;
   orderNumber: string;
+  orderDate: string;
   items: { name: string; slug?: string }[];
 }) {
   const resend = getResend();
@@ -247,7 +248,7 @@ export async function sendReviewRequestEmail(params: {
     return { skipped: true };
   }
 
-  const { customerName, items } = params;
+  const { customerName, orderNumber, orderDate, items } = params;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://hashtagsaintemaxime.fr";
   const itemsHtml = items
     .map((i) => {
@@ -271,8 +272,11 @@ export async function sendReviewRequestEmail(params: {
           <tr>
             <td style="padding:36px 32px;text-align:center;">
               <h1 style="font-size:20px;color:#1E293B;margin:0 0 16px;">Alors, ça donne quoi ? ⭐</h1>
-              <p style="font-size:15px;line-height:1.6;color:#475569;margin:0 0 24px;">
+              <p style="font-size:15px;line-height:1.6;color:#475569;margin:0 0 8px;">
                 ${customerName}, ta commande devrait être arrivée depuis quelques jours. On adorerait savoir ce que tu en penses !
+              </p>
+              <p style="font-size:12px;color:#94A3B8;margin:0 0 24px;">
+                Commande ${orderNumber} du ${orderDate}
               </p>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="text-align:left;margin:0 0 24px;">
                 ${itemsHtml}
