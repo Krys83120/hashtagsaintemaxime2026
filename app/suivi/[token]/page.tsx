@@ -37,8 +37,10 @@ export default async function SuiviCommandePage({ params }: Props) {
     );
   }
 
-  const currentStepIndex = steps.findIndex((s) => s.key === order.status);
+  const effectiveStatus = order.status === "partially_shipped" ? "shipped" : order.status;
+  const currentStepIndex = steps.findIndex((s) => s.key === effectiveStatus);
   const isCancelled = order.status === "cancelled" || order.status === "refunded";
+  const isPartial = order.status === "partially_shipped";
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12 sm:py-16">
@@ -84,7 +86,48 @@ export default async function SuiviCommandePage({ params }: Props) {
         </div>
       )}
 
-      {order.tracking_number && (
+      {isPartial && order.shipments?.length > 0 && (() => {
+        const items: any[] = order.items || [];
+        const shipments: any[] = order.shipments || [];
+        const shippedIndexes = new Set(shipments.flatMap((s: any) => s.itemIndexes));
+        const pendingItems = items.filter((_, i) => !shippedIndexes.has(i));
+
+        return (
+          <div className="bg-white rounded-2xl border border-sm-lightgray p-6 mb-8">
+            <p className="font-bold text-sm-dark mb-4">📦 Ta commande part en plusieurs fois</p>
+            <div className="space-y-3 mb-4">
+              {shipments.map((s: any, si: number) => {
+                const shippedItems = s.itemIndexes.map((i: number) => items[i]).filter(Boolean);
+                const trackingUrl = getCarrierTrackingUrl(s.carrier, s.trackingNumber);
+                return (
+                  <div key={s.id} className="bg-green-50 rounded-xl p-4">
+                    <p className="text-xs font-bold text-green-700 uppercase mb-1">✅ Envoi {si + 1} — expédié le {new Date(s.shippedAt).toLocaleDateString("fr-FR")}</p>
+                    <ul className="text-sm text-sm-dark mb-2">
+                      {shippedItems.map((item: any, i: number) => <li key={i}>{item.name} × {item.qty}</li>)}
+                    </ul>
+                    <p className="text-xs text-sm-gray">{s.carrier} — <span className="font-mono">{s.trackingNumber}</span></p>
+                    {trackingUrl && (
+                      <a href={trackingUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-sm-cyan font-semibold hover:underline">
+                        Suivre ce colis →
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {pendingItems.length > 0 && (
+              <div className="bg-orange-50 rounded-xl p-4">
+                <p className="text-xs font-bold text-orange-700 uppercase mb-1">⏳ Encore en préparation</p>
+                <ul className="text-sm text-sm-dark">
+                  {pendingItems.map((item: any, i: number) => <li key={i}>{item.name} × {item.qty}</li>)}
+                </ul>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {order.tracking_number && !isPartial && (
         <div className="bg-sm-cream rounded-2xl p-6 mb-8 text-center">
           <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-1">Numéro de suivi {order.carrier ? `(${order.carrier})` : ""}</p>
           <p className="text-lg font-mono font-bold text-sm-dark mb-4">{order.tracking_number}</p>

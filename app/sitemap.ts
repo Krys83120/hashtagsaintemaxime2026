@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllProducts } from "@/lib/products";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://hashtagsaintemaxime.fr";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.hashtagsaintemaxime.fr";
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, lastModified: new Date(), changeFrequency: "daily", priority: 1 },

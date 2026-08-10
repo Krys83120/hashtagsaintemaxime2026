@@ -296,3 +296,98 @@ export async function sendReviewRequestEmail(params: {
     `,
   });
 }
+
+export async function sendPartialShipmentEmail(params: {
+  to: string;
+  customerName: string;
+  orderNumber: string;
+  shippedItems: { name: string; qty: number }[];
+  pendingItems: { name: string; qty: number }[];
+  trackingNumber: string;
+  carrier: string;
+  trackingUrl: string;
+  isFinalShipment: boolean;
+}) {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("RESEND_API_KEY non configurée, email d'expédition partielle non envoyé.");
+    return { skipped: true };
+  }
+
+  const { customerName, orderNumber, shippedItems, pendingItems, trackingNumber, carrier, trackingUrl, isFinalShipment } = params;
+
+  const shippedHtml = shippedItems
+    .map((i) => `<tr><td style="padding:4px 0;font-size:14px;color:#1E293B;">✅ ${i.name} × ${i.qty}</td></tr>`)
+    .join("");
+  const pendingHtml = pendingItems
+    .map((i) => `<tr><td style="padding:4px 0;font-size:14px;color:#64748B;">⏳ ${i.name} × ${i.qty}</td></tr>`)
+    .join("");
+
+  const title = isFinalShipment
+    ? "Le reste de ta commande est parti ! 🚚"
+    : "Une partie de ta commande est en route ! 🚚";
+  const intro = isFinalShipment
+    ? `${customerName}, la suite (et fin) de ta commande <strong>${orderNumber}</strong> vient d'être expédiée.`
+    : `${customerName}, ta commande <strong>${orderNumber}</strong> ne peut pas partir en une seule fois — voici ce qui part dès aujourd'hui, et ce qui suit très prochainement.`;
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: params.to,
+    subject: isFinalShipment
+      ? `Le reste de ta commande ${orderNumber} est expédié 🚚 — #SAINTEMAXIME®`
+      : `Ta commande ${orderNumber} part en 2 fois 📦 — #SAINTEMAXIME®`,
+    html: `
+      <div style="background-color:#f0fdff;padding:40px 20px;font-family:Helvetica,Arial,sans-serif;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+          <tr>
+            <td style="background:linear-gradient(135deg,#00D4E8,#FF6B8A);padding:32px 24px;text-align:center;">
+              <span style="font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">#SAINTEMAXIME</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:36px 32px;">
+              <h1 style="font-size:20px;color:#1E293B;margin:0 0 12px;text-align:center;">${title}</h1>
+              <p style="font-size:15px;line-height:1.6;color:#475569;margin:0 0 24px;text-align:center;">
+                ${intro}
+              </p>
+
+              <p style="font-size:12px;font-weight:700;color:#16A34A;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 6px;">Expédié aujourd'hui</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
+                ${shippedHtml}
+              </table>
+              <div style="background:#f0fdff;border-radius:12px;padding:14px;text-align:center;margin:0 0 24px;">
+                <p style="font-size:11px;color:#64748B;margin:0 0 2px;text-transform:uppercase;">Suivi (${carrier})</p>
+                <p style="font-size:15px;font-weight:700;color:#1E293B;margin:0;font-family:monospace;">${trackingNumber}</p>
+              </div>
+
+              ${!isFinalShipment ? `
+              <p style="font-size:12px;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 6px;">Encore en préparation — arrive bientôt</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+                ${pendingHtml}
+              </table>
+              <p style="font-size:13px;color:#94A3B8;margin:0 0 24px;text-align:center;">
+                Tu recevras un second email avec un nouveau numéro de suivi dès que le reste partira.
+              </p>
+              ` : ""}
+
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td style="border-radius:999px;background:#00D4E8;">
+                    <a href="${trackingUrl}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">
+                      Suivre ma commande
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px;background:#f8fafc;text-align:center;">
+              <p style="font-size:12px;color:#94A3B8;margin:0;">#SAINTEMAXIME® — Sainte-Maxime, France</p>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `,
+  });
+}

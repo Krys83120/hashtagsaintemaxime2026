@@ -35,11 +35,11 @@ export const metadata: Metadata = {
   authors: [{ name: "#SAINTEMAXIME" }],
   creator: "#SAINTEMAXIME",
   publisher: "#SAINTEMAXIME",
-  metadataBase: new URL("https://hashtagsaintemaxime.fr"),
+  metadataBase: new URL("https://www.hashtagsaintemaxime.fr"),
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://hashtagsaintemaxime.fr",
+    url: "https://www.hashtagsaintemaxime.fr",
     siteName: "#SAINTEMAXIME",
     title: "#SAINTEMAXIME | La Marque Officielle de Sainte-Maxime",
     description:
@@ -72,10 +72,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://hashtagsaintemaxime.fr",
-  },
-  verification: {
-    google: "VOTRE_CODE_VERIFICATION_GOOGLE", // À remplacer
+    canonical: "https://www.hashtagsaintemaxime.fr",
   },
 };
 
@@ -106,8 +103,8 @@ export default async function RootLayout({
               "@type": "Organization",
               name: "#SAINTEMAXIME",
               alternateName: "Hashtag Sainte Maxime",
-              url: "https://hashtagsaintemaxime.fr",
-              logo: "https://hashtagsaintemaxime.fr/logo-saintemaxime.png",
+              url: "https://www.hashtagsaintemaxime.fr",
+              logo: "https://www.hashtagsaintemaxime.fr/logo-saintemaxime.png",
               foundingDate: "2019",
               description:
                 "La marque officielle #SAINTEMAXIME propose des vêtements, accessoires et souvenirs uniques estampillés de la ville de Sainte-Maxime.",
@@ -130,13 +127,13 @@ export default async function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              url: "https://hashtagsaintemaxime.fr",
+              url: "https://www.hashtagsaintemaxime.fr",
               name: "#SAINTEMAXIME – Boutique Officielle",
               potentialAction: {
                 "@type": "SearchAction",
                 target: {
                   "@type": "EntryPoint",
-                  urlTemplate: "https://hashtagsaintemaxime.fr/boutique/?s={search_term_string}",
+                  urlTemplate: "https://www.hashtagsaintemaxime.fr/boutique/?s={search_term_string}",
                 },
                 "query-input": "required name=search_term_string",
               },

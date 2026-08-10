@@ -13,13 +13,14 @@ interface Order {
   email: string;
   items: { name: string; qty: number; price: number }[];
   total: number;
-  status: "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+  status: "pending" | "paid" | "processing" | "shipped" | "partially_shipped" | "delivered" | "cancelled" | "refunded";
   date: string;
   shippingAddress: string;
   deliveryAddress?: string;
   trackingNumber?: string;
   carrier?: string;
   notes?: string;
+  shipments: { id: string; itemIndexes: number[]; trackingNumber: string; carrier: string; shippedAt: string }[];
 }
 
 function fromDbRow(row: any): Order {
@@ -37,6 +38,7 @@ function fromDbRow(row: any): Order {
     trackingNumber: row.tracking_number || undefined,
     carrier: row.carrier || undefined,
     notes: row.notes || undefined,
+    shipments: row.shipments || [],
   };
 }
 
@@ -58,6 +60,9 @@ export default function AdminCommandesPage() {
   const [filterStatus, setFilterStatus] = useState("");
   const [viewingOrder, setViewingOrder] = useState<string | null>(null);
   const [trackingDrafts, setTrackingDrafts] = useState<Record<string, { number: string; carrier: string }>>({});
+  const [shipMode, setShipMode] = useState<Record<string, "full" | "partial">>({});
+  const [selectedItems, setSelectedItems] = useState<Record<string, number[]>>({});
+  const [sendingPartialShip, setSendingPartialShip] = useState<string | null>(null);
   const [sendingShipEmail, setSendingShipEmail] = useState<string | null>(null);
   const [sendingReviewRequest, setSendingReviewRequest] = useState<string | null>(null);
   const supabase = createClient();
@@ -122,6 +127,46 @@ export default function AdminCommandesPage() {
       setError(result.error || "Erreur lors de l'expédition.");
       return;
     }
+    loadOrders();
+  };
+
+  const alreadyShippedIndexes = (order: Order): Set<number> =>
+    new Set(order.shipments.flatMap((s) => s.itemIndexes));
+
+  const shipOrderItems = async (order: Order) => {
+    const draft = trackingDrafts[order.id] || { number: order.trackingNumber || "", carrier: order.carrier || "Colissimo" };
+    if (!draft.number.trim()) {
+      setError("Merci de renseigner un numéro de suivi.");
+      return;
+    }
+
+    const mode = shipMode[order.id] || "full";
+    const shippedAlready = alreadyShippedIndexes(order);
+    const remainingIndexes = order.items.map((_, i) => i).filter((i) => !shippedAlready.has(i));
+
+    const itemIndexes = mode === "full" ? remainingIndexes : (selectedItems[order.id] || []);
+
+    if (itemIndexes.length === 0) {
+      setError(mode === "partial" ? "Sélectionne au moins un article à expédier." : "Tous les articles ont déjà été expédiés.");
+      return;
+    }
+
+    setSendingPartialShip(order.id);
+    setError("");
+
+    const res = await fetch("/api/admin/orders/ship", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: order.id, itemIndexes, trackingNumber: draft.number.trim(), carrier: draft.carrier.trim() }),
+    });
+    const result = await res.json();
+    setSendingPartialShip(null);
+
+    if (!res.ok) {
+      setError(result.error || "Erreur lors de l'expédition.");
+      return;
+    }
+    setSelectedItems((prev) => ({ ...prev, [order.id]: [] }));
     loadOrders();
   };
 
@@ -293,50 +338,109 @@ export default function AdminCommandesPage() {
 
                       <div className="p-4 bg-sm-cream rounded-xl space-y-3">
                         <p className="text-xs font-bold text-sm-gray uppercase tracking-wider">Expédition & suivi</p>
-                        {order.trackingNumber && (
-                          <p className="text-sm text-sm-dark">
-                            Déjà renseigné : <span className="font-mono font-medium">{order.trackingNumber}</span>
-                            {order.carrier && ` (${order.carrier})`}
-                          </p>
+
+                        {order.shipments.length > 0 && (
+                          <div className="space-y-1.5">
+                            {order.shipments.map((s, i) => (
+                              <div key={s.id} className="text-xs bg-white rounded-lg px-3 py-2 border border-sm-lightgray">
+                                <span className="font-semibold text-sm-dark">Envoi {i + 1}</span> — {s.carrier} · <span className="font-mono">{s.trackingNumber}</span> · {s.itemIndexes.length} article(s) · {new Date(s.shippedAt).toLocaleDateString("fr-FR")}
+                              </div>
+                            ))}
+                          </div>
                         )}
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <input
-                            type="text"
-                            placeholder="Numéro de suivi"
-                            defaultValue={order.trackingNumber || ""}
-                            onChange={(e) =>
-                              setTrackingDrafts((prev) => ({
-                                ...prev,
-                                [order.id]: { number: e.target.value, carrier: prev[order.id]?.carrier ?? order.carrier ?? "Colissimo" },
-                              }))
-                            }
-                            className="flex-1 px-3 py-2 rounded-lg border border-sm-lightgray focus:border-sm-cyan outline-none text-sm"
-                          />
-                          <select
-                            defaultValue={order.carrier || "Colissimo"}
-                            onChange={(e) =>
-                              setTrackingDrafts((prev) => ({
-                                ...prev,
-                                [order.id]: { number: prev[order.id]?.number ?? order.trackingNumber ?? "", carrier: e.target.value },
-                              }))
-                            }
-                            className="px-3 py-2 rounded-lg border border-sm-lightgray focus:border-sm-cyan outline-none text-sm bg-white"
-                          >
-                            <option value="Colissimo">Colissimo</option>
-                            <option value="Chronopost">Chronopost</option>
-                            <option value="Mondial Relay">Mondial Relay</option>
-                            <option value="UPS">UPS</option>
-                            <option value="DHL">DHL</option>
-                          </select>
-                          <button
-                            onClick={() => markShippedWithTracking(order)}
-                            disabled={sendingShipEmail === order.id}
-                            className="flex items-center justify-center gap-2 bg-sm-cyan text-white font-semibold px-4 py-2 rounded-lg hover:bg-sm-deep transition-colors text-sm disabled:opacity-60 whitespace-nowrap"
-                          >
-                            <Send className="w-4 h-4" />
-                            {sendingShipEmail === order.id ? "Envoi..." : "Expédier + email"}
-                          </button>
-                        </div>
+
+                        {order.status !== "shipped" && order.status !== "delivered" && (
+                          <>
+                            <div className="flex gap-4">
+                              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                <input
+                                  type="radio"
+                                  checked={(shipMode[order.id] || "full") === "full"}
+                                  onChange={() => setShipMode((prev) => ({ ...prev, [order.id]: "full" }))}
+                                  className="accent-sm-cyan"
+                                />
+                                Commande totale
+                              </label>
+                              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                <input
+                                  type="radio"
+                                  checked={shipMode[order.id] === "partial"}
+                                  onChange={() => setShipMode((prev) => ({ ...prev, [order.id]: "partial" }))}
+                                  className="accent-sm-cyan"
+                                />
+                                Commande partielle
+                              </label>
+                            </div>
+
+                            {shipMode[order.id] === "partial" && (
+                              <div className="space-y-1.5 bg-white rounded-lg p-3 border border-sm-lightgray">
+                                <p className="text-xs text-sm-gray mb-1">Coche les articles disponibles à expédier maintenant :</p>
+                                {order.items.map((item, i) => {
+                                  const shippedAlready = alreadyShippedIndexes(order).has(i);
+                                  return (
+                                    <label key={i} className={`flex items-center gap-2 text-sm ${shippedAlready ? "opacity-40" : "cursor-pointer"}`}>
+                                      <input
+                                        type="checkbox"
+                                        disabled={shippedAlready}
+                                        checked={shippedAlready || (selectedItems[order.id] || []).includes(i)}
+                                        onChange={(e) => {
+                                          setSelectedItems((prev) => {
+                                            const current = prev[order.id] || [];
+                                            return {
+                                              ...prev,
+                                              [order.id]: e.target.checked ? [...current, i] : current.filter((x) => x !== i),
+                                            };
+                                          });
+                                        }}
+                                        className="accent-sm-cyan"
+                                      />
+                                      {item.name} × {item.qty} {shippedAlready && <span className="text-green-600 text-xs">(déjà expédié)</span>}
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <input
+                                type="text"
+                                placeholder="Numéro de suivi de cet envoi"
+                                defaultValue={order.trackingNumber || ""}
+                                onChange={(e) =>
+                                  setTrackingDrafts((prev) => ({
+                                    ...prev,
+                                    [order.id]: { number: e.target.value, carrier: prev[order.id]?.carrier ?? order.carrier ?? "Colissimo" },
+                                  }))
+                                }
+                                className="flex-1 px-3 py-2 rounded-lg border border-sm-lightgray focus:border-sm-cyan outline-none text-sm"
+                              />
+                              <select
+                                defaultValue={order.carrier || "Colissimo"}
+                                onChange={(e) =>
+                                  setTrackingDrafts((prev) => ({
+                                    ...prev,
+                                    [order.id]: { number: prev[order.id]?.number ?? order.trackingNumber ?? "", carrier: e.target.value },
+                                  }))
+                                }
+                                className="px-3 py-2 rounded-lg border border-sm-lightgray focus:border-sm-cyan outline-none text-sm bg-white"
+                              >
+                                <option value="Colissimo">Colissimo</option>
+                                <option value="Chronopost">Chronopost</option>
+                                <option value="Mondial Relay">Mondial Relay</option>
+                                <option value="UPS">UPS</option>
+                                <option value="DHL">DHL</option>
+                              </select>
+                              <button
+                                onClick={() => shipOrderItems(order)}
+                                disabled={sendingPartialShip === order.id}
+                                className="flex items-center justify-center gap-2 bg-sm-cyan text-white font-semibold px-4 py-2 rounded-lg hover:bg-sm-deep transition-colors text-sm disabled:opacity-60 whitespace-nowrap"
+                              >
+                                <Send className="w-4 h-4" />
+                                {sendingPartialShip === order.id ? "Envoi..." : "Expédier + email"}
+                              </button>
+                            </div>
+                          </>
+                        )}
                         <p className="text-xs text-sm-gray">
                           Enregistre le numéro, passe la commande en "Expédiée" et envoie un email au client avec un lien de suivi.
                         </p>
