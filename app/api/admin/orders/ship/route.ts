@@ -96,10 +96,11 @@ export async function POST(request: Request) {
       });
     } else {
       const shippedItems = newlyShippedIndexes.map((i: number) => ({ name: allItems[i].name, qty: allItems[i].qty }));
+      const stockIssueIndexes = new Set((order.stock_issues || []).map((si: any) => si.itemIndex));
       const pendingItems = allItems
         .map((item, idx) => ({ item, idx }))
         .filter(({ idx }) => !allShippedIndexes.has(idx))
-        .map(({ item }) => ({ name: item.name, qty: item.qty }));
+        .map(({ item, idx }) => ({ name: item.name, qty: item.qty, outOfStock: stockIssueIndexes.has(idx) }));
 
       await sendPartialShipmentEmail({
         to: order.customer_email,

@@ -302,7 +302,7 @@ export async function sendPartialShipmentEmail(params: {
   customerName: string;
   orderNumber: string;
   shippedItems: { name: string; qty: number }[];
-  pendingItems: { name: string; qty: number }[];
+  pendingItems: { name: string; qty: number; outOfStock?: boolean }[];
   trackingNumber: string;
   carrier: string;
   trackingUrl: string;
@@ -320,7 +320,11 @@ export async function sendPartialShipmentEmail(params: {
     .map((i) => `<tr><td style="padding:4px 0;font-size:14px;color:#1E293B;">✅ ${i.name} × ${i.qty}</td></tr>`)
     .join("");
   const pendingHtml = pendingItems
-    .map((i) => `<tr><td style="padding:4px 0;font-size:14px;color:#64748B;">⏳ ${i.name} × ${i.qty}</td></tr>`)
+    .map((i) =>
+      i.outOfStock
+        ? `<tr><td style="padding:4px 0;font-size:14px;color:#DC2626;">⚠️ ${i.name} × ${i.qty} — actuellement en rupture de stock, réapprovisionnement en cours</td></tr>`
+        : `<tr><td style="padding:4px 0;font-size:14px;color:#64748B;">⏳ ${i.name} × ${i.qty}</td></tr>`
+    )
     .join("");
 
   const title = isFinalShipment

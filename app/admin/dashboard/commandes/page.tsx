@@ -21,6 +21,7 @@ interface Order {
   carrier?: string;
   notes?: string;
   shipments: { id: string; itemIndexes: number[]; trackingNumber: string; carrier: string; shippedAt: string }[];
+  stockIssues: { itemIndex: number; note?: string }[];
 }
 
 function fromDbRow(row: any): Order {
@@ -39,6 +40,7 @@ function fromDbRow(row: any): Order {
     carrier: row.carrier || undefined,
     notes: row.notes || undefined,
     shipments: row.shipments || [],
+    stockIssues: row.stock_issues || [],
   };
 }
 
@@ -126,6 +128,23 @@ export default function AdminCommandesPage() {
 
     if (!res.ok) {
       setError(result.error || "Erreur lors de l'expédition.");
+      return;
+    }
+    loadOrders();
+  };
+
+  const toggleStockIssue = async (order: Order, itemIndex: number) => {
+    const isMarked = order.stockIssues.some((i) => i.itemIndex === itemIndex);
+    const action = isMarked ? "unmark" : "mark";
+
+    const res = await fetch("/api/admin/orders/stock-issue", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: order.id, itemIndex, action }),
+    });
+    if (!res.ok) {
+      const result = await res.json();
+      setError(result.error || "Erreur lors de la mise à jour.");
       return;
     }
     loadOrders();
@@ -304,12 +323,28 @@ export default function AdminCommandesPage() {
                       <div className="pt-4">
                         <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-2">Articles</p>
                         <div className="space-y-2">
-                          {order.items.map((item, i) => (
-                            <div key={i} className="flex justify-between items-center bg-sm-cream rounded-xl px-4 py-2">
-                              <span className="text-sm">{item.name} × {item.qty}</span>
-                              <span className="text-sm font-medium">{(item.qty * item.price).toFixed(2)}€</span>
-                            </div>
-                          ))}
+                          {order.items.map((item, i) => {
+                            const stockIssue = order.stockIssues.find((si) => si.itemIndex === i);
+                            return (
+                              <div key={i} className={`flex justify-between items-center rounded-xl px-4 py-2 ${stockIssue ? "bg-red-50 border border-red-200" : "bg-sm-cream"}`}>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm">{item.name} × {item.qty}</span>
+                                  {stockIssue && <span className="text-xs font-bold text-red-600">⚠️ Rupture de stock</span>}
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-sm font-medium">{(item.qty * item.price).toFixed(2)}€</span>
+                                  <button
+                                    onClick={() => toggleStockIssue(order, i)}
+                                    className={`text-xs font-semibold px-2 py-1 rounded-lg transition-colors ${
+                                      stockIssue ? "bg-red-100 text-red-700 hover:bg-red-200" : "text-sm-gray hover:bg-sm-lightgray"
+                                    }`}
+                                  >
+                                    {stockIssue ? "Annuler" : "⚠️ Rupture"}
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
                           <div className="flex justify-between items-center px-4 pt-2">
                             <span className="font-bold text-sm-dark">Total</span>
                             <span className="font-bold text-sm-cyan text-lg">{order.total.toFixed(2)}€</span>
@@ -378,6 +413,7 @@ export default function AdminCommandesPage() {
                                 <p className="text-xs text-sm-gray mb-1">Coche les articles disponibles à expédier maintenant :</p>
                                 {order.items.map((item, i) => {
                                   const shippedAlready = alreadyShippedIndexes(order).has(i);
+                                  const stockIssue = order.stockIssues.find((si) => si.itemIndex === i);
                                   return (
                                     <label key={i} className={`flex items-center gap-2 text-sm ${shippedAlready ? "opacity-40" : "cursor-pointer"}`}>
                                       <input
@@ -395,7 +431,9 @@ export default function AdminCommandesPage() {
                                         }}
                                         className="accent-sm-cyan"
                                       />
-                                      {item.name} × {item.qty} {shippedAlready && <span className="text-green-600 text-xs">(déjà expédié)</span>}
+                                      {item.name} × {item.qty}
+                                      {shippedAlready && <span className="text-green-600 text-xs">(déjà expédié)</span>}
+                                      {!shippedAlready && stockIssue && <span className="text-red-600 text-xs font-bold">⚠️ En rupture</span>}
                                     </label>
                                   );
                                 })}
@@ -470,7 +508,7 @@ export default function AdminCommandesPage() {
                       <div>
                         <p className="text-xs font-bold text-sm-gray uppercase tracking-wider mb-2">Changer le statut</p>
                         <div className="flex flex-wrap gap-2">
-                          {(["pending", "paid", "processing", "shipped", "delivered", "cancelled", "refunded"] as const).map((s) => (
+                          {(["pending", "paid", "processing", "shipped", "partially_shipped", "delivered", "cancelled", "refunded"] as const).map((s) => (
                             <button key={s} onClick={() => updateStatus(order.id, s)}
                               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                                 order.status === s
