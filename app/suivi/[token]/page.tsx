@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Package, Truck, CheckCircle2, Clock, XCircle, ExternalLink } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatPrice } from "@/lib/utils";
-import { getCarrierTrackingUrl } from "@/lib/carrier-tracking";
+import { getCarrierTrackingUrl, getParcelsAppTrackingUrl } from "@/lib/carrier-tracking";
 
 interface Props {
   params: { token: string };
@@ -106,11 +106,16 @@ export default async function SuiviCommandePage({ params }: Props) {
                       {shippedItems.map((item: any, i: number) => <li key={i}>{item.name} × {item.qty}</li>)}
                     </ul>
                     <p className="text-xs text-sm-gray">{s.carrier} — <span className="font-mono">{s.trackingNumber}</span></p>
-                    {trackingUrl && (
-                      <a href={trackingUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-sm-cyan font-semibold hover:underline">
-                        Suivre ce colis →
+                    <div className="flex gap-3 mt-1">
+                      {trackingUrl && (
+                        <a href={trackingUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-sm-cyan font-semibold hover:underline">
+                          Suivre ce colis →
+                        </a>
+                      )}
+                      <a href={getParcelsAppTrackingUrl(s.trackingNumber) || "#"} target="_blank" rel="noopener noreferrer" className="text-xs text-sm-gray hover:underline">
+                        Suivi universel (ParcelsApp) →
                       </a>
-                    )}
+                    </div>
                   </div>
                 );
               })}
@@ -145,6 +150,16 @@ export default async function SuiviCommandePage({ params }: Props) {
               </a>
             ) : null;
           })()}
+          <div className="mt-3">
+            <a
+              href={getParcelsAppTrackingUrl(order.tracking_number) || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-sm-gray hover:underline"
+            >
+              Ou suivi universel via ParcelsApp →
+            </a>
+          </div>
         </div>
       )}
 

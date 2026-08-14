@@ -13,6 +13,16 @@ export function getCarrierTrackingUrl(carrier: string | null | undefined, tracki
   if (c.includes("gls")) return `https://gls-group.eu/FR/fr/suivi-colis?match=${n}`;
   if (c.includes("la poste") || c.includes("laposte")) return `https://www.laposte.fr/outils/suivre-vos-envois?code=${n}`;
 
-  // Transporteur inconnu ou non renseigné précisément : recherche Google en secours
-  return `https://www.google.com/search?q=${encodeURIComponent(`suivi colis ${carrier || ""} ${trackingNumber}`)}`;
+  // Transporteur inconnu ou non renseigné précisément : ParcelsApp en secours (détecte le transporteur automatiquement)
+  return getParcelsAppTrackingUrl(trackingNumber);
+}
+
+/**
+ * Lien de suivi universel ParcelsApp.com : détecte automatiquement le transporteur
+ * à partir du numéro de suivi. Fonctionne pour (quasi) tous les transporteurs du monde,
+ * pratique en complément du lien direct du transporteur.
+ */
+export function getParcelsAppTrackingUrl(trackingNumber: string | null | undefined): string | null {
+  if (!trackingNumber) return null;
+  return `https://parcelsapp.com/fr/tracking?number=${encodeURIComponent(trackingNumber.trim())}`;
 }
