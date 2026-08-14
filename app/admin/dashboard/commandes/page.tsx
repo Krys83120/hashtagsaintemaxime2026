@@ -47,6 +47,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
   paid: { label: "Payée", color: "bg-blue-100 text-blue-700", icon: Package },
   processing: { label: "En préparation", color: "bg-blue-100 text-blue-700", icon: Package },
   shipped: { label: "Expédiée", color: "bg-purple-100 text-purple-700", icon: Truck },
+  partially_shipped: { label: "Partiellement expédiée", color: "bg-orange-100 text-orange-700", icon: Truck },
   delivered: { label: "Livrée", color: "bg-green-100 text-green-700", icon: CheckCircle },
   cancelled: { label: "Annulée", color: "bg-red-100 text-red-700", icon: XCircle },
   refunded: { label: "Remboursée", color: "bg-gray-100 text-gray-700", icon: XCircle },
@@ -226,8 +227,8 @@ export default function AdminCommandesPage() {
         </div>
 
         {/* Stats cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          {["pending", "processing", "shipped", "delivered", "cancelled"].map((s) => {
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+          {["pending", "processing", "shipped", "partially_shipped", "delivered", "cancelled"].map((s) => {
             const count = orders.filter((o) => o.status === s).length;
             const cfg = statusConfig[s];
             return (
